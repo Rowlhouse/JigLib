@@ -1,0 +1,445 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="collision_include">
+      <UniqueIdentifier>{71da76f5-f87a-4c57-9506-e08953e7b4a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collision_src">
+      <UniqueIdentifier>{83a4fd62-247d-4698-a30c-c592c20d3511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry_include">
+      <UniqueIdentifier>{27ea3cac-d49f-4e87-b64e-5d437bfe45f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry_include\primitives-inc">
+      <UniqueIdentifier>{e27690e8-6905-46ce-8c16-070441649ffb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry_src">
+      <UniqueIdentifier>{941ce532-c38d-41e8-bcde-feda875060f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry_src\primitives-src">
+      <UniqueIdentifier>{36a4b128-00dd-414d-9bb9-3a55a13519fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="maths_include">
+      <UniqueIdentifier>{ee0e7063-10e9-40a9-9b65-f99c9b5a5006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="maths_src">
+      <UniqueIdentifier>{016ff55a-34c1-42ec-ac1d-fdb8595f9cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="physics_include">
+      <UniqueIdentifier>{f6d056b7-17f7-446c-a22d-6424939d56fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="physics_src">
+      <UniqueIdentifier>{bb754cf5-57fb-4cf5-a119-dcb72cead3aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils_include">
+      <UniqueIdentifier>{ca9ce882-1da0-4b95-b156-0f6728a24c41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils_src">
+      <UniqueIdentifier>{e7c759bb-90cd-42b3-af12-d4f8a90364d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vehicles_include">
+      <UniqueIdentifier>{4facfead-da3f-46ff-b6a3-dafa3ef42e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vehicles_src">
+      <UniqueIdentifier>{03a11ca8-128f-46ba-b5c7-59a308da9327}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="collision\include\colldetectboxbox.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectboxheightmap.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectboxplane.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectboxstaticmesh.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectcapsulebox.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectcapsulecapsule.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectcapsuleheightmap.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectcapsuleplane.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectcapsulestaticmesh.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectspherebox.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectspherecapsule.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectsphereheightmap.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectsphereplane.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectspheresphere.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\colldetectspherestaticmesh.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collision.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collisioninfo.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collisionskin.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collisionsystem.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collisionsystembrute.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\collisionsystemgrid.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\include\materials.hpp">
+      <Filter>collision_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\distance.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\geometry.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\indexedtriangle.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\intersection.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\line.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\octree.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\overlap.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\rectangle.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\triangle.hpp">
+      <Filter>geometry_include</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\aabox.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\box.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\capsule.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\heightmap.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\plane.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\primitive.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\sphere.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="geometry\include\trianglemesh.hpp">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\criticaldamping.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\maths.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\mathsmisc.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\matrix33.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\precision.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\transform3.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\vector2.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="maths\include\vector3.hpp">
+      <Filter>maths_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\body.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\constraint.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\constraintmaxdistance.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\constraintpoint.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\constraintvelocity.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\constraintworldpoint.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\hingejoint.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\joint.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\physics.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\physicscontroller.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\include\physicssystem.hpp">
+      <Filter>physics_include</Filter>
+    </ClInclude>
+    <ClInclude Include="physics\src\physicscollision.hpp">
+      <Filter>physics_src</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\array2d.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\assert.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\configfile.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\fixedvector.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\time.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\timer.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\trace.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\include\utils.hpp">
+      <Filter>utils_include</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\include\car.hpp">
+      <Filter>vehicles_include</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\include\chassis.hpp">
+      <Filter>vehicles_include</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\include\vehicles.hpp">
+      <Filter>vehicles_include</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicles\include\wheel.hpp">
+      <Filter>vehicles_include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\jiglib.hpp" />
+    <ClInclude Include="include\jiglibconfig.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="collision\src\colldetectboxbox.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectboxheightmap.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectboxplane.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectboxstaticmesh.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectcapsulebox.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectcapsulecapsule.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectcapsuleheightmap.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectcapsuleplane.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectcapsulestaticmesh.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectspherebox.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectspherecapsule.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectsphereheightmap.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectsphereplane.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectspheresphere.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\colldetectspherestaticmesh.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\collisioninfo.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\collisionskin.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\collisionsystem.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\collisionsystembrute.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\collisionsystemgrid.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="collision\src\materials.cpp">
+      <Filter>collision_src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\distance.cpp">
+      <Filter>geometry_src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\indexedtriangle.cpp">
+      <Filter>geometry_src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\intersection.cpp">
+      <Filter>geometry_src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\octree.cpp">
+      <Filter>geometry_src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\aabox.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\box.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\capsule.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\heightmap.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\plane.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\primitive.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\sphere.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry\src\trianglemesh.cpp">
+      <Filter>geometry_src\primitives-src</Filter>
+    </ClCompile>
+    <ClCompile Include="maths\src\matrix33.cpp">
+      <Filter>maths_src</Filter>
+    </ClCompile>
+    <ClCompile Include="maths\src\vector3.cpp">
+      <Filter>maths_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\body.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\constraint.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\constraintmaxdistance.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\constraintpoint.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\constraintvelocity.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\constraintworldpoint.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\hingejoint.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\physicscontroller.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="physics\src\physicssystem.cpp">
+      <Filter>physics_src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\assert.cpp">
+      <Filter>utils_src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\configfile.cpp">
+      <Filter>utils_src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\timer.cpp">
+      <Filter>utils_src</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\src\trace.cpp">
+      <Filter>utils_src</Filter>
+    </ClCompile>
+    <ClCompile Include="vehicles\src\car.cpp">
+      <Filter>vehicles_src</Filter>
+    </ClCompile>
+    <ClCompile Include="vehicles\src\chassis.cpp">
+      <Filter>vehicles_src</Filter>
+    </ClCompile>
+    <ClCompile Include="vehicles\src\wheel.cpp">
+      <Filter>vehicles_src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="geometry\include\distance.inl">
+      <Filter>geometry_include</Filter>
+    </None>
+    <None Include="geometry\include\intersection.inl">
+      <Filter>geometry_include</Filter>
+    </None>
+    <None Include="geometry\include\overlap.inl">
+      <Filter>geometry_include</Filter>
+    </None>
+    <None Include="geometry\include\plane.inl">
+      <Filter>geometry_include</Filter>
+    </None>
+    <None Include="geometry\include\aabox.inl">
+      <Filter>geometry_include\primitives-inc</Filter>
+    </None>
+    <None Include="maths\include\matrix33.inl">
+      <Filter>maths_include</Filter>
+    </None>
+    <None Include="maths\include\vector3.inl">
+      <Filter>maths_include</Filter>
+    </None>
+    <None Include="physics\include\body.inl">
+      <Filter>physics_include</Filter>
+    </None>
+  </ItemGroup>
+</Project>

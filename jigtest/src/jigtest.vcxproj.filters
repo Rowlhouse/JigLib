@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="framework">
+      <UniqueIdentifier>{afb9e31c-3168-4a78-a019-995b00093948}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="application">
+      <UniqueIdentifier>{309bd371-8677-4486-a170-58f4c4471db5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="framework\camera.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\imageloader.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\rendermanager.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\renderobject.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\sdlapplicationbase.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\skybox.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\texture.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\viewport.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="application\appconfig.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\boxchain.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\boxobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\boxsphereobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\capsuleobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\carai.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\carobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\characterobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\contactrender.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\debugconfig.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\heightmapobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\jigtestapp.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\main.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\meshobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\newton.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\object.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\planeobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\ragdoll.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\spherechain.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="application\sphereobject.cpp">
+      <Filter>application</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework\camera.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\graphics.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\imageloader.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\rendermanager.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\renderobject.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\sdlapplicationbase.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\skybox.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\texture.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\viewport.hpp">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="application\appconfig.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\boxchain.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\boxobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\boxsphereobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\capsuleobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\carai.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\carobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\characterobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\contactrender.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\debugconfig.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\heightmapobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\jigtestapp.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\meshobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\newton.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\object.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\planeobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\ragdoll.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\spherechain.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="application\sphereobject.hpp">
+      <Filter>application</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\jigtest.cfg" />
+    <None Include="..\jigtest1.cfg" />
+    <None Include="..\jigtest2.cfg" />
+    <None Include="..\jigtest_castle.cfg" />
+    <None Include="..\jigtest_newton.cfg" />
+    <None Include="..\jigtest_stress.cfg" />
+    <None Include="..\program.log" />
+    <None Include="..\readme.txt" />
+    <None Include="..\..\todo.txt" />
+  </ItemGroup>
+</Project>
