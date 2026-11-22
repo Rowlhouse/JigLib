@@ -18,7 +18,7 @@ tPrimitive* tPlane::Clone() const
 bool tPlane::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, const class tSegment &seg) const
 {
   bool result;
-  if (result = SegmentPlaneIntersection(&frac, seg, *this))
+  if ((result = SegmentPlaneIntersection(&frac, seg, *this)))
   {
     pos = seg.GetPoint(frac);
     normal = GetN();

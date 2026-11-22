@@ -21,7 +21,7 @@ tPrimitive* tCapsule::Clone() const
 bool tCapsule::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, const class tSegment &seg) const
 {
   bool result;
-  if (result = SegmentCapsuleIntersection(&frac, seg, *this))
+  if ((result = SegmentCapsuleIntersection(&frac, seg, *this)))
   {
     pos = seg.GetPoint(frac);
     normal = pos - mTransform.position;

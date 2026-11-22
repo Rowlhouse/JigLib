@@ -23,7 +23,7 @@ tPrimitive* tSphere::Clone() const
 bool tSphere::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, const class tSegment &seg) const
 {
   bool result;
-  if (result = SegmentSphereIntersection(&frac, seg, *this))
+  if ((result = SegmentSphereIntersection(&frac, seg, *this)))
   {
     pos = seg.GetPoint(frac);
     normal = pos - mPos;

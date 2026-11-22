@@ -6,6 +6,7 @@ project(JigLib
   LANGUAGES CXX)
 
 option(JIGLIB_USE_DOUBLE "Use double precision for tScalar" OFF)
+option(JIGLIB_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (used by CI)" OFF)
 
 # Default to a Release build for single-config generators
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -103,8 +104,14 @@ if(MSVC)
   # C4267: size_t to unsigned conversions. Container sizes are stored as unsigned throughout, and
   # never get anywhere near 2^32.
   target_compile_options(jiglib PRIVATE /W3 /wd4267 /permissive-)
+  if(JIGLIB_WARNINGS_AS_ERRORS)
+    target_compile_options(jiglib PRIVATE /WX)
+  endif()
 else()
   target_compile_options(jiglib PRIVATE -Wall)
+  if(JIGLIB_WARNINGS_AS_ERRORS)
+    target_compile_options(jiglib PRIVATE -Werror)
+  endif()
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${JIGLIB_SOURCES} ${JIGLIB_HEADERS})

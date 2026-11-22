@@ -42,7 +42,7 @@ jobs:
         run: brew list ninja || brew install ninja
 
       - name: Configure
-        run: cmake --preset default ${{ matrix.cmake_args }}
+        run: cmake --preset default -DJIGLIB_WARNINGS_AS_ERRORS=ON ${{ matrix.cmake_args }}
 
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }}

@@ -24,7 +24,7 @@ tPhysicsSystem * tPhysicsSystem::mCurrentPhysicsSystem = 0;
 
 // Limit the extra velocity during collision/penetration calculations
 static const tScalar maxVelMag = 0.5f;
-static const tScalar maxShockVelMag = 0.05f;
+[[maybe_unused]] static const tScalar maxShockVelMag = 0.05f;
 static const tScalar minVelForProcessing = 0.001f;
 static const tScalar penetrationShockRelaxationTimesteps = 10;
 
@@ -696,13 +696,13 @@ bool tPhysicsSystem::ProcessCollisionAccumulated(tCollisionInfo * collision,
         gotOne = true;
 #ifdef _DEBUG
         {
-          tScalar checkNormalVel;
+          [[maybe_unused]] tScalar checkNormalVel;
           if (body1)
             checkNormalVel = Dot(body0->GetVelocity(ptInfo.mR0) - body1->GetVelocity(ptInfo.mR1),
                                  collision->mDirToBody0);
           else
             checkNormalVel =  Dot(body0->GetVelocity(ptInfo.mR0), collision->mDirToBody0);
-          int junk = 0;
+          [[maybe_unused]] int junk = 0;
         }
 #endif
       }
@@ -1131,7 +1131,7 @@ bool tPhysicsSystem::ProcessCollisionForShock(tCollisionInfo * collision,
   const tScalar timescale = penetrationShockRelaxationTimesteps * dt;
   for (iPos = 0 ; iPos < collision->mPointInfo.Size() ; ++iPos)
   {
-    tCollPointInfo& ptInfo = collision->mPointInfo[iPos];
+    [[maybe_unused]] tCollPointInfo& ptInfo = collision->mPointInfo[iPos];
 //    ptInfo.mAccumulatedNormalImpulseAux = 0.0f;
   }
 
@@ -1177,12 +1177,12 @@ bool tPhysicsSystem::ProcessCollisionForShock(tCollisionInfo * collision,
 
 #ifdef _DEBUG
       {
-        tScalar normalVelAfter = 0.0f;
+        [[maybe_unused]] tScalar normalVelAfter = 0.0f;
         if (body0)
           normalVelAfter =  Dot(body0->GetVelocity(ptInfo.mR0), N) + Dot(body0->GetVelocityAux(ptInfo.mR0), N);
         if (body1)
           normalVelAfter -= Dot(body1->GetVelocity(ptInfo.mR1), N) + Dot(body1->GetVelocityAux(ptInfo.mR1), N);
-        int junk = 0;
+        [[maybe_unused]] int junk = 0;
       }
 
 #endif

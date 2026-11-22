@@ -114,8 +114,8 @@ bool tConstraintPoint::Apply(tScalar dt)
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
   SetSatisfied();
 
-  bool body0FrozenPre = !mBody0->IsActive();
-  bool body1FrozenPre = !mBody1->IsActive();
+  [[maybe_unused]] bool body0FrozenPre = !mBody0->IsActive();
+  [[maybe_unused]] bool body1FrozenPre = !mBody1->IsActive();
 //  if (body0FrozenPre && body1FrozenPre)
 //    return false;
 
