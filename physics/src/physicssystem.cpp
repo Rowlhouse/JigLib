@@ -15,6 +15,7 @@
 #include "trace.hpp"
 
 #include <algorithm>
+#include <random>
 
 using namespace JigLib;
 using namespace std;
@@ -1375,8 +1376,9 @@ void tPhysicsSystem::DetectAllCollisions(tScalar dt)
 
   // There's a bug in MSV6.0 std::sort - accesses index -1 !!!!
   // stable_sort seems to work. However, best results with jenga
-  // stacks come from random.
-  std::random_shuffle(mCollisions.begin(), mCollisions.end());
+  // stacks come from random. The generator has a fixed seed, so runs are repeatable.
+  static std::minstd_rand shuffleRng;
+  std::shuffle(mCollisions.begin(), mCollisions.end(), shuffleRng);
 //  std::stable_sort(mCollisions.begin(), mCollisions.end(), MoreCollisionHeight);
 //  std::stable_sort(mCollisions.begin(), mCollisions.end(), MoreCollisionDepth);
 

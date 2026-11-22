@@ -16,7 +16,7 @@ public:
   ~tOctree();
 
   // Gets the number of triangles
-  unsigned GetNumTriangles() const {return mTriangles.size();}
+  unsigned GetNumTriangles() const {return (unsigned) mTriangles.size();}
 
   // Get a triangle
   const tIndexedTriangle & GetTriangle(unsigned iTriangle) const {

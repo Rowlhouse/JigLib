@@ -5,6 +5,8 @@
 #include "collisioninfo.hpp"
 #include "collisionsystem.hpp"
 
+#include <cstdint>
+
 
 using namespace std;
 using namespace JigLib;
@@ -56,7 +58,7 @@ void tCollisionInfo::Init(const tCollDetectInfo &info,
 void tCollisionInfo::Destroy()
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
-  mSkinInfo.skin0 = (tCollisionSkin *) 0xDEADBEAF;
+  mSkinInfo.skin0 = (tCollisionSkin *) (uintptr_t) 0xDEADBEAF;
   mSkinInfo.skin1 = mSkinInfo.skin0;
 }
 

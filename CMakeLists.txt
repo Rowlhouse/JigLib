@@ -100,7 +100,9 @@ target_compile_definitions(jiglib PUBLIC
 
 if(MSVC)
   target_compile_definitions(jiglib PRIVATE _CRT_SECURE_NO_WARNINGS)
-  target_compile_options(jiglib PRIVATE /W3)
+  # C4267: size_t to unsigned conversions. Container sizes are stored as unsigned throughout, and
+  # never get anywhere near 2^32.
+  target_compile_options(jiglib PRIVATE /W3 /wd4267)
 else()
   target_compile_options(jiglib PRIVATE -Wall)
 endif()

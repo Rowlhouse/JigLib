@@ -45,7 +45,7 @@ public:
   void RemoveAllPrimitives();
 
   // Returns the number of registered primitives
-  unsigned GetNumPrimitives() const {return mPrimitivesLocal.size();}
+  unsigned GetNumPrimitives() const {return (unsigned) mPrimitivesLocal.size();}
 
   // Gets the primitive in local space
   const tPrimitive *GetPrimitiveLocal(unsigned iPrim) const {return mPrimitivesLocal[iPrim];}
