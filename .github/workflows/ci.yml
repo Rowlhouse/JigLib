@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }} (${{ matrix.preset }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [Windows MSVC, Linux GCC, Linux Clang, macOS Clang]
+        preset: [debug, release]
+        include:
+          - name: Windows MSVC
+            os: windows-latest
+          - name: Linux GCC
+            os: ubuntu-latest
+            cmake_args: -DCMAKE_CXX_COMPILER=g++
+          - name: Linux Clang
+            os: ubuntu-latest
+            cmake_args: -DCMAKE_CXX_COMPILER=clang++
+          - name: macOS Clang
+            os: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew list ninja || brew install ninja
+
+      - name: Configure
+        run: cmake --preset default ${{ matrix.cmake_args }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }}
