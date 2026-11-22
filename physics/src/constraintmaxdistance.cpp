@@ -1,25 +1,20 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file constraintmaxdistance.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "constraintmaxdistance.hpp"
 #include "body.hpp"
 
 using namespace JigLib;
 using namespace std;
 
-// maximum relative velocity induced at the constraint points - proportional
-// to the error
+// Maximum relative velocity induced at the constraint points - proportional to the error
 static const tScalar maxVelMag = 20.0f;
 static const tScalar minVelForProcessing = 0.01f;
 
-//==============================================================
+//======================================================================================================================
 // tConstraintMaxDistance
-//==============================================================
+//======================================================================================================================
 tConstraintMaxDistance::tConstraintMaxDistance(
   tBody * body0, const tVector3 & body0Pos,
   tBody * body1, const tVector3 & body1Pos,
@@ -30,9 +25,9 @@ tConstraintMaxDistance::tConstraintMaxDistance(
   Initialise(body0, body0Pos, body1, body1Pos, maxDistance);
 }
 
-//==============================================================
+//======================================================================================================================
 // tConstraintMaxDistance
-//==============================================================
+//======================================================================================================================
 tConstraintMaxDistance::tConstraintMaxDistance()
   :
   mBody0(0),
@@ -41,9 +36,9 @@ tConstraintMaxDistance::tConstraintMaxDistance()
   TRACE_METHOD_ONLY(ONCE_2);
 }
 
-//==============================================================
+//======================================================================================================================
 // tConstraintMaxDistance
-//==============================================================
+//======================================================================================================================
 tConstraintMaxDistance::~tConstraintMaxDistance()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -52,9 +47,9 @@ tConstraintMaxDistance::~tConstraintMaxDistance()
   Destroy();
 }
 
-//==============================================================
+//======================================================================================================================
 // Destroy
-//==============================================================
+//======================================================================================================================
 void tConstraintMaxDistance::Destroy()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -62,9 +57,9 @@ void tConstraintMaxDistance::Destroy()
   DisableConstraint();
 }
 
-//==============================================================
+//======================================================================================================================
 // initialise
-//==============================================================
+//======================================================================================================================
 void tConstraintMaxDistance::Initialise(
   tBody * body0, const tVector3 & body0Pos,
   tBody * body1, const tVector3 & body1Pos,
@@ -80,14 +75,14 @@ void tConstraintMaxDistance::Initialise(
   if (mBody1) mBody1->AddConstraint(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // preApply
-//==============================================================
+//======================================================================================================================
 void tConstraintMaxDistance::PreApply(tScalar dt)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
   SetUnsatisfied();
-  
+
   MultMatrix33(mR0, mBody0->GetOrientation(), mBody0Pos);
   MultMatrix33(mR1, mBody1->GetOrientation(), mBody1Pos);
 
@@ -95,13 +90,13 @@ void tConstraintMaxDistance::PreApply(tScalar dt)
   const tVector3 worldPos1(mBody1->GetPosition() + mR1);
   mWorldPos = 0.5f * (worldPos0 + worldPos1);
 
-  // current location of point 0 relative to point 1
+  // Current location of point 0 relative to point 1
   SubVector3(mCurrentRelPos0, worldPos0, worldPos1);
 }
 
-//==============================================================
+//======================================================================================================================
 // apply
-//==============================================================
+//======================================================================================================================
 bool tConstraintMaxDistance::Apply(tScalar dt)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
@@ -117,10 +112,10 @@ bool tConstraintMaxDistance::Apply(tScalar dt)
   const tVector3 currentVel1(
     mBody1->GetVelocity() + Cross(mBody1->GetAngVel(), mR1));
 
-  // predict a new location
+  // Predict a new location
   tVector3 predRelPos0(mCurrentRelPos0 + (currentVel0 - currentVel1) * dt);
 
-  // if the new position is out of range then clamp it
+  // If the new position is out of range then clamp it
   tVector3 clampedRelPos0 = predRelPos0;
   tScalar clampedRelPos0Mag = clampedRelPos0.GetLength();
   if (clampedRelPos0Mag <= SCALAR_TINY)
@@ -128,8 +123,7 @@ bool tConstraintMaxDistance::Apply(tScalar dt)
   if (clampedRelPos0Mag > mMaxDistance)
     clampedRelPos0 *= mMaxDistance / clampedRelPos0Mag;
 
-  // now claculate desired vel based on the current pos, new/clamped
-  // pos and dt
+  // Now calculate desired vel based on the current pos, new/clamped pos and dt
   tVector3 desiredRelVel0((clampedRelPos0 - mCurrentRelPos0) / Max(dt, SCALAR_TINY));
 
   // Vr is -ve the total velocity change
@@ -137,7 +131,7 @@ bool tConstraintMaxDistance::Apply(tScalar dt)
 
   tScalar normalVel = Vr.GetLength();
 
-  // limit it
+  // Limit it
   if (normalVel > maxVelMag)
   {
     Vr *= (maxVelMag / normalVel);
@@ -150,8 +144,8 @@ bool tConstraintMaxDistance::Apply(tScalar dt)
 
   const tVector3 N = Vr / normalVel;
 
-  tScalar denominator = mBody0->GetInvMass() + mBody1->GetInvMass() + 
-    Dot(N, Cross(mBody0->GetWorldInvInertia() * (Cross(mR0, N)), mR0)) + 
+  tScalar denominator = mBody0->GetInvMass() + mBody1->GetInvMass() +
+    Dot(N, Cross(mBody0->GetWorldInvInertia() * (Cross(mR0, N)), mR0)) +
     Dot(N, Cross(mBody1->GetWorldInvInertia() * (Cross(mR1, N)), mR1));
 
   if (denominator < SCALAR_TINY)

@@ -1,27 +1,23 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file characterobject.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "characterobject.hpp"
 #include "debugconfig.hpp"
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // SetProperties
-//==============================================================
+//======================================================================================================================
 void tCharacterObject::SetProperties(tScalar elasticity, tScalar staticFriction, tScalar dynamicFriction)
 {
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(elasticity, staticFriction, dynamicFriction));
 }
 
-//==============================================================
+//======================================================================================================================
 // tCharacterObject
-//==============================================================
+//======================================================================================================================
 tCharacterObject::tCharacterObject(tScalar radius, tScalar length)
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -31,10 +27,10 @@ tCharacterObject::tCharacterObject(tScalar radius, tScalar length)
   mCollisionSkin.AddPrimitive(capsule, tMaterialTable::UNSET);
   mCollisionSkin.SetOwner(&mBody);
   SetProperties(0.0f, 2.0f, 2.0f);
-  
+
   mBody.SetCollisionSkin(&mCollisionSkin);
   SetDensity(600.0f);
-  
+
   mBodyAngle = 0.0f;
   mLookUpAngle = 0.0f;
 
@@ -57,25 +53,25 @@ tCharacterObject::tCharacterObject(tScalar radius, tScalar length)
   mDisplayListNum = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tCharacterObject
-//==============================================================
+//======================================================================================================================
 tCharacterObject::~tCharacterObject()
 {
   TRACE_METHOD_ONLY(ONCE_2);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetDensity
-//==============================================================
+//======================================================================================================================
 void tCharacterObject::SetDensity(tScalar density, tPrimitive::tPrimitiveProperties::tMassDistribution massType)
 {
   SetMass(density * mCollisionSkin.GetVolume(), massType);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetMass
-//==============================================================
+//======================================================================================================================
 void tCharacterObject::SetMass(tScalar mass, tPrimitive::tPrimitiveProperties::tMassDistribution massType)
 {
   mBody.SetMass(mass);
@@ -83,9 +79,9 @@ void tCharacterObject::SetMass(tScalar mass, tPrimitive::tPrimitiveProperties::t
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetRenderPosition
-//==============================================================
+//======================================================================================================================
 void tCharacterObject::SetRenderPosition(tScalar renderFraction)
 {
   TRACE_METHOD_ONLY(FRAME_2);
@@ -101,25 +97,24 @@ void tCharacterObject::SetRenderPosition(tScalar renderFraction)
   }
   else
   {
-    mRenderPosition = 
-      mBody.GetPosition() * renderFraction + 
+    mRenderPosition =
+      mBody.GetPosition() * renderFraction +
       mBody.GetOldPosition() * (1.0f - renderFraction);
-    // should really use quaternions and SLERP... but maybe if the
-    // object is spinning so fast then it doesn't matter if it renders
-    // a bit wrong...
-    mRenderOrientation = 
-      mBody.GetOrientation() * renderFraction + 
+    // Should really use quaternions and SLERP... But maybe if the object is spinning so fast then
+    // it doesn't matter if it renders a bit wrong...
+    mRenderOrientation =
+      mBody.GetOrientation() * renderFraction +
       mBody.GetOldOrientation() * (1.0f - renderFraction);
 //    mRenderOrientation.Orthonormalise();
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingCharacter
-//==============================================================
+//======================================================================================================================
 const tSphere & tCharacterObject::GetRenderBoundingSphere() const
 {
-  // fudge this a little...
+  // Fudge this a little...
   const tCapsule & capsule = mCollisionSkin.GetPrimitiveLocal(0)->GetCapsule();
   static tSphere sphere;
   sphere.SetPos(capsule.GetPos() + 0.5f * capsule.GetLength() * capsule.GetOrient().GetLook());
@@ -127,59 +122,59 @@ const tSphere & tCharacterObject::GetRenderBoundingSphere() const
   return sphere;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tCharacterObject::GetRenderPosition() const
 {
   return mRenderPosition;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tCharacterObject::GetRenderOrientation() const
 {
   return mRenderOrientation;
 }
 
-//==============================================================
+//======================================================================================================================
 // Render
-//==============================================================
+//======================================================================================================================
 void tCharacterObject::Render(tRenderObject::tRenderType renderType)
 {
   TRACE_METHOD_ONLY(FRAME_2);
   const tCapsule & capsule = mCollisionSkin.GetPrimitiveLocal(0)->GetCapsule();
-  
+
   if (mDisplayListNum == 0)
   {
     mDisplayListNum = glGenLists(1);
     glNewList(mDisplayListNum, GL_COMPILE);
-    GLCOLOR4(RangedRandom(0.2f, 1.0f), 
+    GLCOLOR4(RangedRandom(0.2f, 1.0f),
              RangedRandom(0.2f, 1.0f),
-             RangedRandom(0.2f, 1.0f), 
+             RangedRandom(0.2f, 1.0f),
              0.5f);
 
     unsigned num = 12;
 
     GLTRANSLATE(0.0f, 0.0f, capsule.GetRadius());
-    gluSphere(GetGLUQuadric(), 
-              capsule.GetRadius(), 
+    gluSphere(GetGLUQuadric(),
+              capsule.GetRadius(),
               num, num);
 
     gluCylinder(GetGLUQuadric(), capsule.GetRadius(), capsule.GetRadius(), capsule.GetLength(), num, num);
 
     GLTRANSLATE(0.0f, 0.0f, capsule.GetLength());
-    gluSphere(GetGLUQuadric(), 
-              capsule.GetRadius(), 
+    gluSphere(GetGLUQuadric(),
+              capsule.GetRadius(),
               num, num);
 
     glEndList();
   }
-  
+
   if (tDebugConfig::mRenderCollisionBoundingBoxes)
     RenderWorldBoundingBox();
-  
+
   ApplyTransformation(mRenderPosition, mRenderOrientation);
   bool translucent = !mBody.IsActive();
   if (translucent && tDebugConfig::mIndicateFrozenObjects)
@@ -187,53 +182,53 @@ void tCharacterObject::Render(tRenderObject::tRenderType renderType)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
-  
+
   glCallList(mDisplayListNum);
-  
+
   if (translucent && tDebugConfig::mIndicateFrozenObjects)
     glDisable(GL_BLEND);
 }
 
-//====================================================================
+//======================================================================================================================
 // ControlFwd
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::ControlFwd(bool start) {
   if (start) mMoveDir |= MOVE_FWD; else mMoveDir &= ~MOVE_FWD;
   UpdateControl();
 }
-//====================================================================
+//======================================================================================================================
 // ControlBack
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::ControlBack(bool start) {
   if (start) mMoveDir |= MOVE_BACK; else mMoveDir &= ~MOVE_BACK;
   UpdateControl();
 }
-//====================================================================
+//======================================================================================================================
 // ControlLeft
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::ControlLeft(bool start) {
   if (start) mMoveDir |= MOVE_LEFT; else mMoveDir &= ~MOVE_LEFT;
   UpdateControl();
 }
-//====================================================================
+//======================================================================================================================
 // ControlRight
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::ControlRight(bool start) {
   if (start) mMoveDir |= MOVE_RIGHT; else mMoveDir &= ~MOVE_RIGHT;
   UpdateControl();
 }
-//====================================================================
+//======================================================================================================================
 // ControlJump
-//====================================================================
-void tCharacterObject::ControlJump() 
+//======================================================================================================================
+void tCharacterObject::ControlJump()
 {
   mDoJump = true;
   UpdateControl();
 }
 
-//====================================================================
+//======================================================================================================================
 // UpdateConstraint
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::UpdateControl()
 {
   mBody.mDesiredFwdSpeed = 0.0f;
@@ -251,9 +246,9 @@ void tCharacterObject::UpdateControl()
   mBody.SetActive();
 }
 
-//====================================================================
+//======================================================================================================================
 // PostPhysics
-//====================================================================
+//======================================================================================================================
 void tCharacterObject::tCharacterBody::PostPhysics(tScalar dt)
 {
   const tVector3& fwd = GetOrientation().GetLook();

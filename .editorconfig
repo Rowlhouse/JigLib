@@ -9,6 +9,9 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 2
 
+[*.{cpp,hpp,h,inl}]
+max_line_length = 120
+
 [CMakeLists.txt]
 indent_style = space
 indent_size = 2

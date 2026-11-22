@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file spherechain.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "spherechain.hpp"
 
 #include "rendermanager.hpp"
@@ -16,9 +12,9 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tSphereChain
-//==============================================================
+//======================================================================================================================
 tSphereChain::tSphereChain(tRenderManager * renderManager,
                            unsigned chainLength,
                            const tVector3 & pos,
@@ -33,20 +29,20 @@ tSphereChain::tSphereChain(tRenderManager * renderManager,
     thisPos.z += radius;
     thisPos.y -= chainLength * radius;
     thisPos.y += 2.0f * iSphere * radius;
-    
+
     tSphereObject * sphereObject = new tSphereObject(radius);
-    sphereObject->SetProperties(0.0f, 
+    sphereObject->SetProperties(0.0f,
                                 1.0f,
                                 0.7f);
     sphereObject->SetDensity(sphereDensity);
     mSpheres.push_back(sphereObject);
     sphereObject->GetBody()->MoveTo(thisPos, tMatrix33::Identity());
     renderManager->AddObject(sphereObject);
-    /// physics will register collision for objects passed to it.
+    // Physics will register collision for objects passed to it.
     sphereObject->GetBody()->EnableBody();
   }
 
-  // add the joints/constraints. Also disable collisions between adjacent bodies
+  // Add the joints/constraints. Also disable collisions between adjacent bodies
   for (iSphere = 0 ; iSphere < chainLength-1 ; ++iSphere)
   {
     mSpheres[iSphere]->GetBody()->GetCollisionSkin()->
@@ -66,10 +62,10 @@ tSphereChain::tSphereChain(tRenderManager * renderManager,
     else
     {
       tHingeJoint * joint = new tHingeJoint;
-      joint->Initialise(mSpheres[iSphere]->GetBody(), mSpheres[iSphere+1]->GetBody(), 
+      joint->Initialise(mSpheres[iSphere]->GetBody(), mSpheres[iSphere+1]->GetBody(),
                         tVector3::Look(),
                         tVector3(0.0f, 0.0f, 0.0f),
-                        radius, 
+                        radius,
                         90.0f, 90.0f,
                         0.0f,
                         0.1f);
@@ -79,9 +75,9 @@ tSphereChain::tSphereChain(tRenderManager * renderManager,
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tSphereChain
-//==============================================================
+//======================================================================================================================
 tSphereChain::~tSphereChain()
 {
   unsigned i;
@@ -93,18 +89,18 @@ tSphereChain::~tSphereChain()
     delete mSpheres[i];
 }
 
-//==============================================================
+//======================================================================================================================
 // GetBody
-//==============================================================
+//======================================================================================================================
 tBody * tSphereChain::GetBody()
 {
   return mSpheres[0]->GetBody();
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetRenderPosition
-//==============================================================
+//======================================================================================================================
 void tSphereChain::SetRenderPosition(JigLib::tScalar renderFraction)
 {
   unsigned numSpheres = mSpheres.size();
@@ -112,25 +108,25 @@ void tSphereChain::SetRenderPosition(JigLib::tScalar renderFraction)
     mSpheres[i]->SetRenderPosition(renderFraction);
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingSphere
-//==============================================================
+//======================================================================================================================
 const tSphere & tSphereChain::GetRenderBoundingSphere() const
 {
   return tSphere::HugeSphere();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tSphereChain::GetRenderPosition() const
 {
   return mSpheres[0]->GetRenderPosition();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tSphereChain::GetRenderOrientation() const
 {
   return mSpheres[0]->GetRenderOrientation();

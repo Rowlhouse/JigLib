@@ -1,27 +1,23 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file capsule.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "capsule.hpp"
 #include "intersection.hpp"
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // Clone
-//==============================================================
+//======================================================================================================================
 tPrimitive* tCapsule::Clone() const
 {
   return new tCapsule(*this);
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentIntersect
-//==============================================================
+//======================================================================================================================
 bool tCapsule::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, const class tSegment &seg) const
 {
   bool result;
@@ -35,12 +31,12 @@ bool tCapsule::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, 
   return result;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetMassProperties
-//==============================================================
-void tCapsule::GetMassProperties(const tPrimitiveProperties &primitiveProperties, 
-                                 tScalar &mass, 
-                                 tVector3 &centerOfMass, 
+//======================================================================================================================
+void tCapsule::GetMassProperties(const tPrimitiveProperties &primitiveProperties,
+                                 tScalar &mass,
+                                 tVector3 &centerOfMass,
                                  tMatrix33 &inertiaTensor) const
 {
   if (primitiveProperties.mMassType == tPrimitiveProperties::MASS)
@@ -57,13 +53,12 @@ void tCapsule::GetMassProperties(const tPrimitiveProperties &primitiveProperties
 
   centerOfMass = GetPos() + 0.5f * GetLength() * GetOrient().GetLook();
 
-  /// todo check solid/shell
-  // first cylinder
+  // TODO: check solid/shell first cylinder
   tScalar cylinderMass = mass * PI * Sq(mRadius) * mLength / GetVolume();
   tScalar Ixx = 0.5f * cylinderMass * Sq(mRadius);
   tScalar Iyy = 0.25f * cylinderMass * Sq(mRadius) + (1.0f / 12.0f) * cylinderMass * Sq(mLength);
   tScalar Izz = Iyy;
-  // add ends
+  // Add ends
   tScalar endMass = mass - cylinderMass;
   Ixx += 0.2f * endMass * Sq(mRadius);
   Iyy += 0.2f * endMass * Sq(mRadius) + endMass * Sq(0.5f * mLength);
@@ -73,7 +68,7 @@ void tCapsule::GetMassProperties(const tPrimitiveProperties &primitiveProperties
                     0.0f, Iyy, 0.0f,
                     0.0f, 0.0f, Izz);
   // transform - e.g. see p664 of Physics-Based Animation
-  // todo is the order correct here? Does it matter?
+  // TODO: is the order correct here? Does it matter?
 
   // Calculate the tensor in a frame at the CoM, but aligned with the world axes
   inertiaTensor = mTransform.orientation * inertiaTensor * mTransform.orientation.GetTranspose();

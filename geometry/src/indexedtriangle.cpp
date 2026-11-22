@@ -3,9 +3,9 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tIndexedTriangle
-//==============================================================
+//======================================================================================================================
 tIndexedTriangle::tIndexedTriangle()
 {
   mVertexIndices[0] = mVertexIndices[1] = mVertexIndices[2] = -1;
@@ -14,11 +14,11 @@ tIndexedTriangle::tIndexedTriangle()
   mBoundingBox.Clear();
 }
 
-//==============================================================
+//======================================================================================================================
 // SetVertexIndices
-//==============================================================
-void tIndexedTriangle::SetVertexIndices(unsigned i0, unsigned i1, unsigned i2, 
-                                        const tVector3 * vertexArray) 
+//======================================================================================================================
+void tIndexedTriangle::SetVertexIndices(unsigned i0, unsigned i1, unsigned i2,
+                                        const tVector3 * vertexArray)
 {
   mVertexIndices[0] = i0;
   mVertexIndices[1] = i1;

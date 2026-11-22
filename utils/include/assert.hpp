@@ -21,7 +21,7 @@ void AssertFn();
 
 namespace JigLib
 {
-  
+
 #define DO_JIG_DEATH \
 printf(\
 "This program has crashed\n" \
@@ -33,7 +33,7 @@ TRACE("Assert %s at %s:%d\n", #exp, __FILE__, __LINE__); \
 AssertFn(); \
 DO_JIG_DEATH \
 }
-  
+
 #define AssertMsg(exp, msg) \
 if (!(exp)) { \
 TRACE("Assert %s at %s:%d\n%s\n", #exp, __FILE__, __LINE__, msg); \

@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file rendermanager.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "rendermanager.hpp"
 #include "renderobject.hpp"
 #include "viewport.hpp"
@@ -15,9 +11,9 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tRenderManager
-//==============================================================
+//======================================================================================================================
 tRenderManager::tRenderManager() : mWireFrame(false)
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -31,9 +27,9 @@ tRenderManager::~tRenderManager()
     mObjects[i]->SetRenderManager(0);
 }
 
-//==============================================================
+//======================================================================================================================
 // AddObject
-//==============================================================
+//======================================================================================================================
 void tRenderManager::AddObject(tRenderObject * object)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -45,14 +41,14 @@ void tRenderManager::AddObject(tRenderObject * object)
   object->SetRenderManager(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // RemoveObject
-//==============================================================
+//======================================================================================================================
 bool tRenderManager::RemoveObject(tRenderObject * object)
 {
   TRACE_METHOD_ONLY(FRAME_1);
   object->SetRenderManager(0);
-  tObjects::iterator it = 
+  tObjects::iterator it =
     find(mObjects.begin(), mObjects.end(), object);
   if (mObjects.end() == it)
     return false;
@@ -60,9 +56,9 @@ bool tRenderManager::RemoveObject(tRenderObject * object)
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // RenderAllObjects
-//==============================================================
+//======================================================================================================================
 void tRenderManager::RenderAllObjects(class tViewport & currentViewport)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -88,12 +84,12 @@ void tRenderManager::RenderAllObjects(class tViewport & currentViewport)
     tSaveGLMatrixState state;
     if (mObjects[i]->GetType() == tRenderObject::BACKGROUND)
     {
-      GLTRANSLATE(currentViewport.GetCamera()->GetPosition().x, 
-                  currentViewport.GetCamera()->GetPosition().y, 
+      GLTRANSLATE(currentViewport.GetCamera()->GetPosition().x,
+                  currentViewport.GetCamera()->GetPosition().y,
                   currentViewport.GetCamera()->GetPosition().z);
     }
     mObjects[i]->Render(tRenderObject::NORMAL);
   }
-  
+
 }
 

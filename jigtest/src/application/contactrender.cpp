@@ -1,20 +1,16 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file contactrender.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "contactrender.hpp"
 #include "graphics.hpp"
 #include "jiglib.hpp"
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // RenderContact
-//==============================================================
+//======================================================================================================================
 void RenderContact(const tVector3 pos,
                    const tVector3 dir,
                    tScalar impulse,
@@ -64,8 +60,8 @@ void RenderContact(const tVector3 pos,
       GLCOLOR3(1.0f, 1.0f, 1.0f);
 
     GLTRANSLATE(pos.x, pos.y, pos.z);
-    gluSphere(GetGLUQuadric(), 
-              0.02f, 
+    gluSphere(GetGLUQuadric(),
+              0.02f,
               12, 12);
 
     glLineWidth(2.0f);
@@ -77,18 +73,18 @@ void RenderContact(const tVector3 pos,
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // RenderAllContacts
-//==============================================================
+//======================================================================================================================
 void RenderAllContacts(int type)
 {
   tSaveGLState state;
   glDisable(GL_LIGHTING);
 
-  const std::vector<tCollisionInfo *> & colls = 
+  const std::vector<tCollisionInfo *> & colls =
     tPhysicsSystem::GetCurrentPhysicsSystem()->GetCollisions();
   unsigned numColls = colls.size();
-  
+
   for (unsigned i = 0 ; i < numColls ; ++i)
   {
     tCollisionInfo * coll = colls[i];

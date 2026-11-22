@@ -1,9 +1,5 @@
-/*!
-  Sss - a slope soaring simulater.
-  Copyright (C) 2003 Danny Chapman - flight@rowlhouse.freeserve.co.uk
-
-  \file image_from_file.h
-*/
+// Sss - a slope soaring simulator.
+// Copyright (C) 2003 Danny Chapman - flight@rowlhouse.freeserve.co.uk
 #include "imageloader.hpp"
 
 #include <stdio.h>
@@ -40,7 +36,7 @@ bool LoadImage(JigLib::tArray2D<tPixel> & data,
     return LoadPNGImage(data, fileName);
   }
   else if ( (file.find(".rgb") != file.npos) ||
-            (file.find(".RGB") != file.npos) ) 
+            (file.find(".RGB") != file.npos) )
   {
     TRACE_FILE_IF(ONCE_3)
       TRACE("Loading SGI RGB image: %s\n", fileName);
@@ -67,9 +63,9 @@ inline unsigned char getrgbchar(FILE * inf)
 }
 
 
-//==============================================================
+//======================================================================================================================
 // LoadRGBAImage
-//==============================================================
+//======================================================================================================================
 bool LoadRGBAImage(tArray2D<tPixel> & data,
                    const char * fileName)
 {
@@ -82,8 +78,8 @@ bool LoadRGBAImage(tArray2D<tPixel> & data,
   unsigned char header[512];
   unsigned long int loop;
   int width, height;
-  
-  if ( (image_in = fopen(fileName, "rb")) == NULL) 
+
+  if ( (image_in = fopen(fileName, "rb")) == NULL)
     return false;
 
   input_short=getshort(image_in);
@@ -100,7 +96,7 @@ bool LoadRGBAImage(tArray2D<tPixel> & data,
         width=input_short;
         input_short=getshort(image_in);
         height=input_short;
-        // if it looks like this isn't a trivial texture, display a
+        // If it looks like this isn't a trivial texture, display a
         // warning - loading the large textures can be slow.
         static bool done_warning = false;
         if ( (done_warning == false) && ( (width > 256) || (height > 256) ) )
@@ -110,10 +106,10 @@ bool LoadRGBAImage(tArray2D<tPixel> & data,
           done_warning = true;
         }
 
-        // how many bytes per pixel
+        // How many bytes per pixel
         input_short=getshort(image_in);
         int bytes_per_pixel = input_short;
-        
+
         if ( (bytes_per_pixel == 3) ||
              (bytes_per_pixel == 4) )
         {
@@ -164,7 +160,7 @@ bool LoadRGBAImage(tArray2D<tPixel> & data,
           }
           delete [] temp;
           fclose(image_in);
-          return true;  
+          return true;
         }
         else
         {
@@ -172,7 +168,7 @@ bool LoadRGBAImage(tArray2D<tPixel> & data,
           fclose(image_in);
           return false;
         }
-      }    
+      }
       else
       {
         TRACE("Not a useable RGB file.\n");
@@ -211,9 +207,9 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
   unsigned char *row_pointer;
   unsigned int has_alpha;
   int width, height;
-  
+
   png_file = fopen(fileName, "rb");
-  if (!png_file) 
+  if (!png_file)
   {
     TRACE("Error opening PNG file %s\n", fileName);
     return false;
@@ -221,14 +217,14 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
 
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
                                    NULL, NULL, NULL);
-  if (!png_ptr) 
+  if (!png_ptr)
   {
     TRACE("Error reading PNG data from file %s\n", fileName);
     fclose(png_file);
     return false;
   }
   info_ptr = png_create_info_struct(png_ptr);
-  if (!info_ptr) 
+  if (!info_ptr)
   {
     TRACE("Error reading PNG info from file %s\n", fileName);
     fclose(png_file);
@@ -248,12 +244,12 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
 
   if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA ||
       color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-      color_type == PNG_COLOR_MASK_ALPHA) 
+      color_type == PNG_COLOR_MASK_ALPHA)
   {
     TRACE("Has alpha\n");
     has_alpha = 1;
   }
-  else 
+  else
   {
     TRACE("Has no alpha\n");
     has_alpha = 0;
@@ -283,7 +279,7 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
   png_read_update_info(png_ptr, info_ptr);
 
   row_pointer = data;
-  for (y = 0; y < (png_uint_32) height; y++) 
+  for (y = 0; y < (png_uint_32) height; y++)
   {
     png_read_row(png_ptr, row_pointer, NULL);
     row_pointer += width * (3 + has_alpha);
@@ -291,8 +287,7 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
   fclose(png_file);
   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
-  // now copy the image into something that definitely has alpha, and
-  // flip it as well.
+  // Now copy the image into something that definitely has alpha, and flip it as well.
   image.Resize(width, height);
   for (y = 0 ; y < (png_uint_32) height ; ++y)
   {
@@ -307,9 +302,9 @@ bool LoadPNGImage(tArray2D<tPixel> & image,
         image(x, y).a = 255;
     }
   }
-  
+
   delete [] data;
-  
+
   return true;
 }
 

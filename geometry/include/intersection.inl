@@ -1,15 +1,11 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file intersection.inl 
-//                     
-//==============================================================
+//======================================================================================================================
 
-//====================================================================
+//======================================================================================================================
 // SegmentPlaneIntersection
-//====================================================================
+//======================================================================================================================
 inline bool SegmentPlaneIntersection(tScalar* tS, const tSegment& seg, const tPlane& plane)
 {
   tScalar denom = Dot(plane.GetN(), seg.GetDelta());
@@ -23,19 +19,19 @@ inline bool SegmentPlaneIntersection(tScalar* tS, const tSegment& seg, const tPl
   }
   else
   {
-    // parallel - return false even if it's in the plane
+    // Parallel - return false even if it's in the plane
     return false;
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // SegmentTriangleIntersection
 // See Real-Time Rendering p581
-//====================================================================
-inline bool SegmentTriangleIntersection(tScalar* tS, tScalar* tT0, tScalar* tT1, 
+//======================================================================================================================
+inline bool SegmentTriangleIntersection(tScalar* tS, tScalar* tT0, tScalar* tT1,
                                         const tSegment& seg, const tTriangle& triangle)
 {
-  /// the parameters - if hit then they get copied into the args
+  // The parameters - if hit then they get copied into the args
   tScalar u, v, t;
 
   const tVector3& e1 = triangle.GetEdge0();
@@ -62,9 +58,9 @@ inline bool SegmentTriangleIntersection(tScalar* tS, tScalar* tT0, tScalar* tT1,
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentSphereIntersection
-//==============================================================
+//======================================================================================================================
 inline bool SegmentSphereIntersection(tScalar* tS, const tSegment& seg, const tSphere& sphere)
 {
   const tVector3& r = seg.GetDelta();
@@ -73,7 +69,7 @@ inline bool SegmentSphereIntersection(tScalar* tS, const tSegment& seg, const tS
   tScalar rSq = r.GetLengthSq();
   if (rSq < radiusSq)
   {
-    if (tS) *tS = 0.0f; // starting inside
+    if (tS) *tS = 0.0f; // Starting inside
     return true;
   }
 
@@ -87,15 +83,16 @@ inline bool SegmentSphereIntersection(tScalar* tS, const tSegment& seg, const tS
   tScalar lambda2 = (-sDotr + sigmaSqrt) / rSq;
   if (lambda1 > 1.0f || lambda2 < 0.0f)
     return false;
-  // intersection!
+  // Intersection!
   if (tS) *tS = Max(lambda1, 0.0f);
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentInfiniteCylinderIntersection
-//==============================================================
-inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg, const tSegment& cylinderAxis, tScalar radius)
+//======================================================================================================================
+inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg, const tSegment& cylinderAxis,
+                                                tScalar radius)
 {
   const tVector3& Ks = seg.GetDelta();
   const tScalar kss = Dot(Ks, Ks);
@@ -113,7 +110,7 @@ inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg
   const tScalar keg = Dot(Ke, Kg);
   const tScalar kgg = Dot(Kg, Kg);
 
-  // check if start is inside
+  // Check if start is inside
   tScalar distSq = (Kg - (keg * Ke) / kee).GetLengthSq();
   if (distSq < radiusSq)
   {
@@ -121,7 +118,7 @@ inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg
     return true;
   }
 
-  // a * t^2 + b * t + c = 0
+  // A * t^2 + b * t + c = 0
   const tScalar a = kee * kss - Sq(kes);
   if (Abs(a) < SCALAR_TINY)
     return false;
@@ -132,7 +129,7 @@ inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg
   if (blah < 0.0f)
     return false;
 
-  // solve for t - take minimum
+  // Solve for t - take minimum
   const tScalar t = (-b - Sqrt(blah)) / (2.0f * a);
 
   if (t < 0.0f || t > 1.0f)
@@ -143,28 +140,28 @@ inline bool SegmentInfiniteCylinderIntersection(tScalar* tS, const tSegment& seg
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentCapsuleIntersection
-//==============================================================
+//======================================================================================================================
 inline bool SegmentCapsuleIntersection(tScalar* tS, const tSegment& seg, const tCapsule& capsule)
 {
   tScalar bestFrac = SCALAR_HUGE;
 
-  // do the main sides
+  // Do the main sides
   tScalar sideFrac = SCALAR_HUGE;
-  if (!SegmentInfiniteCylinderIntersection(&sideFrac, seg, 
-                                           tSegment(capsule.GetPos(), capsule.GetOrient().GetLook()), 
+  if (!SegmentInfiniteCylinderIntersection(&sideFrac, seg,
+                                           tSegment(capsule.GetPos(), capsule.GetOrient().GetLook()),
                                            capsule.GetRadius()))
     return false;
 
-  // only keep this if the side intersection point is within the capsule segment ends
+  // Only keep this if the side intersection point is within the capsule segment ends
   tVector3 sidePos = seg.GetPoint(sideFrac);
   if (Dot((sidePos - capsule.GetPos()), capsule.GetOrient().GetLook()) < 0.0f)
     sideFrac = SCALAR_HUGE;
   else if (Dot((sidePos - capsule.GetEnd()), capsule.GetOrient().GetLook()) > 0.0f)
     sideFrac = SCALAR_HUGE;
 
-  // do the two ends
+  // Do the two ends
   tScalar originFrac = SCALAR_HUGE;
   SegmentSphereIntersection(&originFrac, seg, tSphere(capsule.GetPos(), capsule.GetRadius()));
   tScalar endFrac = SCALAR_HUGE;
@@ -181,12 +178,12 @@ inline bool SegmentCapsuleIntersection(tScalar* tS, const tSegment& seg, const t
 
 
 
-//====================================================================
+//======================================================================================================================
 // SweptSpherePlaneIntersection
-//====================================================================
+//======================================================================================================================
 inline bool SweptSpherePlaneIntersection(tVector3& pt, tScalar& finalPenetration,
-                                         const tSphere& oldSphere, const tSphere& newSphere, 
-                                         const tPlane& plane, 
+                                         const tSphere& oldSphere, const tSphere& newSphere,
+                                         const tPlane& plane,
                                          tScalar* pOldDistToPlane, tScalar* pNewDistToPlane)
 {
   const tScalar oldDistToPlane = pOldDistToPlane ? *pOldDistToPlane : PointPlaneDistance(oldSphere.GetPos(), plane);
@@ -198,7 +195,7 @@ inline bool SweptSpherePlaneIntersection(tVector3& pt, tScalar& finalPenetration
   if (newDistToPlane > radius)
     return false;
 
-  // intersect with plane
+  // Intersect with plane
   tScalar t = (newDistToPlane - radius) / (newDistToPlane - oldDistToPlane);
   if (t < 0.0f || t > 1.0f)
     return false;

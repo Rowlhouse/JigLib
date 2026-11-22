@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file newton.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef NEWTON_HPP
 #define NEWTON_HPP
 
@@ -15,7 +11,7 @@
 
 #include <vector>
 
-/// Newton's cradle
+// Newton's cradle
 class tNewton : public tObject
 {
 public:
@@ -24,7 +20,7 @@ public:
           const JigLib::tVector3 & pos,
           JigLib::tScalar radius);
   ~tNewton();
-  
+
   JigLib::tBody * GetBody();
   void SetRenderPosition(JigLib::tScalar renderFraction);
 
@@ -32,7 +28,7 @@ public:
   const JigLib::tSphere & GetRenderBoundingSphere() const;
   const JigLib::tVector3 & GetRenderPosition() const;
   const JigLib::tMatrix33 & GetRenderOrientation() const;
-  
+
 private:
   std::vector<tSphereObject *> mBalls;
   std::vector<JigLib::tConstraintWorldPoint *> mConstraints;

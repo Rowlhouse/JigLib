@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file precision.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef JIGPRECISION_HPP
 #define JIGPRECISION_HPP
 
@@ -16,9 +12,9 @@
 namespace JigLib
 {
 #ifdef USING_DOUBLE
-  typedef double tScalar;
+typedef double tScalar;
 #else
-  typedef float tScalar;
+typedef float tScalar;
 #endif
 }
 
@@ -26,7 +22,9 @@ namespace JigLib
 
 #include <xmmintrin.h>
 #define PREFETCH(ptr) _mm_prefetch((char*)(ptr),_MM_HINT_T0);
-#define PREFETCH_LOOP(num, ptr) { for (int prefetchLoop = 0; prefetchLoop < num; prefetchLoop+=64) {_mm_prefetch( (const char*)(ptr)+prefetchLoop,_MM_HINT_T0); } }
+#define PREFETCH_LOOP(num, ptr) { \
+  for (int prefetchLoop = 0; prefetchLoop < num; prefetchLoop+=64) { \
+    _mm_prefetch( (const char*)(ptr)+prefetchLoop,_MM_HINT_T0); } }
 
 #else
 

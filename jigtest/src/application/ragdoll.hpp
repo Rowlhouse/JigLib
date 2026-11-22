@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file ragdoll.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef RAGDOLL_HPP
 #define RAGDOLL_HPP
 
@@ -16,13 +12,13 @@
 class tRagdoll : public tObject
 {
 public:
-  /// complex ragdoll has more limbs/joints
+  // Complex ragdoll has more limbs/joints
   enum tRagdollType {SIMPLE, COMPLEX};
   tRagdoll(class tRenderManager * render,
            tRagdollType type,
            float density);
   ~tRagdoll();
-  
+
   JigLib::tBody * GetBody();
   void SetRenderPosition(JigLib::tScalar renderFraction);
 
@@ -30,28 +26,28 @@ public:
   const JigLib::tSphere & GetRenderBoundingSphere() const;
   const JigLib::tVector3 & GetRenderPosition() const;
   const JigLib::tMatrix33 & GetRenderOrientation() const;
-  
-  /// move everything so that the torso is at the specified position
+
+  // Move everything so that the torso is at the specified position
   void MoveTorso(const JigLib::tVector3 & pos);
-  
-  /// rotate everything
+
+  // Rotate everything
   void ApplyRotationToTorso(const JigLib::tMatrix33 & mat);
 
-  /// Makes everything inactive/frozen 
+  // Makes everything inactive/frozen
   void PutToSleep();
 
   virtual void SetPhysicsPosition(const JigLib::tVector3& pos, const JigLib::tMatrix33& orient);
   virtual void SetPhysicsVelocity(const JigLib::tVector3& vel);
 
 private:
-  // indices into m_components
+  // Indices into m_components
   enum tLimb_id {
-    TORSO, 
-    HEAD, 
+    TORSO,
+    HEAD,
     UPPER_LEG_LEFT,
-    UPPER_LEG_RIGHT, 
-    LOWER_LEG_LEFT, 
-    LOWER_LEG_RIGHT, 
+    UPPER_LEG_RIGHT,
+    LOWER_LEG_LEFT,
+    LOWER_LEG_RIGHT,
     UPPER_ARM_LEFT,
     UPPER_ARM_RIGHT,
     LOWER_ARM_LEFT,
@@ -63,7 +59,7 @@ private:
     HIPS,
     NUM_LIMBS
   };
-  
+
   enum tJoint_id
   {
     NECK,

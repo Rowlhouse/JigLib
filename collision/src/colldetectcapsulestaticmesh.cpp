@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectcapsulestaticmesh.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectcapsulestaticmesh.hpp"
 #include "colldetectspherestaticmesh.hpp"
 #include "capsule.hpp"
@@ -17,17 +13,17 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectCapsuleStaticMesh
-//==============================================================
+//======================================================================================================================
 tCollDetectCapsuleStaticMesh::tCollDetectCapsuleStaticMesh() :
 tCollDetectFunctor("CapsuleMesh", tPrimitive::CAPSULE, tPrimitive::TRIANGLEMESH)
 {
 }
 
-//==============================================================
+//======================================================================================================================
 // CollDetectCapsuleStaticMeshOverlap
-//==============================================================
+//======================================================================================================================
 void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshOverlap(const tCapsule& oldCapsule,
                                                                       const tCapsule& newCapsule,
                                                                       const tTriangleMesh& mesh,
@@ -77,12 +73,12 @@ void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshOverlap(const tCap
       const tVector3  oldCapsuleEnd = oldCapsule.GetEnd();
       tSegment oldSeg(oldCapsuleStart, oldCapsuleEnd - oldCapsuleStart);
       d2 = SegmentTriangleDistanceSq(&tS, &tT0, &tT1, oldSeg, triangle);
-      // report result from old position
+      // Report result from old position
       tScalar dist = Sqrt(d2);
       tScalar depth = oldCapsule.GetRadius() - dist;
       tVector3 pt = triangle.GetPoint(tT0, tT1);
-      tVector3 collisionN = d2 > SCALAR_TINY ? 
-        (oldSeg.GetPoint(tS) - pt).GetNormalisedSafe() : 
+      tVector3 collisionN = d2 > SCALAR_TINY ?
+        (oldSeg.GetPoint(tS) - pt).GetNormalisedSafe() :
         meshTriangle.GetPlane().GetN();
       collPts.push_back(tCollPointInfo(pt - body0Pos, pt - body1Pos, depth)) ;
       collNormal += collisionN;
@@ -99,28 +95,28 @@ void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshOverlap(const tCap
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // CollDetectOverlap
-//==============================================================
+//======================================================================================================================
 void tCollDetectCapsuleStaticMesh::CollDetectOverlap(const tCollDetectInfo &info,
                                          tScalar collTolerance,
                                          tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  
+
   const tCapsule & oldCapsule = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetCapsule();
   const tCapsule & newCapsule = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetCapsule();
 
-  // todo - proper swept test
-  // note - mesh is static and its triangles are in world space
+  // TODO: proper swept test
+  // Note: mesh is static and its triangles are in world space
   const tTriangleMesh & mesh = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetTriangleMesh();
 
   CollDetectCapsuleStaticMeshOverlap(oldCapsule, newCapsule, mesh, info, collTolerance, collisionFunctor);
 }
 
-//====================================================================
+//======================================================================================================================
 // CollDetectCapsuleStaticMeshSweep
-//====================================================================
+//======================================================================================================================
 void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshSweep(const tCapsule& oldCapsule,
                                                                     const tCapsule& newCapsule,
                                                                     const tTriangleMesh& mesh,
@@ -128,7 +124,7 @@ void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshSweep(const tCapsu
                                                                     tScalar collTolerance,
                                                                     tCollisionFunctor & collisionFunctor)
 {
-  // really use a swept test - or overlap?
+  // Really use a swept test - or overlap?
   tVector3 delta = newCapsule.GetPos() - oldCapsule.GetPos();
   if (delta.GetLengthSq() < Sq(0.5f * newCapsule.GetRadius()))
   {
@@ -150,37 +146,37 @@ void tCollDetectCapsuleStaticMesh::CollDetectCapsuleStaticMeshSweep(const tCapsu
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // CollDetectSweep
-//====================================================================
+//======================================================================================================================
 void tCollDetectCapsuleStaticMesh::CollDetectSweep(const tCollDetectInfo &info,
                                          tScalar collTolerance,
                                          tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  
+
   const tCapsule & oldCapsule = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetCapsule();
   const tCapsule & newCapsule = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetCapsule();
 
-  // todo - proper swept test
-  // note - mesh is static and its triangles are in world space
+  // TODO: proper swept test
+  // Note: mesh is static and its triangles are in world space
   const tTriangleMesh & mesh = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetTriangleMesh();
 
   CollDetectCapsuleStaticMeshSweep(oldCapsule, newCapsule, mesh, info, collTolerance, collisionFunctor);
 }
 
-//====================================================================
+//======================================================================================================================
 // CollDetect
-//====================================================================
+//======================================================================================================================
 void tCollDetectCapsuleStaticMesh::CollDetect(const tCollDetectInfo &infoOrig,
                                          tScalar collTolerance,
                                          tCollisionFunctor & collisionFunctor) const
 {
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
 

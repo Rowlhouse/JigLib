@@ -1,20 +1,16 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file distance.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "distance.hpp"
 #include "intersection.hpp"
 #include <limits>
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // SegmentSegmentDistanceSq
-//==============================================================
-tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1, 
+//======================================================================================================================
+tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
                                          const tSegment & seg0, const tSegment & seg1)
 {
   tVector3 kDiff = seg0.mOrigin - seg1.mOrigin;
@@ -28,7 +24,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
 
   if ( fDet >= SCALAR_TINY )
   {
-    // line segments are not parallel
+    // Line segments are not parallel
     fB1 = -Dot(kDiff, seg1.mDelta);
     fS = fA01*fB1-fA11*fB0;
     fT = fA01*fB0-fA00*fB1;
@@ -39,16 +35,16 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
       {
         if ( fT >= (tScalar)0.0 )
         {
-          if ( fT <= fDet )  // region 0 (interior)
+          if ( fT <= fDet )  // Region 0 (interior)
           {
-            // minimum at two interior points of 3D lines
+            // Minimum at two interior points of 3D lines
             tScalar fInvDet = ((tScalar)1.0)/fDet;
             fS *= fInvDet;
             fT *= fInvDet;
             fSqrDist = fS*(fA00*fS+fA01*fT+((tScalar)2.0)*fB0) +
               fT*(fA01*fS+fA11*fT+((tScalar)2.0)*fB1)+fC;
           }
-          else  // region 3 (side)
+          else  // Region 3 (side)
           {
             fT = (tScalar)1.0;
             fTmp = fA01+fB0;
@@ -69,7 +65,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
             }
           }
         }
-        else  // region 7 (side)
+        else  // Region 7 (side)
         {
           fT = (tScalar)0.0;
           if ( fB0 >= (tScalar)0.0 )
@@ -93,7 +89,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
       {
         if ( fT >= (tScalar)0.0 )
         {
-          if ( fT <= fDet )  // region 1 (side)
+          if ( fT <= fDet )  // Region 1 (side)
           {
             fS = (tScalar)1.0;
             fTmp = fA01+fB1;
@@ -113,7 +109,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
               fSqrDist = fTmp*fT+fA00+((tScalar)2.0)*fB0+fC;
             }
           }
-          else  // region 2 (corner)
+          else  // Region 2 (corner)
           {
             fTmp = fA01+fB0;
             if ( -fTmp <= fA00 )
@@ -153,7 +149,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
             }
           }
         }
-        else  // region 8 (corner)
+        else  // Region 8 (corner)
         {
           if ( -fB0 < fA00 )
           {
@@ -192,11 +188,11 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
         }
       }
     }
-    else 
+    else
     {
       if ( fT >= (tScalar)0.0 )
       {
-        if ( fT <= fDet )  // region 5 (side)
+        if ( fT <= fDet )  // Region 5 (side)
         {
           fS = (tScalar)0.0;
           if ( fB1 >= (tScalar)0.0 )
@@ -215,7 +211,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
             fSqrDist = fB1*fT+fC;
           }
         }
-        else  // region 4 (corner)
+        else  // Region 4 (corner)
         {
           fTmp = fA01+fB0;
           if ( fTmp < (tScalar)0.0 )
@@ -253,7 +249,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
           }
         }
       }
-      else   // region 6 (corner)
+      else   // Region 6 (corner)
       {
         if ( fB0 < (tScalar)0.0 )
         {
@@ -293,10 +289,10 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
   }
   else
   {
-    // line segments are parallel
+    // Line segments are parallel
     if ( fA01 > (tScalar)0.0 )
     {
-      // direction vectors form an obtuse angle
+      // Direction vectors form an obtuse angle
       if ( fB0 >= (tScalar)0.0 )
       {
         fS = (tScalar)0.0;
@@ -329,7 +325,7 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
     }
     else
     {
-      // direction vectors form an acute angle
+      // Direction vectors form an acute angle
       if ( -fB0 >= fA00 )
       {
         fS = (tScalar)1.0;
@@ -369,10 +365,11 @@ tScalar JigLib::SegmentSegmentDistanceSq(tScalar *t0, tScalar *t1,
   return Abs(fSqrDist);
 }
 
-//==============================================================
+//======================================================================================================================
 // PointRectangleDistance
-//==============================================================
-tScalar JigLib::PointRectangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam, const tVector3 & rkPoint, const tRectangle & rkRct)
+//======================================================================================================================
+tScalar JigLib::PointRectangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
+                                         const tVector3 & rkPoint, const tRectangle & rkRct)
 {
   tVector3 kDiff = rkRct.mOrigin - rkPoint;
   tScalar fA00 = rkRct.mEdge0.GetLengthSq();
@@ -424,9 +421,9 @@ tScalar JigLib::PointRectangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SegmentRectDistanceSq
-//==============================================================
+//======================================================================================================================
 tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar* pfRctP1,
                                       const tSegment & seg, const tRectangle & rect)
 {
@@ -466,7 +463,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
     {
       if ( fS < (tScalar)0.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 6m
+        if ( fT < (tScalar)0.0 )  // Region 6m
         {
           // min on face s=0 or t=0 or r=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -497,7 +494,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 5m
+        else if ( fT <= (tScalar)1.0 )  // Region 5m
         {
           // min on face s=0 or r=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -516,7 +513,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else  // region 4m
+        else  // Region 4m
         {
           // min on face s=0 or t=1 or r=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -550,7 +547,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else if ( fS <= (tScalar)1.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 7m
+        if ( fT < (tScalar)0.0 )  // Region 7m
         {
           // min on face t=0 or r=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -569,14 +566,14 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 0m
+        else if ( fT <= (tScalar)1.0 )  // Region 0m
         {
           // min on face r=0
           fSqrDist = PointRectangleDistanceSq(&fS, &fT, seg.mOrigin, rect);
           //          fSqrDist = SqrDistance(seg.mOrigin,rkRct,&fS,&fT);
           fR = (tScalar)0.0;
         }
-        else  // region 3m
+        else  // Region 3m
         {
           // min on face t=1 or r=0
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge1;
@@ -598,7 +595,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else
       {
-        if ( fT < (tScalar)0.0 )  // region 8m
+        if ( fT < (tScalar)0.0 )  // Region 8m
         {
           // min on face s=1 or t=0 or r=0
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -629,7 +626,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 1m
+        else if ( fT <= (tScalar)1.0 )  // Region 1m
         {
           // min on face s=1 or r=0
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -648,7 +645,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else  // region 2m
+        else  // Region 2m
         {
           // min on face s=1 or t=1 or r=0
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -685,7 +682,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
     {
       if ( fS < (tScalar)0.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 6
+        if ( fT < (tScalar)0.0 )  // Region 6
         {
           // min on face s=0 or t=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -706,7 +703,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 5
+        else if ( fT <= (tScalar)1.0 )  // Region 5
         {
           // min on face s=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -715,7 +712,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
           //              fSqrDist = SqrDistance(seg,kSegPgm,&fR,&fT);
           fS = (tScalar)0.0;
         }
-        else // region 4
+        else // Region 4
         {
           // min on face s=0 or t=1
           kSegPgm.mOrigin = rect.mOrigin;
@@ -739,7 +736,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else if ( fS <= (tScalar)1.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 7
+        if ( fT < (tScalar)0.0 )  // Region 7
         {
           // min on face t=0
           kSegPgm.mOrigin = rect.mOrigin;
@@ -748,15 +745,15 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
           //              fSqrDist = SqrDistance(seg,kSegPgm,&fR,&fS);
           fT = (tScalar)0.0;
         }
-        else if ( fT <= (tScalar)1.0 )  // region 0
+        else if ( fT <= (tScalar)1.0 )  // Region 0
         {
-          // global minimum is interior
+          // Global minimum is interior
           fSqrDist = fR*(fA00*fR+fA01*fS+fA02*fT+((tScalar)2.0)*fB0)
             +fS*(fA01*fR+fA11*fS+((tScalar)2.0)*fB1)
             +fT*(fA02*fR+fA22*fT+((tScalar)2.0)*fB2)
             +kDiff.GetLengthSq();
         }
-        else  // region 3
+        else  // Region 3
         {
           // min on face t=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge1;
@@ -768,7 +765,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else
       {
-        if ( fT < 0.0 )  // region 8
+        if ( fT < 0.0 )  // Region 8
         {
           // min on face s=1 or t=0
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -789,7 +786,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 1
+        else if ( fT <= (tScalar)1.0 )  // Region 1
         {
           // min on face s=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -798,7 +795,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
           //              fSqrDist = SqrDistance(seg,kSegPgm,&fR,&fT);
           fS = (tScalar)1.0;
         }
-        else  // region 2
+        else  // Region 2
         {
           // min on face s=1 or t=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -825,7 +822,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
     {
       if ( fS < (tScalar)0.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 6p
+        if ( fT < (tScalar)0.0 )  // Region 6p
         {
           // min on face s=0 or t=0 or r=1
           kSegPgm.mOrigin = rect.mOrigin;
@@ -857,7 +854,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 5p
+        else if ( fT <= (tScalar)1.0 )  // Region 5p
         {
           // min on face s=0 or r=1
           kSegPgm.mOrigin = rect.mOrigin;
@@ -879,7 +876,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else  // region 4p
+        else  // Region 4p
         {
           // min on face s=0 or t=1 or r=1
           kSegPgm.mOrigin = rect.mOrigin;
@@ -914,7 +911,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else if ( fS <= (tScalar)1.0 )
       {
-        if ( fT < (tScalar)0.0 )  // region 7p
+        if ( fT < (tScalar)0.0 )  // Region 7p
         {
           // min on face t=0 or r=1
           kSegPgm.mOrigin = rect.mOrigin;
@@ -934,7 +931,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 0p
+        else if ( fT <= (tScalar)1.0 )  // Region 0p
         {
           // min on face r=1
           kPt = seg.mOrigin+seg.mDelta;
@@ -942,7 +939,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
           //              fSqrDist = SqrDistance(kPt,rkRct,&fS,&fT);
           fR = (tScalar)1.0;
         }
-        else  // region 3p
+        else  // Region 3p
         {
           // min on face t=1 or r=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge1;
@@ -965,7 +962,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
       }
       else
       {
-        if ( fT < (tScalar)0.0 )  // region 8p
+        if ( fT < (tScalar)0.0 )  // Region 8p
         {
           // min on face s=1 or t=0 or r=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -997,7 +994,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else if ( fT <= (tScalar)1.0 )  // region 1p
+        else if ( fT <= (tScalar)1.0 )  // Region 1p
         {
           // min on face s=1 or r=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -1017,7 +1014,7 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
             fT = fT0;
           }
         }
-        else  // region 2p
+        else  // Region 2p
         {
           // min on face s=1 or t=1 or r=1
           kSegPgm.mOrigin = rect.mOrigin+rect.mEdge0;
@@ -1135,19 +1132,19 @@ tScalar JigLib::SegmentRectDistanceSq(tScalar* pfSegP, tScalar* pfRctP0, tScalar
   return Abs(fSqrDist);
 }
 
-//========================================================
-// SqrDistance 
-//========================================================
+//======================================================================================================================
+// SqrDistance
+//======================================================================================================================
 tScalar SqrDistance (const tVector3& rkPoint, const tBox& rkBox,
                      tScalar* pfBParam0, tScalar* pfBParam1, tScalar* pfBParam2)
 {
-  // compute coordinates of point in box coordinate system
+  // Compute coordinates of point in box coordinate system
   tVector3 kDiff = rkPoint - rkBox.GetCentre();
-  tVector3 kClosest(Dot(kDiff, rkBox.GetOrient()[0]), 
+  tVector3 kClosest(Dot(kDiff, rkBox.GetOrient()[0]),
                     Dot(kDiff, rkBox.GetOrient()[1]),
                     Dot(kDiff, rkBox.GetOrient()[2]));
 
-  // project test point onto box
+  // Project test point onto box
   tScalar fSqrDistance = (tScalar)0.0;
   tScalar fDelta;
 
@@ -1202,9 +1199,9 @@ tScalar SqrDistance (const tVector3& rkPoint, const tBox& rkBox,
   return Max(fSqrDistance, 0.0f);
 }
 
-//========================================================
-// Face 
-//========================================================
+//======================================================================================================================
+// Face
+//======================================================================================================================
 static void Face(int i0, int i1, int i2, tVector3& rkPnt,
                  const tVector3& rkDir, const tBox& rkBox,
                  const tVector3& rkPmE, tScalar* pfLParam, tScalar& rfSqrDistance)
@@ -1428,7 +1425,7 @@ static void Face(int i0, int i1, int i2, tVector3& rkPnt,
     }
   }
 }
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static void CaseNoZeros (tVector3& rkPnt, const tVector3& rkDir,
                          const tBox& rkBox, tScalar* pfLParam, tScalar& rfSqrDistance)
 {
@@ -1447,12 +1444,12 @@ static void CaseNoZeros (tVector3& rkPnt, const tVector3& rkDir,
     fProdDxPz = rkDir.x*kPmE.z;
     if ( fProdDzPx >= fProdDxPz )
     {
-      // line intersects x = e0
+      // Line intersects x = e0
       Face(0,1,2,rkPnt,rkDir,rkBox,kPmE,pfLParam,rfSqrDistance);
     }
     else
     {
-      // line intersects z = e2
+      // Line intersects z = e2
       Face(2,0,1,rkPnt,rkDir,rkBox,kPmE,pfLParam,rfSqrDistance);
     }
   }
@@ -1462,17 +1459,17 @@ static void CaseNoZeros (tVector3& rkPnt, const tVector3& rkDir,
     fProdDyPz = rkDir.y*kPmE.z;
     if ( fProdDzPy >= fProdDyPz )
     {
-      // line intersects y = e1
+      // Line intersects y = e1
       Face(1,2,0,rkPnt,rkDir,rkBox,kPmE,pfLParam,rfSqrDistance);
     }
     else
     {
-      // line intersects z = e2
+      // Line intersects z = e2
       Face(2,0,1,rkPnt,rkDir,rkBox,kPmE,pfLParam,rfSqrDistance);
     }
   }
 }
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static void Case0 (int i0, int i1, int i2, tVector3& rkPnt,
                    const tVector3& rkDir, const tBox& rkBox, tScalar* pfLParam,
                    tScalar& rfSqrDistance)
@@ -1485,7 +1482,7 @@ static void Case0 (int i0, int i1, int i2, tVector3& rkPnt,
 
   if ( fProd0 >= fProd1 )
   {
-    // line intersects P[i0] = e[i0]
+    // Line intersects P[i0] = e[i0]
     rkPnt[i0] = rkBox.GetHalfSideLengths()(i0);
 
     tScalar fPpE1 = rkPnt[i1] + rkBox.GetHalfSideLengths()(i1);
@@ -1512,7 +1509,7 @@ static void Case0 (int i0, int i1, int i2, tVector3& rkPnt,
   }
   else
   {
-    // line intersects P[i1] = e[i1]
+    // Line intersects P[i1] = e[i1]
     rkPnt[i1] = rkBox.GetHalfSideLengths()(i1);
 
     tScalar fPpE0 = rkPnt[i0] + rkBox.GetHalfSideLengths()(i0);
@@ -1551,7 +1548,7 @@ static void Case0 (int i0, int i1, int i2, tVector3& rkPnt,
     rkPnt[i2] = rkBox.GetHalfSideLengths()(i2);
   }
 }
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static void Case00 (int i0, int i1, int i2, tVector3& rkPnt,
                     const tVector3& rkDir, const tBox& rkBox, tScalar* pfLParam,
                     tScalar& rfSqrDistance)
@@ -1589,7 +1586,7 @@ static void Case00 (int i0, int i1, int i2, tVector3& rkPnt,
     rkPnt[i2] = rkBox.GetHalfSideLengths()(i2);
   }
 }
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static void Case000 (tVector3& rkPnt, const tBox& rkBox,
                      tScalar& rfSqrDistance)
 {
@@ -1634,13 +1631,13 @@ static void Case000 (tVector3& rkPnt, const tBox& rkBox,
     rkPnt.z = rkBox.GetHalfSideLengths()(2);
   }
 }
-//========================================================
-// SqrDistance 
-//========================================================
+//======================================================================================================================
+// SqrDistance
+//======================================================================================================================
 tScalar SqrDistance(const tLine& rkLine, const tBox& rkBox,
                     tScalar* pfLParam, tScalar* pfBParam0, tScalar* pfBParam1, tScalar* pfBParam2)
 {
-  // compute coordinates of line in box coordinate system
+  // Compute coordinates of line in box coordinate system
   tVector3 kDiff = rkLine.mOrigin - rkBox.GetCentre();
   tVector3 kPnt(Dot(kDiff, rkBox.GetOrient()[0]),
                 Dot(kDiff, rkBox.GetOrient()[1]),
@@ -1729,7 +1726,7 @@ tScalar SqrDistance(const tLine& rkLine, const tBox& rkBox,
     }
   }
 
-  // undo reflections
+  // Undo reflections
   for (i = 0; i < 3; i++)
   {
     if ( bReflect[i] )
@@ -1748,10 +1745,10 @@ tScalar SqrDistance(const tLine& rkLine, const tBox& rkBox,
   return Max(fSqrDistance, 0.0f);
 }
 
-//========================================================
+//======================================================================================================================
 // SegmentBoxDistanceSq
-//========================================================
-tScalar JigLib::SegmentBoxDistanceSq(tScalar * pfLParam, 
+//======================================================================================================================
+tScalar JigLib::SegmentBoxDistanceSq(tScalar * pfLParam,
                                      tScalar * pfBParam0, tScalar * pfBParam1, tScalar * pfBParam2,
                                      const tSegment & rkSeg, const tBox & rkBox)
 {
@@ -1820,10 +1817,10 @@ tScalar JigLib::SegmentBoxDistanceSq(tScalar * pfLParam,
 }
 
 
-//==============================================================
+//======================================================================================================================
 // PointTriangleDistanceSq
-//==============================================================
-tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam, 
+//======================================================================================================================
+tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
                                         const tVector3 & rkPoint, const tTriangle & rkTri)
 {
   tVector3 kDiff = rkTri.GetOrigin() - rkPoint;
@@ -1842,7 +1839,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
   {
     if ( fS < (tScalar)0.0 )
     {
-      if ( fT < (tScalar)0.0 )  // region 4
+      if ( fT < (tScalar)0.0 )  // Region 4
       {
         if ( fB0 < (tScalar)0.0 )
         {
@@ -1878,7 +1875,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
           }
         }
       }
-      else  // region 3
+      else  // Region 3
       {
         fS = (tScalar)0.0;
         if ( fB1 >= (tScalar)0.0 )
@@ -1898,7 +1895,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
         }
       }
     }
-    else if ( fT < (tScalar)0.0 )  // region 5
+    else if ( fT < (tScalar)0.0 )  // Region 5
     {
       fT = (tScalar)0.0;
       if ( fB0 >= (tScalar)0.0 )
@@ -1917,9 +1914,9 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
         fSqrDist = fB0*fS+fC;
       }
     }
-    else  // region 0
+    else  // Region 0
     {
-      // minimum at interior point
+      // Minimum at interior point
       tScalar fInvDet = ((tScalar)1.0)/fDet;
       fS *= fInvDet;
       fT *= fInvDet;
@@ -1931,7 +1928,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
   {
     tScalar fTmp0, fTmp1, fNumer, fDenom;
 
-    if ( fS < (tScalar)0.0 )  // region 2
+    if ( fS < (tScalar)0.0 )  // Region 2
     {
       fTmp0 = fA01 + fB0;
       fTmp1 = fA11 + fB1;
@@ -1973,7 +1970,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
         }
       }
     }
-    else if ( fT < (tScalar)0.0 )  // region 6
+    else if ( fT < (tScalar)0.0 )  // Region 6
     {
       fTmp0 = fA01 + fB1;
       fTmp1 = fA00 + fB0;
@@ -2015,7 +2012,7 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
         }
       }
     }
-    else  // region 1
+    else  // Region 1
     {
       fNumer = fA11 + fB1 - fA01 - fB0;
       if ( fNumer <= (tScalar)0.0 )
@@ -2053,12 +2050,13 @@ tScalar JigLib::PointTriangleDistanceSq(tScalar * pfSParam, tScalar * pfTParam,
   return Abs(fSqrDist);
 }
 
-//====================================================================
+//======================================================================================================================
 // SegmentTriangleDistanceSq
-//====================================================================
-tScalar JigLib::SegmentTriangleDistanceSq(tScalar* segT, tScalar* triT0, tScalar* triT1, const tSegment& seg, const tTriangle& triangle)
+//======================================================================================================================
+tScalar JigLib::SegmentTriangleDistanceSq(tScalar* segT, tScalar* triT0, tScalar* triT1,
+                                          const tSegment& seg, const tTriangle& triangle)
 {
-  // compare segment to all three edges of the triangle
+  // Compare segment to all three edges of the triangle
   tScalar distSq = std::numeric_limits<tScalar>::max();
 
   if (SegmentTriangleIntersection(segT, triT0, triT1, seg, triangle))
@@ -2084,7 +2082,8 @@ tScalar JigLib::SegmentTriangleDistanceSq(tScalar* segT, tScalar* triT0, tScalar
     if (triT0) *triT0 = 0.0f;
     if (triT1) *triT1 = t;
   }
-  distEdgeSq = SegmentSegmentDistanceSq(&s, &t, seg, tSegment(triangle.GetOrigin() + triangle.GetEdge0(), triangle.GetEdge2()));
+  distEdgeSq = SegmentSegmentDistanceSq(&s, &t, seg,
+                                        tSegment(triangle.GetOrigin() + triangle.GetEdge0(), triangle.GetEdge2()));
   if (distEdgeSq < distSq)
   {
     distSq = distEdgeSq;
@@ -2093,7 +2092,7 @@ tScalar JigLib::SegmentTriangleDistanceSq(tScalar* segT, tScalar* triT0, tScalar
     if (triT1) *triT1 = t;
   }
 
-  // compare segment end points to triangle interior
+  // Compare segment end points to triangle interior
   tScalar startTriSq = PointTriangleDistanceSq(&t, &u, seg.GetOrigin(), triangle);
   if (startTriSq < distSq)
   {

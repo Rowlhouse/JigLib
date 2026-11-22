@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file heightmapobject.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "heightmapobject.hpp"
 #include "imageloader.hpp"
 #include "appconfig.hpp"
@@ -14,26 +10,26 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tHeightmapObject
-//==============================================================
+//======================================================================================================================
 tHeightmapObject::tHeightmapObject(const tHeightmap & heightmap)
 {
   TRACE_METHOD_ONLY(ONCE_2);
-  
+
   mTexture = AllocateRGBAFileTexture("data/terrain.png");
 
   mCollisionSkin.AddPrimitive(heightmap, tMaterialTable::UNSET);
   mCollisionSkin.SetOwner(0);
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(1.0f, 0.4f, 0.3f));
-  
+
   mDisplayListNum = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // tHeightmapObject
-//==============================================================
-tHeightmapObject::tHeightmapObject(const string & fileName, 
+//======================================================================================================================
+tHeightmapObject::tHeightmapObject(const string & fileName,
                                    tScalar dx, tScalar dy, tScalar zMin, tScalar zMax)
 {
   mTexture = AllocateRGBAFileTexture("data/terrain.png");
@@ -42,7 +38,7 @@ tHeightmapObject::tHeightmapObject(const string & fileName,
   tArray2D<tScalar> heights(0, 0);
   bool result = LoadImage(image, fileName.c_str());
 
-  if ( (result == false) || 
+  if ( (result == false) ||
        (image.GetNx() == 0) ||
        (image.GetNy() == 0) )
   {
@@ -67,14 +63,14 @@ tHeightmapObject::tHeightmapObject(const string & fileName,
   mCollisionSkin.AddPrimitive(heightmap, tMaterialTable::UNSET);
   mCollisionSkin.SetOwner(0);
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(1.0f, 0.4f, 0.3f));
-  
+
   mDisplayListNum = 0;
 }
 
 
-//==============================================================
+//======================================================================================================================
 // ~tHeightmapObject
-//==============================================================
+//======================================================================================================================
 tHeightmapObject::~tHeightmapObject()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -82,55 +78,55 @@ tHeightmapObject::~tHeightmapObject()
   mTexture = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // SetProperties
-//==============================================================
+//======================================================================================================================
 void tHeightmapObject::SetProperties(tScalar elasticity, tScalar staticFriction, tScalar dynamicFriction)
 {
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(elasticity, staticFriction, dynamicFriction));
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingHeightmap
-//==============================================================
+//======================================================================================================================
 const tSphere & tHeightmapObject::GetRenderBoundingSphere() const
 {
-  // fudge this a little...
+  // Fudge this a little...
   return tSphere::HugeSphere();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tHeightmapObject::GetRenderPosition() const
 {
   return tVector3::Zero();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tHeightmapObject::GetRenderOrientation() const
 {
   return tMatrix33::Identity();
 }
 
-//==============================================================
+//======================================================================================================================
 // Render
-//==============================================================
+//======================================================================================================================
 void tHeightmapObject::Render(tRenderObject::tRenderType renderType)
 {
   TRACE_METHOD_ONLY(FRAME_2);
-  
+
   if (mDisplayListNum == 0)
-  { 
+  {
     mDisplayListNum = glGenLists(1);
     glNewList(mDisplayListNum, GL_COMPILE);
     const tHeightmap & heightmap = mCollisionSkin.GetPrimitiveLocal(0)->GetHeightmap();
-    
+
     int nx = heightmap.GetNx();
     int ny = heightmap.GetNy();
-    
+
     int i, j, j0;
     for (j0 = 0 ; j0 < (ny - 1) ; ++j0)
     {
@@ -141,7 +137,7 @@ void tHeightmapObject::Render(tRenderObject::tRenderType renderType)
         for (offset = 1 ; offset >= 0 ; --offset)
         {
           j = j0 + offset;
-          
+
           tVector3 pos;
           tVector3 normal;
           heightmap.GetSurfacePosAndNormal(pos, normal, i, j);
@@ -154,7 +150,7 @@ void tHeightmapObject::Render(tRenderObject::tRenderType renderType)
 
     glEndList();
   }
-  
+
   if (tAppConfig::mTextureLevel > 0 && mTexture)
   {
     glEnable(GL_TEXTURE_2D);

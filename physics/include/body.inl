@@ -1,16 +1,12 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file body.inl 
-//                     
-//==============================================================
+//======================================================================================================================
 // only to be included by body.hpp
 
-//==============================================================
+//======================================================================================================================
 // LimitVel
-//==============================================================
+//======================================================================================================================
 inline void tBody::LimitVel()
 {
   Limit(mTransformRate.velocity.x, -mVelMax, mVelMax);
@@ -18,9 +14,9 @@ inline void tBody::LimitVel()
   Limit(mTransformRate.velocity.z, -mVelMax, mVelMax);
 }
 
-//==============================================================
+//======================================================================================================================
 // LimitAngVel
-//==============================================================
+//======================================================================================================================
 inline void tBody::LimitAngVel()
 {
   tScalar fX = Abs(mTransformRate.angVelocity.x) / mAngVelMax;
@@ -31,9 +27,9 @@ inline void tBody::LimitAngVel()
     mTransformRate.angVelocity /= f;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetVelocity
-//==============================================================
+//======================================================================================================================
 inline tVector3 tBody::GetVelocity(const tVector3& relPos) const
 {
   return tVector3(
@@ -42,21 +38,24 @@ inline tVector3 tBody::GetVelocity(const tVector3& relPos) const
     mTransformRate.velocity[2] + mTransformRate.angVelocity[0]*relPos[1] - mTransformRate.angVelocity[1]*relPos[0]);
 }
 
-//==============================================================
+//======================================================================================================================
 // GetVelocityAux
-//==============================================================
+//======================================================================================================================
 inline tVector3 tBody::GetVelocityAux(const tVector3& relPos) const
 {
   return tVector3(
-    mTransformRateAux.velocity[0] + mTransformRateAux.angVelocity[1]*relPos[2] - mTransformRateAux.angVelocity[2]*relPos[1],
-    mTransformRateAux.velocity[1] + mTransformRateAux.angVelocity[2]*relPos[0] - mTransformRateAux.angVelocity[0]*relPos[2],
-    mTransformRateAux.velocity[2] + mTransformRateAux.angVelocity[0]*relPos[1] - mTransformRateAux.angVelocity[1]*relPos[0]);
+    mTransformRateAux.velocity[0] +
+    mTransformRateAux.angVelocity[1]*relPos[2] - mTransformRateAux.angVelocity[2]*relPos[1],
+    mTransformRateAux.velocity[1] +
+    mTransformRateAux.angVelocity[2]*relPos[0] - mTransformRateAux.angVelocity[0]*relPos[2],
+    mTransformRateAux.velocity[2] +
+    mTransformRateAux.angVelocity[0]*relPos[1] - mTransformRateAux.angVelocity[1]*relPos[0]);
 }
 
 
-//==============================================================
+//======================================================================================================================
 // DoMovementActivations
-//==============================================================
+//======================================================================================================================
 inline void tBody::DoMovementActivations()
 {
   TRACE_METHOD_ONLY(FRAME_2);
@@ -65,17 +64,17 @@ inline void tBody::DoMovementActivations()
     return;
   if ( (mTransform.position - mStoredPositionForActivation).GetLengthSq() < mSqDeltaPosThreshold)
     return;
-  
+
   const size_t numBodies = mBodiesToBeActivatedOnMovement.size();
   for (size_t i = 0 ; i < numBodies ; ++i)
     tPhysicsSystem::GetCurrentPhysicsSystem()->ActivateObject(mBodiesToBeActivatedOnMovement[i]);
   mBodiesToBeActivatedOnMovement.resize(0);
 }
 
-//==============================================================
+//======================================================================================================================
 // add_movement_activation
-//==============================================================
-inline void tBody::AddMovementActivation(const tVector3 & pos, 
+//======================================================================================================================
+inline void tBody::AddMovementActivation(const tVector3 & pos,
                                          tBody * otherBody)
 {
   const size_t numBodies = mBodiesToBeActivatedOnMovement.size();
@@ -83,29 +82,29 @@ inline void tBody::AddMovementActivation(const tVector3 & pos,
   for (i = 0 ; i < numBodies ; ++i)
   {
     if (mBodiesToBeActivatedOnMovement[i] == otherBody)
-      return; // already made a note of this body
+      return; // Already made a note of this body
   }
   if (numBodies == 0)
     mStoredPositionForActivation = pos;
   mBodiesToBeActivatedOnMovement.push_back(otherBody);
 }
 
-//==============================================================
+//======================================================================================================================
 // TryToFreeze
-//==============================================================
+//======================================================================================================================
 inline void tBody::TryToFreeze(tScalar dt)
 {
   if (!mAllowFreezing || mImmovable || !IsActive())
     return;
-  
-  if ((mTransform.position - mLastPositionForDeactivation).GetLengthSq() > 
+
+  if ((mTransform.position - mLastPositionForDeactivation).GetLengthSq() >
       mSqDeltaPosThreshold)
   {
     mLastPositionForDeactivation = mTransform.position;
     mInactiveTime = 0.0f;
     return;
   }
-// ugly - use quaternions
+// Ugly - use quaternions
   tMatrix33 deltaMat = mTransform.orientation - mLastOrientationForDeactivation;
   if ( (deltaMat.GetLook().GetLengthSq() > mSqDeltaOrientThreshold ) ||
        (deltaMat.GetLeft().GetLengthSq() > mSqDeltaOrientThreshold ) ||
@@ -116,30 +115,30 @@ inline void tBody::TryToFreeze(tScalar dt)
     return;
   }
 
-// check the thresholds as well
+// Check the thresholds as well
   if ( GetShouldBeActive() )
   {
-    // let the inactivity timer continue
+    // Let the inactivity timer continue
     return;
   }
-  
+
   mInactiveTime += dt;
-  
+
   if (mInactiveTime > mDeactivationTime)
   {
-// sleep!
+// Sleep!
     mLastOrientationForDeactivation = mTransform.orientation;
     mLastPositionForDeactivation = mTransform.position;
     SetInactive();
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // set_orientation
-//==============================================================
-inline void tBody::SetOrientation(const tMatrix33 & orient) 
-{ 
-  mTransform.orientation = orient; 
+//======================================================================================================================
+inline void tBody::SetOrientation(const tMatrix33 & orient)
+{
+  mTransform.orientation = orient;
   mInvOrientation = mTransform.orientation.GetTranspose();
   mWorldInvInertia = mTransform.orientation * mBodyInvInertia * mInvOrientation;
   mWorldInertia = mTransform.orientation * mBodyInertia * mInvOrientation;
@@ -151,9 +150,9 @@ inline void tBody::SetOrientation(const tMatrix33 & orient)
 
 void DummyFnForMSVC();
 
-//==============================================================
+//======================================================================================================================
 // ApplyWorldImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyWorldImpulse(const tVector3 & impulse)
 {
   if (mImmovable)
@@ -175,9 +174,9 @@ inline void tBody::ApplyWorldImpulse(const tVector3 & impulse)
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeWorldImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyNegativeWorldImpulse(const tVector3 & impulse)
 {
 #ifdef CHECK_RIGID_BODY
@@ -190,9 +189,9 @@ inline void tBody::ApplyNegativeWorldImpulse(const tVector3 & impulse)
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyWorldImpulseAux
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyWorldImpulseAux(const tVector3 & impulse)
 {
   if (mImmovable)
@@ -214,9 +213,9 @@ inline void tBody::ApplyWorldImpulseAux(const tVector3 & impulse)
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeWorldImpulseAux
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyNegativeWorldImpulseAux(const tVector3 & impulse)
 {
 #ifdef CHECK_RIGID_BODY
@@ -229,9 +228,9 @@ inline void tBody::ApplyNegativeWorldImpulseAux(const tVector3 & impulse)
 #endif
 }
 
-//====================================================================
+//======================================================================================================================
 // ApplyBodyWorldImpulse
-//====================================================================
+//======================================================================================================================
 inline void tBody::ApplyBodyWorldImpulse(const tVector3 & impulse, const tVector3 & delta)
 {
   if (mImmovable)
@@ -264,9 +263,9 @@ inline void tBody::ApplyBodyWorldImpulse(const tVector3 & impulse, const tVector
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeBodyWorldImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyNegativeBodyWorldImpulse(const tVector3 & impulse, const tVector3 & delta)
 {
 #ifdef CHECK_RIGID_BODY
@@ -279,9 +278,9 @@ inline void tBody::ApplyNegativeBodyWorldImpulse(const tVector3 & impulse, const
   mVelChanged = true;
 #endif
 }
-//====================================================================
+//======================================================================================================================
 // ApplyBodyWorldImpulseAux
-//====================================================================
+//======================================================================================================================
 inline void tBody::ApplyBodyWorldImpulseAux(const tVector3 & impulse, const tVector3 & delta)
 {
   if (mImmovable)
@@ -292,7 +291,7 @@ inline void tBody::ApplyBodyWorldImpulseAux(const tVector3 & impulse, const tVec
 #endif
   AddScaleVector3(mTransformRateAux.velocity, mTransformRateAux.velocity, mInvMass, impulse);
   mTransformRateAux.angVelocity += mWorldInvInertia * Cross(delta, impulse);
-  /// todo flag vel changed?
+  // TODO: flag vel changed?
   mVelChanged = true;
 #ifdef CHECK_RIGID_BODY
   if (!mTransformRateAux.angVelocity.IsSensible())
@@ -314,9 +313,9 @@ inline void tBody::ApplyBodyWorldImpulseAux(const tVector3 & impulse, const tVec
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeBodyWorldImpulseAux
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyNegativeBodyWorldImpulseAux(const tVector3 & impulse, const tVector3 & delta)
 {
 #ifdef CHECK_RIGID_BODY
@@ -326,50 +325,50 @@ inline void tBody::ApplyNegativeBodyWorldImpulseAux(const tVector3 & impulse, co
     return;
   AddScaleVector3(mTransformRateAux.velocity, mTransformRateAux.velocity, -mInvMass, impulse);
   mTransformRateAux.angVelocity -= mWorldInvInertia * Cross(delta, impulse);
-  /// todo falg vel changed when it's aux?
+  // TODO: flag vel changed when it's aux?
   mVelChanged = true;
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyWorldImpulse
-//==============================================================
-inline void tBody::ApplyWorldImpulse(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyWorldImpulse(const tVector3 & impulse,
                                      const tVector3 & pos)
 {
   ApplyBodyWorldImpulse(impulse, pos - mTransform.position);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeWorldImpulse
-//==============================================================
-inline void tBody::ApplyNegativeWorldImpulse(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyNegativeWorldImpulse(const tVector3 & impulse,
                                              const tVector3 & pos)
 {
   ApplyNegativeBodyWorldImpulse(impulse, pos - mTransform.position);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyWorldImpulseAux
-//==============================================================
-inline void tBody::ApplyWorldImpulseAux(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyWorldImpulseAux(const tVector3 & impulse,
                                         const tVector3 & pos)
 {
   ApplyBodyWorldImpulseAux(impulse, pos - mTransform.position);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeWorldImpulseAux
-//==============================================================
-inline void tBody::ApplyNegativeWorldImpulseAux(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyNegativeWorldImpulseAux(const tVector3 & impulse,
                                                 const tVector3 & pos)
 {
   ApplyNegativeBodyWorldImpulseAux(impulse, pos - mTransform.position);
 }
 
-//==============================================================
+//======================================================================================================================
 // apply_world_ang_impulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyWorldAngImpulse(const tVector3 & angImpulse)
 {
   if (mImmovable) return;
@@ -391,61 +390,61 @@ inline void tBody::ApplyWorldAngImpulse(const tVector3 & angImpulse)
 #endif
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyBodyImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyBodyImpulse(const tVector3 & impulse)
 {
   ApplyWorldImpulse(mTransform.orientation * impulse);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeBodyImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyNegativeBodyImpulse(const tVector3 & impulse)
 {
   ApplyNegativeWorldImpulse(mTransform.orientation * impulse);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyBodyImpulse
-//==============================================================
-inline void tBody::ApplyBodyImpulse(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyBodyImpulse(const tVector3 & impulse,
                                     const tVector3 & pos)
 {
   ApplyWorldImpulse(mTransform.orientation * impulse, mTransform.position + mTransform.orientation * pos);
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyNegativeBodyImpulse
-//==============================================================
-inline void tBody::ApplyNegativeBodyImpulse(const tVector3 & impulse, 
+//======================================================================================================================
+inline void tBody::ApplyNegativeBodyImpulse(const tVector3 & impulse,
                                             const tVector3 & pos)
 {
   ApplyNegativeWorldImpulse(mTransform.orientation * impulse, mTransform.position + mTransform.orientation * pos);
 }
-//==============================================================
+//======================================================================================================================
 // ApplyBodyAngImpulse
-//==============================================================
+//======================================================================================================================
 inline void tBody::ApplyBodyAngImpulse(const tVector3 & angImpulse)
 {
   ApplyWorldAngImpulse(mTransform.orientation * angImpulse);
 }
 
-//========================================================
+//======================================================================================================================
 // AddWorldForce
-//========================================================
-inline void tBody::AddWorldForce(const tVector3 & force) 
+//======================================================================================================================
+inline void tBody::AddWorldForce(const tVector3 & force)
 {
   if (mImmovable) return;
   mForce += force;
   mVelChanged = true;
 }
 
-//==============================================================
+//======================================================================================================================
 // AddWorldForce
-//==============================================================
-inline void tBody::AddWorldForce(const tVector3 & force, 
+//======================================================================================================================
+inline void tBody::AddWorldForce(const tVector3 & force,
                                  const tVector3 & pos)
 {
   if (mImmovable) return;
@@ -454,52 +453,52 @@ inline void tBody::AddWorldForce(const tVector3 & force,
   mVelChanged = true;
 }
 
-//========================================================
+//======================================================================================================================
 // AddWorldTorque
-//========================================================
-inline void tBody::AddWorldTorque(const tVector3 & torque) 
+//======================================================================================================================
+inline void tBody::AddWorldTorque(const tVector3 & torque)
 {
   if (mImmovable) return;
   mTorque += torque;
   mVelChanged = true;
 }
 
-//==============================================================
+//======================================================================================================================
 // AddBodyForce
-//==============================================================
+//======================================================================================================================
 inline void tBody::AddBodyForce(const tVector3 & force)
 {
   AddWorldForce(mTransform.orientation * force);
 }
 
-//==============================================================
+//======================================================================================================================
 // AddBodyForce
-//==============================================================
+//======================================================================================================================
 inline void tBody::AddBodyForce(const tVector3 & force, const tVector3 & pos)
 {
   AddWorldForce(mTransform.orientation * force, mTransform.position + mTransform.orientation * pos);
 }
 
-//==============================================================
+//======================================================================================================================
 // AddBodyTorque
-//==============================================================
+//======================================================================================================================
 inline void tBody::AddBodyTorque(const tVector3 & torque)
 {
   AddWorldTorque(mTransform.orientation * torque);
 }
 
-//==============================================================
+//======================================================================================================================
 // ClearForces
-//==============================================================
+//======================================================================================================================
 inline void tBody::ClearForces()
 {
   mForce.SetTo(0.0f);
   mTorque.SetTo(0.0f);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetForceToGravity
-//==============================================================
+//======================================================================================================================
 inline void tBody::SetForceToGravity()
 {
   if (tPhysicsSystem::GetCurrentPhysicsSystem())
@@ -508,9 +507,9 @@ inline void tBody::SetForceToGravity()
     mForce.SetTo(0.0f);
 }
 
-//========================================================
+//======================================================================================================================
 // AddExternalForces
-//========================================================
+//======================================================================================================================
 inline void tBody::AddExternalForces(tScalar dt)
 {
   mTorque.SetTo(0.0f);
@@ -518,9 +517,9 @@ inline void tBody::AddExternalForces(tScalar dt)
 }
 
 
-//==============================================================
+//======================================================================================================================
 // CopyCurrentStateToOld
-//==============================================================
+//======================================================================================================================
 inline void tBody::CopyCurrentStateToOld()
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
@@ -528,9 +527,9 @@ inline void tBody::CopyCurrentStateToOld()
   mOldTransformRate = mTransformRate;
 }
 
-//==============================================================
+//======================================================================================================================
 // SetConstraintsUnsatisfied
-//==============================================================
+//======================================================================================================================
 inline void tBody::SetConstraintsAndCollisionsUnsatisfied()
 {
   for (size_t iConstraint = mConstraints.size() ; iConstraint-- != 0; )
@@ -544,25 +543,25 @@ inline void tBody::SetConstraintsAndCollisionsUnsatisfied()
   }
 }
 
-//========================================================
+//======================================================================================================================
 // StoreState
-//========================================================
+//======================================================================================================================
 inline void tBody::StoreState()
 {
   mStoredTransform = mTransform;
   mStoredTransformRate = mTransformRate;
 }
 
-//========================================================
+//======================================================================================================================
 // RestoreState
-//========================================================
+//======================================================================================================================
 inline void tBody::RestoreState()
 {
   mTransform = mStoredTransform;
   mTransformRate = mStoredTransformRate;
 
   mInvOrientation = mTransform.orientation.GetTranspose();
-  // recalculate the world inertia
+  // Recalculate the world inertia
   mWorldInvInertia = mTransform.orientation * mBodyInvInertia * mInvOrientation;
   mWorldInertia = mTransform.orientation * mBodyInertia * mInvOrientation;
 }

@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file graphics.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef GRAPHICS_HPP
 #define GRAPHICS_HPP
 
@@ -14,7 +10,7 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 #if 0
-// evil evil evil evil evil
+// Evil evil evil evil evil
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -27,7 +23,7 @@
 #include <GL/glu.h>
 #endif  // __APPLE__
 #endif
-// helpers to avoid using SDL directly
+// Helpers to avoid using SDL directly
 inline void GetWindowSize(int & width, int & height)
 {
   SDL_Surface * surface = SDL_GetVideoSurface();
@@ -43,8 +39,7 @@ inline void GetWindowSize(int & width, int & height)
   }
 }
 
-// single quadric for everything... if it doesn't exist it will be
-// created
+// Single quadric for everything... If it doesn't exist it will be created
 inline GLUquadricObj * GetGLUQuadric()
 {
   static GLUquadricObj * quadric = 0;
@@ -66,16 +61,16 @@ struct tSaveGLState
   ~tSaveGLState() {glPopMatrix(); glPopAttrib();}
 };
 
-// cheap!
+// Cheap!
 struct tSaveGLMatrixState
 {
   tSaveGLMatrixState() {glPushMatrix();}
   ~tSaveGLMatrixState() {glPopMatrix();}
 };
 
-//==============================================================
+//======================================================================================================================
 // CheckGLErrors
-//==============================================================
+//======================================================================================================================
 inline void CheckGLErrors(char * str="")
 {
   GLenum err_code = glGetError();
@@ -146,16 +141,16 @@ inline void CheckGLErrors(char * str="")
 
 #endif
 
-//==============================================================
+//======================================================================================================================
 // apply_transformation
-//==============================================================
-inline void ApplyTransformation(const JigLib::tVector3 & translation, 
+//======================================================================================================================
+inline void ApplyTransformation(const JigLib::tVector3 & translation,
                                 const JigLib::tMatrix33 & rotation)
 {
-  // translation's easy...
+  // Translation's easy...
   GLTRANSLATE(translation[0], translation[1], translation[2]);
-  
-  JigLib::tScalar matrix[] = 
+
+  JigLib::tScalar matrix[] =
     {
       rotation(0, 0), // 1st column
       rotation(1, 0),
@@ -171,7 +166,7 @@ inline void ApplyTransformation(const JigLib::tVector3 & translation,
       0,
       0, 0, 0, 1        // 4th column
     };
-  
+
   GLMULTMATRIX(&matrix[0]);
 }
 

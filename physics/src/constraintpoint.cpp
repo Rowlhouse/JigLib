@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file constraintpoint.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "constraintpoint.hpp"
 #include "body.hpp"
 
@@ -15,9 +11,9 @@ using namespace std;
 static const tScalar mMaxVelMag = 20.0f;
 static const tScalar minVelForProcessing = 0.01f;
 
-//==============================================================
+//======================================================================================================================
 // tConstraintPoint
-//==============================================================
+//======================================================================================================================
 tConstraintPoint::tConstraintPoint(
   tBody * body0, const tVector3 & body0Pos,
   tBody * body1, const tVector3 & body1Pos,
@@ -30,9 +26,9 @@ tConstraintPoint::tConstraintPoint(
              allowedDistance, timescale);
 }
 
-//==============================================================
+//======================================================================================================================
 // tConstraintPoint
-//==============================================================
+//======================================================================================================================
 tConstraintPoint::tConstraintPoint()
   :
   mBody0(0), mBody1(0)
@@ -40,9 +36,9 @@ tConstraintPoint::tConstraintPoint()
   TRACE_METHOD_ONLY(ONCE_2);
 }
 
-//==============================================================
+//======================================================================================================================
 // tConstraintPoint
-//==============================================================
+//======================================================================================================================
 tConstraintPoint::~tConstraintPoint()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -51,9 +47,9 @@ tConstraintPoint::~tConstraintPoint()
   Destroy();
 }
 
-//==============================================================
+//======================================================================================================================
 // initialise
-//==============================================================
+//======================================================================================================================
 void tConstraintPoint::Initialise(tBody * body0, const tVector3 & body0Pos,
                                   tBody * body1, const tVector3 & body1Pos,
                                   tScalar allowedDistance,
@@ -72,9 +68,9 @@ void tConstraintPoint::Initialise(tBody * body0, const tVector3 & body0Pos,
   if (mBody1) mBody1->AddConstraint(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // Destroy
-//==============================================================
+//======================================================================================================================
 void tConstraintPoint::Destroy()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -82,26 +78,26 @@ void tConstraintPoint::Destroy()
   DisableConstraint();
 }
 
-//==============================================================
+//======================================================================================================================
 // PreApply
-//==============================================================
+//======================================================================================================================
 void tConstraintPoint::PreApply(tScalar dt)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
   SetUnsatisfied();
-  
+
   MultMatrix33(mR0, mBody0->GetOrientation(), mBody0Pos);
   MultMatrix33(mR1, mBody1->GetOrientation(), mBody1Pos);
   const tVector3 worldPos0(mBody0->GetPosition() + mR0);
   const tVector3 worldPos1(mBody1->GetPosition() + mR1);
   mWorldPos = 0.5f * (worldPos0 + worldPos1);
 
-  // add a "correction" based on the deviation of point 0
+  // Add a "correction" based on the deviation of point 0
   const tVector3 deviation(worldPos0 - worldPos1);
   tScalar deviationAmount = deviation.GetLength();
   if (deviationAmount > mAllowedDistance)
   {
-    mVrExtra = ((deviationAmount - mAllowedDistance) / 
+    mVrExtra = ((deviationAmount - mAllowedDistance) /
                 (deviationAmount * Max(mTimescale, dt))) * deviation;
   }
   else
@@ -110,9 +106,9 @@ void tConstraintPoint::PreApply(tScalar dt)
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // Apply
-//==============================================================
+//======================================================================================================================
 bool tConstraintPoint::Apply(tScalar dt)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
@@ -123,19 +119,19 @@ bool tConstraintPoint::Apply(tScalar dt)
 //  if (body0FrozenPre && body1FrozenPre)
 //    return false;
 
-  const tVector3 currentVel0(mBody0->GetVelocity() + 
+  const tVector3 currentVel0(mBody0->GetVelocity() +
                              Cross(mBody0->GetAngVel(), mR0));
-  const tVector3 currentVel1(mBody1->GetVelocity() + 
+  const tVector3 currentVel1(mBody1->GetVelocity() +
                              Cross(mBody1->GetAngVel(), mR1));
 
-  // add a "correction" based on the deviation of point 0
+  // Add a "correction" based on the deviation of point 0
   tVector3 Vr(mVrExtra + currentVel0 - currentVel1);
 
   tScalar normalVel = Vr.GetLength();
   if (normalVel < minVelForProcessing)
     return false;
 
-  // limit things
+  // Limit things
   if (normalVel > mMaxVelMag)
   {
     Vr *= mMaxVelMag / normalVel;
@@ -145,8 +141,8 @@ bool tConstraintPoint::Apply(tScalar dt)
   const tVector3 N = Vr / normalVel;
 
   const tScalar numerator = -normalVel;
-  const tScalar denominator = mBody0->GetInvMass() + mBody1->GetInvMass() + 
-    Dot(N, Cross(mBody0->GetWorldInvInertia() * (Cross(mR0, N)), mR0)) + 
+  const tScalar denominator = mBody0->GetInvMass() + mBody1->GetInvMass() +
+    Dot(N, Cross(mBody0->GetWorldInvInertia() * (Cross(mR0, N)), mR0)) +
     Dot(N, Cross(mBody1->GetWorldInvInertia() * (Cross(mR1, N)), mR1));
 
   if (denominator < SCALAR_TINY)

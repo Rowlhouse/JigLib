@@ -1,30 +1,26 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file meshobject.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "meshobject.hpp"
 #include "debugconfig.hpp"
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // SetProperties
-//==============================================================
-void tMeshObject::SetProperties(tScalar elasticity, 
+//======================================================================================================================
+void tMeshObject::SetProperties(tScalar elasticity,
                                 tScalar staticFriction,
                                 tScalar dynamicFriction)
 {
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(elasticity, staticFriction, dynamicFriction));
 }
 
-//==============================================================
+//======================================================================================================================
 // tMeshObject
-//==============================================================
-tMeshObject::tMeshObject(const std::vector<tVector3> &vertices, 
+//======================================================================================================================
+tMeshObject::tMeshObject(const std::vector<tVector3> &vertices,
                          const std::vector<tTriangleVertexIndices> &triangleVertexIndices,
                          int maxTrianglesPerCell, tScalar minCellSize)
 {
@@ -34,7 +30,7 @@ tMeshObject::tMeshObject(const std::vector<tVector3> &vertices,
 
   // Create the mesh
   if (!vertices.empty() && !triangleVertexIndices.empty())
-    mesh.CreateMesh(&vertices[0], vertices.size(), 
+    mesh.CreateMesh(&vertices[0], vertices.size(),
     &triangleVertexIndices[0], triangleVertexIndices.size(),
     maxTrianglesPerCell, minCellSize);
   else
@@ -51,9 +47,9 @@ tMeshObject::tMeshObject(const std::vector<tVector3> &vertices,
 }
 
 
-//==============================================================
+//======================================================================================================================
 // tMeshObject
-//==============================================================
+//======================================================================================================================
 tMeshObject::tMeshObject(const char* meshXMLFile, tScalar meshScale,
                          int maxTrianglesPerCell, tScalar minCellSize)
 {
@@ -72,12 +68,12 @@ tMeshObject::tMeshObject(const char* meshXMLFile, tScalar meshScale,
 
   // Create the mesh
   if (!vertices.empty() && !triangleVertexIndices.empty())
-    mesh.CreateMesh(&vertices[0], vertices.size(), 
+    mesh.CreateMesh(&vertices[0], vertices.size(),
                          &triangleVertexIndices[0], triangleVertexIndices.size(),
                          maxTrianglesPerCell, minCellSize);
   else
     TRACE("Unable to create mesh from %s\n", meshXMLFile);
-  
+
   mCollisionSkin.AddPrimitive(mesh, tMaterialTable::UNSET);
 
   SetProperties(0.6f, 0.4f, 0.2f);
@@ -88,46 +84,46 @@ tMeshObject::tMeshObject(const char* meshXMLFile, tScalar meshScale,
   mDisplayListNum = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tMeshObject
-//==============================================================
+//======================================================================================================================
 tMeshObject::~tMeshObject()
 {
   TRACE_METHOD_ONLY(ONCE_2);
 }
 
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingMesh
-//==============================================================
+//======================================================================================================================
 const tSphere & tMeshObject::GetRenderBoundingSphere() const
 {
-  // ugly...
+  // Ugly...
   static tSphere sphere;
   sphere.SetPos(mCollisionSkin.GetWorldBoundingBox().GetCentre());
   sphere.SetRadius(mCollisionSkin.GetWorldBoundingBox().GetRadiusAboutCentre());
   return sphere;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tMeshObject::GetRenderPosition() const
 {
   return mRenderPosition;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tMeshObject::GetRenderOrientation() const
 {
   return mRenderOrientation;
 }
 
-//==============================================================
+//======================================================================================================================
 // Render
-//==============================================================
+//======================================================================================================================
 void tMeshObject::Render(tRenderObject::tRenderType renderType)
 {
   TRACE_METHOD_ONLY(FRAME_2);
@@ -136,9 +132,9 @@ void tMeshObject::Render(tRenderObject::tRenderType renderType)
   {
     mDisplayListNum = glGenLists(1);
     glNewList(mDisplayListNum, GL_COMPILE);
-    GLCOLOR4(RangedRandom(0.8f, 0.9f), 
+    GLCOLOR4(RangedRandom(0.8f, 0.9f),
              RangedRandom(0.8f, 0.9f),
-             RangedRandom(0.8f, 0.9f), 
+             RangedRandom(0.8f, 0.9f),
              1.0f);
 
     const tTriangleMesh& mesh = mCollisionSkin.GetPrimitiveLocal(0)->GetTriangleMesh();
@@ -149,9 +145,9 @@ void tMeshObject::Render(tRenderObject::tRenderType renderType)
     for (unsigned iTriangle = 0 ; iTriangle < numTriangles ; ++iTriangle)
     {
 #if 0
-      GLCOLOR4(RangedRandom(0.2f, 1.0f), 
+      GLCOLOR4(RangedRandom(0.2f, 1.0f),
                RangedRandom(0.2f, 1.0f),
-               RangedRandom(0.2f, 1.0f), 
+               RangedRandom(0.2f, 1.0f),
                0.5f);
 #endif
       const tIndexedTriangle& triangle = mesh.GetTriangle(iTriangle);
@@ -166,7 +162,7 @@ void tMeshObject::Render(tRenderObject::tRenderType renderType)
       GLVERTEX3V(v0.GetData());
       GLVERTEX3V(v1.GetData());
       GLVERTEX3V(v2.GetData());
-    }  
+    }
     glEnd();
 
     glEndList();
@@ -179,10 +175,10 @@ void tMeshObject::Render(tRenderObject::tRenderType renderType)
   glCallList(mDisplayListNum);
 }
 
-//====================================================================
+//======================================================================================================================
 // AddToTriangles
-//====================================================================
-void tMeshObject::AddToTriangles(std::vector<tVector3>& triangleVertices, 
+//======================================================================================================================
+void tMeshObject::AddToTriangles(std::vector<tVector3>& triangleVertices,
                                  std::vector<tTriangleVertexIndices>& triangleVertexIndices,
                                  const std::vector<tVector3>& vertices,
                                  const std::vector<tTriangleVertexIndices>& faces)
@@ -208,11 +204,11 @@ void tMeshObject::AddToTriangles(std::vector<tVector3>& triangleVertices,
 }
 
 #ifdef NO_XML
-//====================================================================
+//======================================================================================================================
 // LoadMesh
-//====================================================================
-void tMeshObject::LoadMesh(const char* meshXMLFile, 
-                           std::vector<tVector3>& vertices, 
+//======================================================================================================================
+void tMeshObject::LoadMesh(const char* meshXMLFile,
+                           std::vector<tVector3>& vertices,
                            std::vector<tTriangleVertexIndices>& triangleVertexIndices)
 {
   vertices.clear();
@@ -221,9 +217,9 @@ void tMeshObject::LoadMesh(const char* meshXMLFile,
 }
 
 #else
-//====================================================================
+//======================================================================================================================
 // ReadVertices
-//====================================================================
+//======================================================================================================================
 void tMeshObject::ReadVertices(xmlTextReaderPtr reader, std::vector<JigLib::tVector3>& vertices, int numVertices)
 {
   int numVerticesRead = 0;
@@ -241,8 +237,7 @@ void tMeshObject::ReadVertices(xmlTextReaderPtr reader, std::vector<JigLib::tVec
       }
       if (xmlStrcmp(name, (const xmlChar*) "position") == 0)
       {
-        // Dele3D coordinates are left-handed, and y is up... so the
-        // mapping onto my coords is:
+        // DeleD coordinates are left-handed, and y is up... So the mapping onto my coords is:
         // x -> -y
         // y -> z
         // z -> x
@@ -263,7 +258,7 @@ void tMeshObject::ReadVertices(xmlTextReaderPtr reader, std::vector<JigLib::tVec
         name = xmlTextReaderConstName(reader);
         value = xmlTextReaderConstValue(reader);
         z = (tScalar) atof((const char*) value);
-        
+
         if (1 != xmlTextReaderMoveToNextAttribute(reader))
         {
           TRACE("Unable to read vertex z\n"); return;
@@ -300,9 +295,9 @@ void tMeshObject::ReadVertices(xmlTextReaderPtr reader, std::vector<JigLib::tVec
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // ReadFaces
-//====================================================================
+//======================================================================================================================
 void tMeshObject::ReadFaces(xmlTextReaderPtr reader, std::vector<JigLib::tTriangleVertexIndices>& faces, int numFaces)
 {
   int numFacesRead = 0;
@@ -320,7 +315,7 @@ void tMeshObject::ReadFaces(xmlTextReaderPtr reader, std::vector<JigLib::tTriang
       }
       if (xmlStrcmp(name, (const xmlChar*) "face") == 0)
       {
-        // need to flip vertices to convert winding
+        // Need to flip vertices to convert winding
         int v1, v2, v3;
         const xmlChar* value;
         if (1 != xmlTextReaderMoveToNextAttribute(reader))
@@ -338,7 +333,7 @@ void tMeshObject::ReadFaces(xmlTextReaderPtr reader, std::vector<JigLib::tTriang
         name = xmlTextReaderConstName(reader);
         value = xmlTextReaderConstValue(reader);
         v1 = atoi((const char*) value);
-        
+
         if (1 != xmlTextReaderMoveToNextAttribute(reader))
         {
           TRACE("Unable to read face index 3\n"); return;
@@ -363,12 +358,12 @@ void tMeshObject::ReadFaces(xmlTextReaderPtr reader, std::vector<JigLib::tTriang
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // ProcessNode
-//====================================================================
-void tMeshObject::ProcessNode(xmlTextReaderPtr reader, 
-                              std::vector<tVector3>& triangleVertices, 
-                              std::vector<tTriangleVertexIndices>& triangleVertexIndices) 
+//======================================================================================================================
+void tMeshObject::ProcessNode(xmlTextReaderPtr reader,
+                              std::vector<tVector3>& triangleVertices,
+                              std::vector<tTriangleVertexIndices>& triangleVertexIndices)
 {
   if (xmlTextReaderNodeType(reader) != XML_ELEMENT_NODE)
     return;
@@ -394,7 +389,7 @@ void tMeshObject::ProcessNode(xmlTextReaderPtr reader,
         int numFaces = atoi((const char*) value);
         TRACE("Reading %d faces\n", numFaces);
 
-        // now read them
+        // Now read them
         faces.clear();
         vertices.clear();
         ReadFaces(reader, faces, numFaces);
@@ -420,10 +415,10 @@ void tMeshObject::ProcessNode(xmlTextReaderPtr reader,
         int numVertices = atoi((const char*) value);
         TRACE("Reading %d vertices\n", numVertices);
 
-        // now read them
+        // Now read them
         ReadVertices(reader, vertices, numVertices);
 
-        // add em
+        // Add em
         AddToTriangles(triangleVertices, triangleVertexIndices, vertices, faces);
 
         faces.clear();
@@ -441,34 +436,33 @@ void tMeshObject::ProcessNode(xmlTextReaderPtr reader,
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // LoadMesh
-//====================================================================
-void tMeshObject::LoadMesh(const char* meshXMLFile, 
-                           std::vector<tVector3>& vertices, 
+//======================================================================================================================
+void tMeshObject::LoadMesh(const char* meshXMLFile,
+                           std::vector<tVector3>& vertices,
                            std::vector<tTriangleVertexIndices>& triangleVertexIndices)
 {
   vertices.clear();
   triangleVertexIndices.clear();
 
-  // this initialize the library and check potential ABI mismatches
-  // between the version it was compiled for and the actual shared
-  // library used.
+  // This initialize the library and check potential ABI mismatches between the version it was
+  // compiled for and the actual shared library used.
   LIBXML_TEST_VERSION;
 
   xmlTextReaderPtr reader = xmlReaderForFile(meshXMLFile, NULL,
                                              XML_PARSE_PEDANTIC);
-  if (reader != NULL) 
+  if (reader != NULL)
   {
     int ret = xmlTextReaderRead(reader);
-    while (ret == 1) 
+    while (ret == 1)
     {
       ProcessNode(reader, vertices, triangleVertexIndices);
       ret = xmlTextReaderRead(reader);
     }
     /*
     // Once the document has been fully parsed check the validation results
-    if (xmlTextReaderIsValid(reader) != 1) 
+    if (xmlTextReaderIsValid(reader) != 1)
     {
     TRACE("Document %s does not validate\n", meshXMLFile);
     vertices.clear();
@@ -476,8 +470,8 @@ void tMeshObject::LoadMesh(const char* meshXMLFile,
     }
     */
     xmlFreeTextReader(reader);
-  } 
-  else 
+  }
+  else
   {
     TRACE("Unable to open %s\n", meshXMLFile);
   }

@@ -1,25 +1,21 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file collisionsystem.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "collisionsystem.hpp"
 #include "jiglib.hpp"
 
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tCollisionSystem
-//==============================================================
+//======================================================================================================================
 tCollisionSystem::tCollisionSystem()
   : mUseSweepTests(false)
 {
   TRACE_METHOD_ONLY(ONCE_1);
-  
+
   static tCollDetectBoxBox boxBoxCollDetector;
   static tCollDetectBoxHeightmap boxHeightmapCollDetector;
   static tCollDetectBoxPlane boxPlaneCollDetector;
@@ -35,7 +31,7 @@ tCollisionSystem::tCollisionSystem()
   static tCollDetectSphereStaticMesh sphereStaticMeshCollDetector;
   static tCollDetectCapsuleStaticMesh capsuleStaticMeshCollDetector;
   static tCollDetectBoxStaticMesh boxStaticMeshCollDetector;
-  
+
   RegisterCollDetectFunctor(boxBoxCollDetector);
   RegisterCollDetectFunctor(boxHeightmapCollDetector);
   RegisterCollDetectFunctor(boxPlaneCollDetector);
@@ -53,25 +49,25 @@ tCollisionSystem::tCollisionSystem()
   RegisterCollDetectFunctor(boxStaticMeshCollDetector);
 }
 
-//==============================================================
+//======================================================================================================================
 // tCollisionSystem
-//==============================================================
+//======================================================================================================================
 tCollisionSystem::~tCollisionSystem()
 {
   TRACE_METHOD_ONLY(ONCE_1);
 }
 
-//==============================================================
+//======================================================================================================================
 // RegisterCollDetectFunction
-//==============================================================
+//======================================================================================================================
 void tCollisionSystem::RegisterCollDetectFunctor(tCollDetectFunctor & f)
 {
   TRACE_METHOD_ONLY(ONCE_1);
-  
+
   unsigned type0 = f.mType0;
   unsigned type1 = f.mType1;
   unsigned maxType = Max(type0, type1);
-  
+
   if (maxType >= mDetectionFunctors.size())
   {
     mDetectionFunctors.resize(maxType + 1);
@@ -84,7 +80,7 @@ void tCollisionSystem::RegisterCollDetectFunctor(tCollDetectFunctor & f)
       mDetectionFunctors[i].resize(maxType + 1);
     }
   }
-  
+
   mDetectionFunctors[type0][type1] = &f;
   mDetectionFunctors[type1][type0] = &f;
 }

@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file boxchain.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "boxchain.hpp"
 
 #include "rendermanager.hpp"
@@ -16,9 +12,9 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tBoxChain
-//==============================================================
+//======================================================================================================================
 tBoxChain::tBoxChain(tRenderManager * renderManager,
                      unsigned chainLength,
                      const tVector3 & pos,
@@ -33,20 +29,20 @@ tBoxChain::tBoxChain(tRenderManager * renderManager,
     thisPos.z += 0.5f * boxDims.z;
     thisPos.y -= 0.5f * chainLength * boxDims.y;
     thisPos.y += iBox * boxDims.y;
-    
+
     tBoxObject * boxObject = new tBoxObject(boxDims, false);
-    boxObject->SetProperties(0.0f, 
+    boxObject->SetProperties(0.0f,
                              1.0f,
                              0.7f);
     boxObject->SetDensity(boxDensity);
     mBoxes.push_back(boxObject);
     boxObject->GetBody()->MoveTo(thisPos, tMatrix33::Identity());
     renderManager->AddObject(boxObject);
-    /// physics will register collision for objects passed to it.
+    // Physics will register collision for objects passed to it.
     boxObject->GetBody()->EnableBody();
   }
 
-  // add the joints/constraints. Also disable collisions between adjacent bodies
+  // Add the joints/constraints. Also disable collisions between adjacent bodies
   for (iBox = 0 ; iBox < chainLength-1 ; ++iBox)
   {
     mBoxes[iBox]->GetBody()->GetCollisionSkin()->
@@ -66,10 +62,10 @@ tBoxChain::tBoxChain(tRenderManager * renderManager,
     else
     {
       tHingeJoint * joint = new tHingeJoint;
-      joint->Initialise(mBoxes[iBox]->GetBody(), mBoxes[iBox+1]->GetBody(), 
+      joint->Initialise(mBoxes[iBox]->GetBody(), mBoxes[iBox+1]->GetBody(),
                         tVector3::Look(),
                         tVector3(0.0f, 0.5f * boxDims.y, 0.0f),
-                        boxDims.GetLength(), 
+                        boxDims.GetLength(),
                         90.0f, 90.0f,
                         0.1f,
                         0.0f);
@@ -79,9 +75,9 @@ tBoxChain::tBoxChain(tRenderManager * renderManager,
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tBoxChain
-//==============================================================
+//======================================================================================================================
 tBoxChain::~tBoxChain()
 {
   unsigned i;
@@ -93,18 +89,18 @@ tBoxChain::~tBoxChain()
     delete mBoxes[i];
 }
 
-//==============================================================
+//======================================================================================================================
 // GetBody
-//==============================================================
+//======================================================================================================================
 tBody * tBoxChain::GetBody()
 {
   return mBoxes[0]->GetBody();
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetRenderPosition
-//==============================================================
+//======================================================================================================================
 void tBoxChain::SetRenderPosition(JigLib::tScalar renderFraction)
 {
   unsigned numBoxes = mBoxes.size();
@@ -112,25 +108,25 @@ void tBoxChain::SetRenderPosition(JigLib::tScalar renderFraction)
     mBoxes[i]->SetRenderPosition(renderFraction);
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingSphere
-//==============================================================
+//======================================================================================================================
 const tSphere & tBoxChain::GetRenderBoundingSphere() const
 {
   return tSphere::HugeSphere();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tBoxChain::GetRenderPosition() const
 {
   return mBoxes[0]->GetRenderPosition();
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tBoxChain::GetRenderOrientation() const
 {
   return mBoxes[0]->GetRenderOrientation();

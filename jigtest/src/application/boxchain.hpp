@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file boxchain.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef BOXCHAIN_HPP
 #define BOXCHAIN_HPP
 
@@ -19,14 +15,14 @@ class tBoxChain : public tObject
 {
 public:
   enum tChainType {CHAIN_HINGE, CHAIN_BALLNSOCKET};
-  
+
   tBoxChain(class tRenderManager * render,
             unsigned chainLength,
             const JigLib::tVector3 & pos,
             const JigLib::tVector3 & boxDims,
             JigLib::tScalar boxDensity,
             tChainType type);
-  
+
   ~tBoxChain();
 
   JigLib::tBody * GetBody();

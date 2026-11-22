@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectcapsulecapsule.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectcapsulecapsule.hpp"
 #include "capsule.hpp"
 #include "mathsmisc.hpp"
@@ -15,9 +11,9 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectCapsuleCapsule
-//==============================================================
+//======================================================================================================================
 tCollDetectCapsuleCapsule::tCollDetectCapsuleCapsule()
   :
   tCollDetectFunctor("CapsuleCapsule", tPrimitive::CAPSULE, tPrimitive::CAPSULE)
@@ -25,19 +21,19 @@ tCollDetectCapsuleCapsule::tCollDetectCapsuleCapsule()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // operator
-//==============================================================
+//======================================================================================================================
 void tCollDetectCapsuleCapsule::CollDetect(const tCollDetectInfo &info,
                                            tScalar collTolerance,
                                            tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  
+
   const tVector3& body0Pos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& body1Pos = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
 
-  // todo - proper swept test
+  // TODO: proper swept test
   const tCapsule & oldCapsule0 = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetCapsule();
   const tCapsule & newCapsule0 = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetCapsule();
   const tSegment oldSeg0(oldCapsule0.GetPos(), oldCapsule0.GetLength() * oldCapsule0.GetOrient().GetLook());
@@ -54,7 +50,7 @@ void tCollDetectCapsuleCapsule::CollDetect(const tCollDetectInfo &info,
   tScalar newt0, newt1;
   tScalar oldDistSq = SegmentSegmentDistanceSq(&oldt0, &oldt1, oldSeg0, oldSeg1);
   tScalar newDistSq = SegmentSegmentDistanceSq(&newt0, &newt1, newSeg0, newSeg1);
-        
+
   if (Min(oldDistSq, newDistSq) < Sq(radSum + collTolerance))
   {
     tVector3 pos0 = oldSeg0.GetPoint(oldt0);
@@ -70,10 +66,10 @@ void tCollDetectCapsuleCapsule::CollDetect(const tCollDetectInfo &info,
     }
     else
     {
-      // TODO - make this not random...!
+      // TODO: make this not random...!
       delta = RotationMatrix(RangedRandom(0.0f, 360.0f), tVector3::Up()) * tVector3::Look();
     }
-    tVector3 worldPos = pos1 + 
+    tVector3 worldPos = pos1 +
       (oldCapsule1.GetRadius() - 0.5f * depth) * delta;
     tCollPointInfo collInfo(worldPos - body0Pos, worldPos - body1Pos, depth);
 

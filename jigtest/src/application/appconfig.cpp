@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file appconfig.cpp
-//                     
-//==============================================================
+//======================================================================================================================
 #include "appconfig.hpp"
 
 using namespace JigLib;
@@ -35,5 +31,5 @@ int tAppConfig::mTextureLevel = 0;
 bool tAppConfig::mRenderInterpolate = true;
 tScalar tAppConfig::mCamSpeed = 10.0f;
 tScalar tAppConfig::mObjectControllerSpeed = 10.0f;
-std::string tAppConfig::mSkybox("none");  
+std::string tAppConfig::mSkybox("none");
 int tAppConfig::mMovieInterval = 2;

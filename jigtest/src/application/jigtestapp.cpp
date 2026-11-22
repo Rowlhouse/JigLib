@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file jigtestapp.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 
 #include "jigtestapp.hpp"
 #include "appconfig.hpp"
@@ -33,9 +29,9 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // DisplayLicense
-//==============================================================
+//======================================================================================================================
 void DisplayLicense()
 {
   TRACE("JigTest Copyright 2007 Danny Chapman: danny@rowlhouse.freeserve.co.uk\n");
@@ -45,9 +41,9 @@ void DisplayLicense()
   TRACE("Version compiled " __TIME__ " " __DATE__ "\n");
 }
 
-//==============================================================
+//======================================================================================================================
 // tJigTestApp
-//==============================================================
+//======================================================================================================================
 tJigTestApp::tJigTestApp(int & argc, char * argv[])
   :
   tSDLApplicationBase(argc, argv, "jigtest.cfg", ::DisplayLicense),
@@ -69,9 +65,9 @@ tJigTestApp::tJigTestApp(int & argc, char * argv[])
   mPhysicsCounter = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tJigTestApp
-//==============================================================
+//======================================================================================================================
 tJigTestApp::~tJigTestApp()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -87,9 +83,9 @@ tJigTestApp::~tJigTestApp()
   delete mCollisionSystem;
 }
 
-//==============================================================
+//======================================================================================================================
 // HandleFPSMouseMotion
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleFPSMouseMotion(const SDL_MouseMotionEvent & event)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -132,9 +128,9 @@ void tJigTestApp::HandleFPSMouseMotion(const SDL_MouseMotionEvent & event)
 }
 
 
-//====================================================================
+//======================================================================================================================
 // HandleFPSKeyDown
-//====================================================================
+//======================================================================================================================
 void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -142,7 +138,7 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
     return;
 
   tCharacterObject* character = mCharacterObjects[0];
-  switch( keysym.sym ) 
+  switch( keysym.sym )
   {
   case SDLK_F1:
     DoScreenshot();
@@ -168,9 +164,9 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // HandleFPSKeyUp
-//====================================================================
+//======================================================================================================================
 void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -179,7 +175,7 @@ void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
 
   tCharacterObject* character = mCharacterObjects[0];
 
-  switch( keysym.sym ) 
+  switch( keysym.sym )
   {
   case SDLK_w: character->ControlFwd(false); break;
   case SDLK_a: character->ControlLeft(false); break;
@@ -189,9 +185,9 @@ void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // HandleKeyDown
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -204,7 +200,7 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
 
   SDLMod keyMod = SDL_GetModState();
 
-  switch( keysym.sym ) 
+  switch( keysym.sym )
   {
   case SDLK_F1:
     DoScreenshot();
@@ -237,15 +233,15 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
     tAppConfig::mRenderEnable = !tAppConfig::mRenderEnable;
     break;
   case SDLK_k:
-    tDebugConfig::mRenderCollisionContacts = 
+    tDebugConfig::mRenderCollisionContacts =
       (tDebugConfig::mRenderCollisionContacts + 1) %3;
     break;
   case SDLK_b:
-    tDebugConfig::mRenderCollisionBoundingBoxes = 
+    tDebugConfig::mRenderCollisionBoundingBoxes =
       !tDebugConfig::mRenderCollisionBoundingBoxes;
     break;
   case SDLK_v:
-    tDebugConfig::mIndicateFrozenObjects = 
+    tDebugConfig::mIndicateFrozenObjects =
       !tDebugConfig::mIndicateFrozenObjects;
     break;
   case SDLK_f:
@@ -343,9 +339,9 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
   SetSleepingParams();
 }
 
-//==============================================================
+//======================================================================================================================
 // HandleKeyUp
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleKeyUp( const SDL_keysym & keysym )
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -356,7 +352,7 @@ void tJigTestApp::HandleKeyUp( const SDL_keysym & keysym )
     return;
   }
 
-  switch( keysym.sym ) 
+  switch( keysym.sym )
   {
   case SDLK_w:
     mCameraMoveDir &= ~MOVE_FWD;
@@ -394,9 +390,9 @@ void tJigTestApp::HandleKeyUp( const SDL_keysym & keysym )
 }
 
 
-//==============================================================
+//======================================================================================================================
 // HandleMouseButtonDown
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
 {
   if (!GetPhysicsSystem())
@@ -433,7 +429,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
   }
 
   tVector2 mousePt(event.x, event.y);
-  // get the object from physics
+  // Get the object from physics
   tViewport* viewport = 0;
   unsigned nViewports = mViewports.size();
   unsigned i;
@@ -442,9 +438,9 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
     viewport = mViewports[i];
     tVector2 pos, size;
     viewport->GetPositionAndSize(pos, size);
-    if (mousePt.x > pos.x && 
+    if (mousePt.x > pos.x &&
         mousePt.x < pos.x + size.x &&
-        mousePt.y > pos.y && 
+        mousePt.y > pos.y &&
         mousePt.y < pos.y + size.y)
     {
       break;
@@ -466,7 +462,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
   tCollisionSkin * skin = 0;
   tVector3 pos;
   tVector3 normal;
-  tSegment seg(camPos, worldPos - camPos); 
+  tSegment seg(camPos, worldPos - camPos);
 
   bool result = coll->SegmentIntersect(frac, skin, pos, normal, seg, 0);
 
@@ -510,9 +506,9 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // HandleMouseButtonUp
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
 {
   if (event.button == 2 || event.button == 3)
@@ -525,9 +521,9 @@ void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // HandleMouseMotion
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::HandleMouseMotion( const SDL_MouseMotionEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -551,9 +547,9 @@ void tJigTestApp::HandleMouseMotion( const SDL_MouseMotionEvent & event )
       viewport = mViewports[i];
       tVector2 pos, size;
       viewport->GetPositionAndSize(pos, size);
-      if (mousePt.x > pos.x && 
+      if (mousePt.x > pos.x &&
           mousePt.x < pos.x + size.x &&
-          mousePt.y > pos.y && 
+          mousePt.y > pos.y &&
           mousePt.y < pos.y + size.y)
       {
         break;
@@ -571,9 +567,9 @@ void tJigTestApp::HandleMouseMotion( const SDL_MouseMotionEvent & event )
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ControlMainObject
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::ControlMainObject(tObjectControl control, bool down)
 {
   for (int i = Max(mCameraTargetIndex, 0) ; i < (int) mObjects.size() ; ++i)
@@ -636,9 +632,9 @@ void tJigTestApp::ControlMainObject(tObjectControl control, bool down)
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ControlMainCar
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::ControlMainCar(tObjectControl control, bool down)
 {
   if (mCarObjects.empty())
@@ -666,9 +662,9 @@ void tJigTestApp::ControlMainCar(tObjectControl control, bool down)
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // FireLastCreatedObject
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::FireLastCreatedObject()
 {
   int origIndex = mCameraTargetIndex;
@@ -678,9 +674,9 @@ void tJigTestApp::FireLastCreatedObject()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // FireObject
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::FireObject()
 {
   if (mObjects.empty())
@@ -704,9 +700,9 @@ void tJigTestApp::FireObject()
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ProcessMainEvent
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::ProcessMainEvent()
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -716,7 +712,7 @@ void tJigTestApp::ProcessMainEvent()
     {
       TRACE("FPS = %5.2f, ", GetFPS());
       TRACE("Physics duration = %5.2fms which is %5.2f%% of the timestep\n",
-            1000.0f * mPhysicsDuration, 
+            1000.0f * mPhysicsDuration,
             100.0f * mPhysicsDuration * tAppConfig::mPhysicsFrequency);
     }
   }
@@ -751,9 +747,8 @@ void tJigTestApp::ProcessMainEvent()
   {
     if (!mPaused)
     {
-    	mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
-      // the idea is that we run physics until it progresses just beyond
-      // where we want to be.
+        mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
+      // The idea is that we run physics until it progresses just beyond where we want to be.
       int maxLoops = tAppConfig::mMaxPhysicsStepsPerFrame;
       while ( (iLoop < maxLoops) &&
               (GetStartOfFrameTime() > mPhysics.GetTargetTime()) )
@@ -769,8 +764,8 @@ void tJigTestApp::ProcessMainEvent()
         if (timeAvailable)
         {
           static const tScalar frac = 0.05f;
-          mPhysicsDuration = 
-            (1.0f - frac) * mPhysicsDuration + 
+          mPhysicsDuration =
+            (1.0f - frac) * mPhysicsDuration +
             frac * GetTimeDelta(before, after);
         }
 
@@ -780,7 +775,7 @@ void tJigTestApp::ProcessMainEvent()
           exit(0);
         }
 
-        // single stepping?
+        // Single stepping?
         if (mPauseAfterNextPhysicsStep)
         {
           mPauseAfterNextPhysicsStep = false;
@@ -801,29 +796,29 @@ void tJigTestApp::ProcessMainEvent()
     }
     else
     {
-    	mPhysics.SetNullUpdate(true);
+        mPhysics.SetNullUpdate(true);
       mPhysics.Integrate(1.0f / tAppConfig::mPhysicsFrequency);
       mPhysics.ResetTime(GetStartOfFrameTime());
       iLoop = 1;
     }
   }
 
-  // update car ai
+  // Update car ai
   mCarAI.Update(iLoop / tAppConfig::mPhysicsFrequency);
 
   // Update camera[0] speed
   if (0 == mCameras[0]->GetPositionObject())
   {
-    tVector3 desiredCamVel = 
-      !!(mCameraMoveDir & MOVE_FWD) * tVector3::Look() + 
-      !!(mCameraMoveDir & MOVE_BACK) * -tVector3::Look() + 
-      !!(mCameraMoveDir & MOVE_LEFT) * tVector3::Left() + 
-      !!(mCameraMoveDir & MOVE_RIGHT) * -tVector3::Left() + 
-      !!(mCameraMoveDir & MOVE_UP) * tVector3::Up() + 
+    tVector3 desiredCamVel =
+      !!(mCameraMoveDir & MOVE_FWD) * tVector3::Look() +
+      !!(mCameraMoveDir & MOVE_BACK) * -tVector3::Look() +
+      !!(mCameraMoveDir & MOVE_LEFT) * tVector3::Left() +
+      !!(mCameraMoveDir & MOVE_RIGHT) * -tVector3::Left() +
+      !!(mCameraMoveDir & MOVE_UP) * tVector3::Up() +
       !!(mCameraMoveDir & MOVE_DOWN) * -tVector3::Up();
-    desiredCamVel = tAppConfig::mCamSpeed * 
+    desiredCamVel = tAppConfig::mCamSpeed *
       mCameras[0]->GetOrient() * desiredCamVel;
-    // cam vel is relative to a reference distance
+    // Cam vel is relative to a reference distance
     desiredCamVel *= (mCameras[0]->GetTarget() - mCameras[0]->GetPosition()).GetLength() / 10.0f;
     tVector3 camPos = mCameras[0]->GetPosition();
     tScalar dt = GetStartOfFrameTime() - GetOldStartOfFrameTime();
@@ -833,11 +828,11 @@ void tJigTestApp::ProcessMainEvent()
     mCameras[0]->SetPosition(camPos);
   }
 
-  // do rendering
+  // Do rendering
   if (tAppConfig::mRenderEnable)
   {
-    /// The fraction used to interpolate between old and current
-    /// positions in the physics when rendering.
+    // The fraction used to interpolate between old and current positions in the physics when
+    // rendering.
     tScalar renderFraction = 1.0f;
 
     if (tAppConfig::mRenderInterpolate)
@@ -845,7 +840,7 @@ void tJigTestApp::ProcessMainEvent()
       tScalar physicsDt = mPhysics.GetTargetTime() - mPhysics.GetOldTime();
       if (physicsDt > SCALAR_TINY)
       {
-        renderFraction = 
+        renderFraction =
           (GetStartOfFrameTime() - mPhysics.GetOldTime()) / physicsDt;
         Limit(renderFraction, SCALAR(0.0f), SCALAR(1.0f));
         if (mPaused)
@@ -891,7 +886,7 @@ void tJigTestApp::ProcessMainEvent()
       }
     }
 
-    // if we have a character ignore everything else
+    // If we have a character ignore everything else
     if (!mCharacterObjects.empty())
     {
       tObject* charObject = mCharacterObjects[0];
@@ -919,7 +914,7 @@ void tJigTestApp::ProcessMainEvent()
       mViewports[i]->Render();
       if (tDebugConfig::mRenderCollisionContacts)
         RenderAllContacts(tDebugConfig::mRenderCollisionContacts);
-      if ( (mCameraTargetIndex >= 0) && 
+      if ( (mCameraTargetIndex >= 0) &&
            (mCameraTargetIndex < (int) mObjects.size()) )
       {
         tObject * obj = mObjects[mCameraTargetIndex];
@@ -931,36 +926,36 @@ void tJigTestApp::ProcessMainEvent()
       }
     }
     CheckGLErrors("After vewport renders");
-  }  
+  }
 
   SDL_GL_SwapBuffers( );
 
   CheckGLErrors("After buffer swap");
 }
 
-//==============================================================
+//======================================================================================================================
 // StartMainLoop
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::StartMainLoop()
 {
   TRACE_METHOD_ONLY(FRAME_1);
 
-  // synchronise the physics time
+  // Synchronise the physics time
   mPhysics.ResetTime(GetStartOfFrameTime());
 
   tSDLApplicationBase::StartMainLoop();
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetupExperiment
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::SetupExperiment()
 {
   TRACE_METHOD_ONLY(ONCE_1);
   unsigned i;
 
-  // clear up
+  // Clear up
   {
     RemoveAllObjects(false);
     for (i = 0 ; i < mCameras.size(); ++i)
@@ -984,7 +979,10 @@ void tJigTestApp::SetupExperiment()
   case 1:
     TRACE_FILE_IF(ONCE_1)
       TRACE("Creating tCollisionSystemGrid\n");
-    mCollisionSystem = new tCollisionSystemGrid(32, 32, 4, tAppConfig::mCollisionGridSize, tAppConfig::mCollisionGridSize, tAppConfig::mCollisionGridSize);
+    mCollisionSystem = new tCollisionSystemGrid(32, 32, 4,
+                                                tAppConfig::mCollisionGridSize,
+                                                tAppConfig::mCollisionGridSize,
+                                                tAppConfig::mCollisionGridSize);
     break;
   default:
     TRACE("Collision system type %d not handled\n", tAppConfig::mCollisionSystemType);
@@ -997,7 +995,7 @@ void tJigTestApp::SetupExperiment()
   GetConfigFile().GetValue("collision_use_swept_tests", collisionUseSweptTests);
   mCollisionSystem->SetUseSweepTests(collisionUseSweptTests);
 
-  // create a heightmap or planes for objects to sit on
+  // Create a heightmap or planes for objects to sit on
   string heightmapFilename("none");
   GetConfigFile().GetValue("heightmap_filename", heightmapFilename);
   if (heightmapFilename != string("none"))
@@ -1037,17 +1035,17 @@ void tJigTestApp::SetupExperiment()
       planeUp = Matrix33Gamma(120.0f) * planeUp;
       tPlaneObject * plane3 = new tPlaneObject(tPlane(planeUp, offset));
 
-      plane0->SetProperties(planeElasticity, 
-                            planeStaticFriction, 
+      plane0->SetProperties(planeElasticity,
+                            planeStaticFriction,
                             planeDynamicFriction);
-      plane1->SetProperties(planeElasticity, 
-                            planeStaticFriction, 
+      plane1->SetProperties(planeElasticity,
+                            planeStaticFriction,
                             planeDynamicFriction);
-      plane2->SetProperties(planeElasticity, 
-                            planeStaticFriction, 
+      plane2->SetProperties(planeElasticity,
+                            planeStaticFriction,
                             planeDynamicFriction);
-      plane3->SetProperties(planeElasticity, 
-                            planeStaticFriction, 
+      plane3->SetProperties(planeElasticity,
+                            planeStaticFriction,
                             planeDynamicFriction);
 
       mObjects.push_back(plane0);
@@ -1058,7 +1056,7 @@ void tJigTestApp::SetupExperiment()
       mRenderManager.AddObject(plane1);
       mRenderManager.AddObject(plane2);
       mRenderManager.AddObject(plane3);
-      /// need to add non-physical objects to collision
+      // Need to add non-physical objects to collision
       mCollisionSystem->AddCollisionSkin(plane0->GetCollisionSkin());
       mCollisionSystem->AddCollisionSkin(plane1->GetCollisionSkin());
       mCollisionSystem->AddCollisionSkin(plane2->GetCollisionSkin());
@@ -1071,7 +1069,7 @@ void tJigTestApp::SetupExperiment()
   if (doUnequalExp)
     SetupUnequalExperiment();
 
-  // create some spheres
+  // Create some spheres
   int nSpheres = 1;
   tScalar sphereMinRadius = 1.0f;
   tScalar sphereMaxRadius = 1.0f;
@@ -1095,25 +1093,25 @@ void tJigTestApp::SetupExperiment()
 
   for (int iSphere = 0 ; iSphere < nSpheres ; ++iSphere)
   {
-    tSphereObject * sphereObject = 
+    tSphereObject * sphereObject =
       new tSphereObject(RangedRandom(sphereMinRadius, sphereMaxRadius));
-    sphereObject->SetProperties(sphereElasticity, 
-                                sphereStaticFriction, 
+    sphereObject->SetProperties(sphereElasticity,
+                                sphereStaticFriction,
                                 sphereDynamicFriction);
     sphereObject->SetDensity(sphereDensity);
     mObjects.push_back(sphereObject);
     sphereObject->GetBody()->MoveTo(
-      tVector3(sphereX, sphereY, 
-               sphereZ + (0.5f + iSphere) * (2.0f * sphereMaxRadius)) + 
-      0.05f * sphereMaxRadius * 
+      tVector3(sphereX, sphereY,
+               sphereZ + (0.5f + iSphere) * (2.0f * sphereMaxRadius)) +
+      0.05f * sphereMaxRadius *
       tVector3(RangedRandom(-1, 1), RangedRandom(-1, 1), 0.0f),
       tMatrix33::Identity());
     mRenderManager.AddObject(sphereObject);
-    /// physics will register collision for objects passed to it.
+    // Physics will register collision for objects passed to it.
     sphereObject->GetBody()->EnableBody();
   }
 
-  // create a jenga stack
+  // Create a jenga stack
   int jengaStackHeight = 0;
   tScalar jengaBoxWidth = 1.0f;
   tScalar jengaBoxHeight = 0.5f;
@@ -1127,13 +1125,13 @@ void tJigTestApp::SetupExperiment()
   GetConfigFile().GetValue("jenga_stack_y", jengaStackY);
   GetConfigFile().GetValue("jenga_stack_z", jengaStackZ);
 
-  BuildJengaStack(jengaStackHeight, 
+  BuildJengaStack(jengaStackHeight,
                   tVector3(jengaBoxWidth * 3.0f,
-                           jengaBoxWidth, 
-                           jengaBoxHeight), 
+                           jengaBoxWidth,
+                           jengaBoxHeight),
                   tVector3(jengaStackX, jengaStackY, jengaStackZ));
 
-  // create some boxes
+  // Create some boxes
   int nBoxes = 1;
   tScalar boxMinSide = 1.0f;
   tScalar boxMaxSide = 1.0f;
@@ -1168,44 +1166,44 @@ void tJigTestApp::SetupExperiment()
                                                     RangedRandom(boxMinSide, boxMaxSide),
                                                     RangedRandom(boxMinSide, boxMaxSide)));
     tBoxObject * boxObject = new tBoxObject(sides, false);
-    boxObject->SetProperties(boxElasticity, 
+    boxObject->SetProperties(boxElasticity,
                              boxStaticFriction,
                              boxDynamicFriction);
     boxObject->SetDensity(boxDensity);
     mObjects.push_back(boxObject);
     boxObject->GetBody()->MoveTo(
-      tVector3(boxX, boxY, z + boxZ + 0.5f * sides.z), 
+      tVector3(boxX, boxY, z + boxZ + 0.5f * sides.z),
       Matrix33Gamma(RangedRandom(0.0f, 0.0f)));
     z += sides.z + boxZSpacing - tAppConfig::mAllowedPenetration;
     mRenderManager.AddObject(boxObject);
-    /// physics will register collision for objects passed to it.
+    // Physics will register collision for objects passed to it.
     boxObject->GetBody()->EnableBody();
   }
 
-  // create some capsules
+  // Create some capsules
   int numCapsules = 0;
   GetConfigFile().GetValue("num_capsules", numCapsules);
   for (int iCapsule = 0 ; iCapsule < numCapsules ; ++iCapsule)
   {
     tCapsuleObject * capsule = CreateCapsule();
-    capsule->GetBody()->MoveTo(capsule->GetBody()->GetPosition() + 
-                               iCapsule * 1.0f * tVector3::Up(), 
+    capsule->GetBody()->MoveTo(capsule->GetBody()->GetPosition() +
+                               iCapsule * 1.0f * tVector3::Up(),
                                capsule->GetBody()->GetOrientation());
   }
 
-  // create some capsules
+  // Create some capsules
   int numCompounds = 0;
   GetConfigFile().GetValue("num_compounds", numCompounds);
   for (int iCompound = 0 ; iCompound < numCompounds ; ++iCompound)
   {
     tBoxSphereObject * compound = CreateCompound();
-    compound->GetBody()->MoveTo(compound->GetBody()->GetPosition() + 
-                               iCompound * 1.0f * tVector3::Up(), 
+    compound->GetBody()->MoveTo(compound->GetBody()->GetPosition() +
+                               iCompound * 1.0f * tVector3::Up(),
                                compound->GetBody()->GetOrientation());
   }
 
 
-  // create a wall
+  // Create a wall
   int numWalls = 1;
   tScalar wallSpacing = 10.0f;
   int wallHeight = 0;
@@ -1233,22 +1231,22 @@ void tJigTestApp::SetupExperiment()
   {
     tVector3 offset = -iWall * wallSpacing * tVector3::Look();
     BuildWall(wallHeight, wallWidth,
-              tVector3(wallBoxX, wallBoxY, wallBoxZ), 
+              tVector3(wallBoxX, wallBoxY, wallBoxZ),
               offset + tVector3(wallX, wallY, wallZ),
               wallPyramid);
   }
-  // create some cars
+  // Create some cars
   int numCars = 0;
   GetConfigFile().GetValue("num_cars", numCars);
   for (int iCar = 0 ; iCar < numCars ; ++iCar)
   {
     tCarObject * car = CreateCar();
-    car->GetBody()->MoveTo(car->GetBody()->GetPosition() + 
-                           iCar * 3.0f * tVector3::Up(), 
+    car->GetBody()->MoveTo(car->GetBody()->GetPosition() +
+                           iCar * 3.0f * tVector3::Up(),
                            car->GetBody()->GetOrientation());
   }
 
-  // create a box chain
+  // Create a box chain
   int boxChainLen = 0;
   GetConfigFile().GetValue("box_chain_len", boxChainLen);
   if (boxChainLen > 0)
@@ -1277,7 +1275,7 @@ void tJigTestApp::SetupExperiment()
     mObjects.push_back(chain);
   }
 
-  // create a sphere chain
+  // Create a sphere chain
   int sphereChainLen = 0;
   GetConfigFile().GetValue("sphere_chain_len", sphereChainLen);
   if (sphereChainLen > 0)
@@ -1302,7 +1300,7 @@ void tJigTestApp::SetupExperiment()
     mObjects.push_back(chain);
   }
 
-  // create some ragdolls
+  // Create some ragdolls
   int numRagdolls = 0;
   GetConfigFile().GetValue("num_ragdolls", numRagdolls);
   bool ragdollStartAsleep = false;
@@ -1312,7 +1310,7 @@ void tJigTestApp::SetupExperiment()
     CreateRagdoll();
   }
 
-  // create some newton cradles
+  // Create some newton cradles
   int numNewtons = 0;
   GetConfigFile().GetValue("num_newtons", numNewtons);
   for (int iNewton = 0 ; iNewton < numNewtons ; ++iNewton)
@@ -1320,7 +1318,7 @@ void tJigTestApp::SetupExperiment()
     CreateNewton();
   }
 
-  if (false) // test for PAL problems
+  if (false) // Test for PAL problems
   {
     std::vector<tVector3> verts(5);
     verts[0].Set(1, 0, 2);
@@ -1342,17 +1340,17 @@ void tJigTestApp::SetupExperiment()
     int maxTrianglesPerCell = 4;
 
     tMeshObject* meshObject = new tMeshObject(verts, inds, maxTrianglesPerCell, minCellSize);
-    meshObject->SetProperties(meshElasticity, 
+    meshObject->SetProperties(meshElasticity,
       meshStaticFriction,
       meshDynamicFriction);
     mObjects.push_back(meshObject);
     mRenderManager.AddObject(meshObject);
-    /// need to add non-physical objects to collision
+    // Need to add non-physical objects to collision
     mCollisionSystem->AddCollisionSkin(meshObject->GetCollisionSkin());
   }
 
 
-  // mesh test - todo properly
+  // mesh test - TODO: properly
   std::string meshName("none");
   GetConfigFile().GetValue("mesh_name", meshName);
   if (meshName != "none")
@@ -1370,24 +1368,24 @@ void tJigTestApp::SetupExperiment()
     GetConfigFile().GetValue("mesh_z", meshOffset.z);
     GetConfigFile().GetValue("mesh_max_triangles_per_cell", maxTrianglesPerCell);
     GetConfigFile().GetValue("mesh_min_cell_size", minCellSize);
-    GetConfigFile().GetValue("mesh_elasticity", 
+    GetConfigFile().GetValue("mesh_elasticity",
                              meshElasticity);
-    GetConfigFile().GetValue("mesh_static_friction", 
+    GetConfigFile().GetValue("mesh_static_friction",
                              meshStaticFriction);
-    GetConfigFile().GetValue("mesh_dynamic_friction", 
+    GetConfigFile().GetValue("mesh_dynamic_friction",
                              meshDynamicFriction);
 
     tMeshObject* meshObject = new tMeshObject(meshName.c_str(), meshScale, maxTrianglesPerCell, minCellSize);
-    meshObject->SetProperties(meshElasticity, 
+    meshObject->SetProperties(meshElasticity,
                               meshStaticFriction,
                               meshDynamicFriction);
     mObjects.push_back(meshObject);
     mRenderManager.AddObject(meshObject);
-    /// need to add non-physical objects to collision
+    // Need to add non-physical objects to collision
     mCollisionSystem->AddCollisionSkin(meshObject->GetCollisionSkin());
   }
 
-  // create some viewports and cameras
+  // Create some viewports and cameras
   int numViews = 1;
   GetConfigFile().GetValue("num_views", numViews);
   if (numViews > 2) numViews = 2;
@@ -1400,16 +1398,16 @@ void tJigTestApp::SetupExperiment()
   tScalar h = numViews == 1 ? 1.0f : 0.5f;
   tViewport * viewport0 = new tViewport(&mRenderManager,
                                         camera0,
-                                        0.0f, 0.0f, 
+                                        0.0f, 0.0f,
                                         h, 1.0f);
   mViewports.push_back(viewport0);
 
-  // attach the camera to our object
+  // Attach the camera to our object
   camera0->SetPosition(tVector3(-20.0f, 1.0f, 15.0f));
   camera0->SetTarget(tVector3::Zero());
   camera0->SetUp(tVector3::Up());
 
-  // if there's a car, look at it
+  // If there's a car, look at it
   if (!mCarObjects.empty())
   {
     tCarObject * car = mCarObjects[0];
@@ -1428,11 +1426,11 @@ void tJigTestApp::SetupExperiment()
     mCameras.push_back(camera1);
     tViewport * viewport1 = new tViewport(&mRenderManager,
                                           camera1,
-                                          0.5f, 0.0f, 
+                                          0.5f, 0.0f,
                                           0.5f, 1.0f);
     mViewports.push_back(viewport1);
 
-    // attach the camera to our object
+    // Attach the camera to our object
     camera1->SetPosition(tVector3(-20.0f, 1.0f, 15.0f));
     camera1->SetTarget(tVector3::Zero());
     camera1->SetUp(tVector3::Up());
@@ -1441,9 +1439,9 @@ void tJigTestApp::SetupExperiment()
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // LoadAppConfig
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::LoadAppConfig()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -1451,11 +1449,11 @@ void tJigTestApp::LoadAppConfig()
   GetConfigFile().GetValue("collision_system_type", tAppConfig::mCollisionSystemType);
   GetConfigFile().GetValue("collision_grid_size", tAppConfig::mCollisionGridSize);
   GetConfigFile().GetValue("physics_freq", tAppConfig::mPhysicsFrequency);
-  GetConfigFile().GetValue("physics_num_collision_iterations", 
+  GetConfigFile().GetValue("physics_num_collision_iterations",
                            tAppConfig::mNumCollisionIterations);
-  GetConfigFile().GetValue("penetration_relaxation_timesteps", 
+  GetConfigFile().GetValue("penetration_relaxation_timesteps",
                            tAppConfig::mNumPenetrationRelaxationTimesteps);
-  GetConfigFile().GetValue("physics_num_contact_iterations", 
+  GetConfigFile().GetValue("physics_num_contact_iterations",
                            tAppConfig::mNumContactIterations);
   GetConfigFile().GetValue("allowed_penetration", tAppConfig::mAllowedPenetration);
   GetConfigFile().GetValue("physics_do_shock_step",
@@ -1466,18 +1464,18 @@ void tJigTestApp::LoadAppConfig()
   GetConfigFile().GetValue("physics_gravity_z", tAppConfig::mGravity.z);
   GetConfigFile().GetValue("physics_enable_freezing", tAppConfig::mEnableFreezing);
   GetConfigFile().GetValue("start_paused", mPaused);
-  GetConfigFile().GetValue("max_physics_steps_per_frame", 
+  GetConfigFile().GetValue("max_physics_steps_per_frame",
                            tAppConfig::mMaxPhysicsStepsPerFrame);
-  GetConfigFile().GetValue("null_physics_update", 
+  GetConfigFile().GetValue("null_physics_update",
                            tAppConfig::mNullPhysicsUpdate);
   GetConfigFile().GetValue("physics_solver_type", tAppConfig::mSolverType);
   GetConfigFile().GetValue("movie_interval", tAppConfig::mMovieInterval);
 
-  GetConfigFile().GetValue("indicate_frozen_objects", 
+  GetConfigFile().GetValue("indicate_frozen_objects",
                            tDebugConfig::mIndicateFrozenObjects);
   GetConfigFile().GetValue("render_collision_bounding_boxes",
                            tDebugConfig::mRenderCollisionBoundingBoxes);
-  GetConfigFile().GetValue("render_collision_contacts", 
+  GetConfigFile().GetValue("render_collision_contacts",
                            tDebugConfig::mRenderCollisionContacts);
 
   GetConfigFile().GetValue("render_enable", tAppConfig::mRenderEnable);
@@ -1487,21 +1485,21 @@ void tJigTestApp::LoadAppConfig()
   GetConfigFile().GetValue("object_controller_speed", tAppConfig::mObjectControllerSpeed);
   GetConfigFile().GetValue("projectile_speed", tAppConfig::mProjectileSpeed);
 
-  GetConfigFile().GetValue("physics_vel_threshold", 
+  GetConfigFile().GetValue("physics_vel_threshold",
                            tAppConfig::mPhysicsVelThreshold);
   GetConfigFile().GetValue("physics_ang_vel_threshold",
                            tAppConfig::mPhysicsAngVelThreshold);
-  GetConfigFile().GetValue("physics_pos_threshold", 
+  GetConfigFile().GetValue("physics_pos_threshold",
                            tAppConfig::mPhysicsPosThreshold);
   GetConfigFile().GetValue("physics_orient_threshold",
                            tAppConfig::mPhysicsOrientThreshold);
-  GetConfigFile().GetValue("physics_deactivation_time", 
+  GetConfigFile().GetValue("physics_deactivation_time",
                            tAppConfig::mPhysicsDeactivationTime);
 
-  GetConfigFile().GetValue("physics_quit_iterations", 
+  GetConfigFile().GetValue("physics_quit_iterations",
                            mQuitIterations);
 
-  GetConfigFile().GetValue("skybox", 
+  GetConfigFile().GetValue("skybox",
                            tAppConfig::mSkybox);
 
   Limit(tAppConfig::mPhysicsFrequency, SCALAR(0.1), SCALAR(10000.0f));
@@ -1514,7 +1512,7 @@ void tJigTestApp::LoadAppConfig()
   mPhysics.SetCollToll(tAppConfig::mPhysicsCollToll);
   mPhysics.SetDoShockStep(tAppConfig::mDoShockStep);
   mPhysics.EnableFreezing(tAppConfig::mEnableFreezing);
-	mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
+        mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
   if (tAppConfig::mSolverType == "fast")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_FAST);
   else if (tAppConfig::mSolverType == "normal")
@@ -1533,9 +1531,9 @@ void tJigTestApp::LoadAppConfig()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // Initialise
-//==============================================================
+//======================================================================================================================
 bool tJigTestApp::Initialise(const std::string app_name)
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -1551,9 +1549,9 @@ bool tJigTestApp::Initialise(const std::string app_name)
   return retval;
 }
 
-//==============================================================
+//======================================================================================================================
 // SetSleepingParams
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::SetSleepingParams()
 {
   TRACE_METHOD_ONLY(ONCE_3);
@@ -1574,9 +1572,9 @@ void tJigTestApp::SetSleepingParams()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // CreateSphere
-//==============================================================
+//======================================================================================================================
 tSphereObject * tJigTestApp::CreateSphere()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -1599,10 +1597,10 @@ tSphereObject * tJigTestApp::CreateSphere()
   GetConfigFile().GetValue("sphere_dynamic_friction", sphereDynamicFriction);
   GetConfigFile().GetValue("sphere_density", sphereDensity);
 
-  tSphereObject * sphereObject = 
+  tSphereObject * sphereObject =
     new tSphereObject(RangedRandom(sphereMinRadius, sphereMaxRadius));
-  sphereObject->SetProperties(sphereElasticity, 
-                              sphereStaticFriction, 
+  sphereObject->SetProperties(sphereElasticity,
+                              sphereStaticFriction,
                               sphereDynamicFriction);
   sphereObject->SetDensity(sphereDensity);
   mObjects.push_back(sphereObject);
@@ -1615,15 +1613,15 @@ tSphereObject * tJigTestApp::CreateSphere()
 }
 
 
-//====================================================================
+//======================================================================================================================
 // CreateCharacter
-//====================================================================
+//======================================================================================================================
 tCharacterObject * tJigTestApp::CreateCharacter()
 {
   TRACE_METHOD_ONLY(ONCE_2);
   tScalar radius = 0.5f;
   tScalar height = 2.0f;
-  tCharacterObject * characterObject = 
+  tCharacterObject * characterObject =
     new tCharacterObject(radius, height);
 
   mObjects.push_back(characterObject);
@@ -1637,9 +1635,9 @@ tCharacterObject * tJigTestApp::CreateCharacter()
   return characterObject;
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateCapsule
-//==============================================================
+//======================================================================================================================
 tCapsuleObject * tJigTestApp::CreateCapsule()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -1666,11 +1664,11 @@ tCapsuleObject * tJigTestApp::CreateCapsule()
   GetConfigFile().GetValue("capsule_dynamic_friction", capsuleDynamicFriction);
   GetConfigFile().GetValue("capsule_density", capsuleDensity);
 
-  tCapsuleObject * capsuleObject = 
+  tCapsuleObject * capsuleObject =
     new tCapsuleObject(RangedRandom(capsuleMinRadius, capsuleMaxRadius),
                        RangedRandom(capsuleMinLength, capsuleMaxLength));
-  capsuleObject->SetProperties(capsuleElasticity, 
-                               capsuleStaticFriction, 
+  capsuleObject->SetProperties(capsuleElasticity,
+                               capsuleStaticFriction,
                                capsuleDynamicFriction);
   capsuleObject->SetDensity(capsuleDensity);
   mObjects.push_back(capsuleObject);
@@ -1682,9 +1680,9 @@ tCapsuleObject * tJigTestApp::CreateCapsule()
   return capsuleObject;
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateBox
-//==============================================================
+//======================================================================================================================
 tBoxObject * tJigTestApp::CreateBox()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -1715,23 +1713,23 @@ tBoxObject * tJigTestApp::CreateBox()
     ElementMult(boxScale, tVector3(RangedRandom(boxMinSide, boxMaxSide),
                                    RangedRandom(boxMinSide, boxMaxSide),
                                    RangedRandom(boxMinSide, boxMaxSide))), true);
-  boxObject->SetProperties(boxElasticity, 
+  boxObject->SetProperties(boxElasticity,
                            boxStaticFriction,
                            boxDynamicFriction);
   boxObject->SetDensity(boxDensity);
   mObjects.push_back(boxObject);
   boxObject->GetBody()->MoveTo(
-    tVector3(boxX, boxY, boxZ + 0.5f * boxMaxSide), 
+    tVector3(boxX, boxY, boxZ + 0.5f * boxMaxSide),
     Matrix33Gamma(RangedRandom(0.0f, 360.0f)));
   mRenderManager.AddObject(boxObject);
-  /// physics will register collision for objects passed to it.
+  // Physics will register collision for objects passed to it.
   boxObject->GetBody()->EnableBody();
   return boxObject;
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateCompound
-//==============================================================
+//======================================================================================================================
 tBoxSphereObject * tJigTestApp::CreateCompound()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -1762,24 +1760,24 @@ tBoxSphereObject * tJigTestApp::CreateCompound()
     ElementMult(compoundScale, tVector3(RangedRandom(compoundMinSide, compoundMaxSide),
                                    RangedRandom(compoundMinSide, compoundMaxSide),
                                    RangedRandom(compoundMinSide, compoundMaxSide))), true);
-  compoundObject->SetProperties(compoundElasticity, 
+  compoundObject->SetProperties(compoundElasticity,
                            compoundStaticFriction,
                            compoundDynamicFriction);
   compoundObject->SetDensity(compoundDensity);
   mObjects.push_back(compoundObject);
   compoundObject->GetBody()->MoveTo(
-    tVector3(compoundX, compoundY, compoundZ + 0.5f * compoundMaxSide), 
+    tVector3(compoundX, compoundY, compoundZ + 0.5f * compoundMaxSide),
     Matrix33Gamma(RangedRandom(0.0f, 360.0f)));
   mRenderManager.AddObject(compoundObject);
-  /// physics will register collision for objects passed to it.
+  // Physics will register collision for objects passed to it.
   compoundObject->GetBody()->EnableBody();
   return compoundObject;
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetupUnequalExperiment
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::SetupUnequalExperiment()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -1791,32 +1789,32 @@ void tJigTestApp::SetupUnequalExperiment()
   GetConfigFile().GetValue("box_dynamic_friction", boxDynamicFriction);
 
   tBoxObject * boxObject = new tBoxObject(tVector3(0.1f, 12.0f, 6.0f), true);
-  boxObject->SetProperties(boxElasticity, 
+  boxObject->SetProperties(boxElasticity,
                            boxStaticFriction,
                            boxDynamicFriction);
   boxObject->SetDensity(100.0f);
   mObjects.push_back(boxObject);
-  boxObject->GetBody()->MoveTo(tVector3(0.0f, 0.0f, 3.0f), 
+  boxObject->GetBody()->MoveTo(tVector3(0.0f, 0.0f, 3.0f),
                                tMatrix33::Identity());
   mRenderManager.AddObject(boxObject);
   boxObject->GetBody()->EnableBody();
 
   boxObject = new tBoxObject(tVector3(4.0f, 5.0f, 2.0f), true);
-  boxObject->SetProperties(boxElasticity, 
+  boxObject->SetProperties(boxElasticity,
                            boxStaticFriction,
                            boxDynamicFriction);
   boxObject->SetDensity(100.0f);
   mObjects.push_back(boxObject);
-  boxObject->GetBody()->MoveTo(tVector3(0.0f, 0.0f, 10.0f), 
+  boxObject->GetBody()->MoveTo(tVector3(0.0f, 0.0f, 10.0f),
                                tMatrix33::Identity());
   mRenderManager.AddObject(boxObject);
   boxObject->GetBody()->EnableBody();
 }
 
-//==============================================================
+//======================================================================================================================
 // BuildJengaStack
-//==============================================================
-void tJigTestApp::BuildJengaStack(int height, 
+//======================================================================================================================
+void tJigTestApp::BuildJengaStack(int height,
                                   const tVector3 & boxDims,
                                   const tVector3 & pos)
 {
@@ -1847,7 +1845,7 @@ void tJigTestApp::BuildJengaStack(int height,
     for (int iBox = -1 ; iBox <= 1 ; ++iBox)
     {
       tBoxObject * boxObject = new tBoxObject(boxDims, false);
-      boxObject->SetProperties(boxElasticity, 
+      boxObject->SetProperties(boxElasticity,
                                boxStaticFriction,
                                boxDynamicFriction);
       boxObject->SetDensity(boxDensity);
@@ -1856,16 +1854,16 @@ void tJigTestApp::BuildJengaStack(int height,
         thisPos + (tScalar) iBox * leftDir * boxDims.y,
         rot);
       mRenderManager.AddObject(boxObject);
-      /// physics will register collision for objects passed to it.
+      // Physics will register collision for objects passed to it.
       boxObject->GetBody()->EnableBody();
     }
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // BuildJengaStack
-//==============================================================
-void tJigTestApp::BuildWall(int height, 
+//======================================================================================================================
+void tJigTestApp::BuildWall(int height,
                             int width,
                             const tVector3 & boxDims,
                             const tVector3 & pos,
@@ -1912,24 +1910,24 @@ void tJigTestApp::BuildWall(int height,
              (iH % 2 == 0) &&
              ( (iW == 0) || (iW == width - 1) ) )
           continue;
-      }      
+      }
       tBoxObject * boxObject = new tBoxObject(boxDims, false);
-      boxObject->SetProperties(boxElasticity, 
+      boxObject->SetProperties(boxElasticity,
                                boxStaticFriction,
                                boxDynamicFriction);
       boxObject->SetDensity(boxDensity);
       mObjects.push_back(boxObject);
       boxObject->GetBody()->MoveTo(thisPos, tMatrix33::Identity());
       mRenderManager.AddObject(boxObject);
-      /// physics will register collision for objects passed to it.
+      // Physics will register collision for objects passed to it.
       boxObject->GetBody()->EnableBody();
     }
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // RemoveAllObjects
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::RemoveAllObjects(bool onlyPhysical)
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -1958,7 +1956,7 @@ void tJigTestApp::RemoveAllObjects(bool onlyPhysical)
   }
   tObjects::iterator pos = remove(mObjects.begin(),
                                   mObjects.end(),
-                                  (tObject *) 0); 
+                                  (tObject *) 0);
   mObjects.erase(pos, mObjects.end());
 
   mCarAI.RemoveAllCars();
@@ -1966,18 +1964,18 @@ void tJigTestApp::RemoveAllObjects(bool onlyPhysical)
   mCharacterObjects.resize(0);
 }
 
-//==============================================================
+//======================================================================================================================
 // RestartExperiment
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::RestartExperiment()
 {
   TRACE_METHOD_ONLY(ONCE_1);
   SetupExperiment();
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateBumpyHeightmap
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::CreateBumpyHeightmap()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -1997,14 +1995,14 @@ void tJigTestApp::CreateBumpyHeightmap()
   GetConfigFile().GetValue("heightmap_dy", dy);
   GetConfigFile().GetValue("heightmap_x0", x0);
   GetConfigFile().GetValue("heightmap_y0", y0);
-  GetConfigFile().GetValue("heightmap_elasticity", 
+  GetConfigFile().GetValue("heightmap_elasticity",
                            heightmapElasticity);
-  GetConfigFile().GetValue("heightmap_static_friction", 
+  GetConfigFile().GetValue("heightmap_static_friction",
                            heightmapStaticFriction);
-  GetConfigFile().GetValue("heightmap_dynamic_friction", 
+  GetConfigFile().GetValue("heightmap_dynamic_friction",
                            heightmapDynamicFriction);
 
-  /// create the bumps
+  // Create the bumps
   tArray2D<tScalar> heights(nx, ny, 0.0f);
 
   tScalar lambda = nx * (dx / 5.0f);
@@ -2023,16 +2021,16 @@ void tJigTestApp::CreateBumpyHeightmap()
       tScalar x = xMin + i * dx ;
       tScalar y = yMin + j * dy;
       tScalar radius = Hypot(x, y);
-      tScalar scale = Exp(-Sq(radius - peakRadius) / 
+      tScalar scale = Exp(-Sq(radius - peakRadius) /
                           Sq(peakRadiusDelta));
-      tScalar z = 0.2f * scale * lambda * 
-        SinDeg(360.0f * x / lambda) * 
+      tScalar z = 0.2f * scale * lambda *
+        SinDeg(360.0f * x / lambda) *
         SinDeg(360.0f * y / lambda);
       heights(i, j) = z;
     }
   }
 
-  // make a bumpy bit
+  // Make a bumpy bit
   for (i = 0 ; i < nx ; ++i)
   {
     for (j = 0 ; j < ny ; ++j)
@@ -2045,7 +2043,7 @@ void tJigTestApp::CreateBumpyHeightmap()
     }
   }
 
-  // make sure the middle is completely flat
+  // Make sure the middle is completely flat
   tScalar rMin = 50.0f;
   tScalar rMax = 70.0f;
   for (i = 0 ; i < nx ; ++i)
@@ -2064,22 +2062,22 @@ void tJigTestApp::CreateBumpyHeightmap()
     }
   }
 
-  /// create the actual objects
+  // Create the actual objects
   tHeightmap heightmap(heights, x0, y0, dx, dy);
   tHeightmapObject * heightmapObject = new tHeightmapObject(heightmap);
-  heightmapObject->SetProperties(heightmapElasticity, 
+  heightmapObject->SetProperties(heightmapElasticity,
                                  heightmapStaticFriction,
                                  heightmapDynamicFriction);
   mObjects.push_back(heightmapObject);
   mRenderManager.AddObject(heightmapObject);
 
-  /// need to add non-physical objects to collision
+  // Need to add non-physical objects to collision
   mCollisionSystem->AddCollisionSkin(heightmapObject->GetCollisionSkin());
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateFileHeightmap
-//==============================================================
+//======================================================================================================================
 void tJigTestApp::CreateFileHeightmap(const string & fileName)
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -2099,29 +2097,29 @@ void tJigTestApp::CreateFileHeightmap(const string & fileName)
   GetConfigFile().GetValue("heightmap_dy", dy);
   GetConfigFile().GetValue("heightmap_zmin", zMin);
   GetConfigFile().GetValue("heightmap_zmax", zMax);
-  GetConfigFile().GetValue("heightmap_elasticity", 
+  GetConfigFile().GetValue("heightmap_elasticity",
                            heightmapElasticity);
-  GetConfigFile().GetValue("heightmap_static_friction", 
+  GetConfigFile().GetValue("heightmap_static_friction",
                            heightmapStaticFriction);
-  GetConfigFile().GetValue("heightmap_dynamic_friction", 
+  GetConfigFile().GetValue("heightmap_dynamic_friction",
                            heightmapDynamicFriction);
 
-  /// create the actual objects
-  tHeightmapObject * heightmapObject = 
+  // Create the actual objects
+  tHeightmapObject * heightmapObject =
     new tHeightmapObject(fileName, dx, dy, zMin, zMax);
-  heightmapObject->SetProperties(heightmapElasticity, 
+  heightmapObject->SetProperties(heightmapElasticity,
                                  heightmapStaticFriction,
                                  heightmapDynamicFriction);
   mObjects.push_back(heightmapObject);
   mRenderManager.AddObject(heightmapObject);
-  /// need to add non-physical objects to collision
+  // Need to add non-physical objects to collision
   mCollisionSystem->AddCollisionSkin(heightmapObject->GetCollisionSkin());
 }
 
 
-//==============================================================
+//======================================================================================================================
 // CreateCar
-//==============================================================
+//======================================================================================================================
 tCarObject * tJigTestApp::CreateCar()
 {
   tScalar carMinX = -2.0f;
@@ -2182,29 +2180,29 @@ tCarObject * tJigTestApp::CreateCar()
 
   tCarObject * carObject = new tCarObject(
     FWDrive, RWDrive, maxSteerAngle, steerRate,
-    wheelSideFriction, wheelFwdFriction, 
+    wheelSideFriction, wheelFwdFriction,
     wheelTravel, wheelRadius, wheelZOffset, wheelRestingFrac, wheelDampingFrac,
     wheelNumRays, driveTorque, gravity);
-  
+
   carObject->GetCar().GetChassis().SetDims(
-    tVector3(carMinX, carMinY, carMinZ), 
+    tVector3(carMinX, carMinY, carMinZ),
     tVector3(carMaxX, carMaxY, carMaxZ));
-  carObject->SetProperties(carElasticity, 
+  carObject->SetProperties(carElasticity,
                            carStaticFriction,
                            carDynamicFriction);
   carObject->SetDensity(carDensity);
 
   carObject->GetBody()->MoveTo(
-    tVector3(RangedRandom(-4.0f, 4.0f), 
+    tVector3(RangedRandom(-4.0f, 4.0f),
              RangedRandom(-4.0f, 4.0f), 0.0f) +
-    tVector3(carX, carY, carZ + 2.0f), 
+    tVector3(carX, carY, carZ + 2.0f),
     Matrix33Gamma(RangedRandom(0.0f, 0.0f)));
 
-  // store
+  // Store
   mObjects.push_back(carObject);
   mCarObjects.push_back(carObject);
 
-  // register
+  // Register
   mRenderManager.AddObject(carObject);
   carObject->GetCar().EnableCar();
 
@@ -2215,9 +2213,9 @@ tCarObject * tJigTestApp::CreateCar()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // CreateRagdoll
-//==============================================================
+//======================================================================================================================
 tRagdoll* tJigTestApp::CreateRagdoll()
 {
   tScalar ragdollX = 0.0f;
@@ -2237,22 +2235,22 @@ tRagdoll* tJigTestApp::CreateRagdoll()
     &mRenderManager,
     ragdollComplex ? tRagdoll::COMPLEX : tRagdoll::SIMPLE,
     ragdollDensity);
-  
+
   ragdoll->MoveTorso(
-    tVector3(RangedRandom(-4.0f, 4.0f), 
+    tVector3(RangedRandom(-4.0f, 4.0f),
              RangedRandom(-4.0f, 4.0f), 0.0f) +
     tVector3(ragdollX, ragdollY, ragdollZ));
 
   if (ragdollStartAsleep)
     ragdoll->PutToSleep();
-  // store
+  // Store
   mObjects.push_back(ragdoll);
   return ragdoll;
 }
 
-//==============================================================
+//======================================================================================================================
 // CreateRagdoll
-//==============================================================
+//======================================================================================================================
 tNewton* tJigTestApp::CreateNewton()
 {
   tScalar newtonX = 0.0f;

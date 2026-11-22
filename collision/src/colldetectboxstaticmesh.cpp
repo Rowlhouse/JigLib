@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectboxstaticmesh.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectboxstaticmesh.hpp"
 #include "mathsmisc.hpp"
 #include "box.hpp"
@@ -20,13 +16,13 @@ using namespace JigLib;
 enum {MAX_PTS_PER_BOX_PAIR = 8};
 
 
-//========================================================
+//======================================================================================================================
 // AddPoint
 // if pt is less than Sqrt(combinationDistanceSq) from one of the
 // others the original is replaced with the mean of it
 // and pt, and false is returned. true means that pt was
 // added to pts
-//========================================================
+//======================================================================================================================
 static bool AddPoint(tFixedVector<tVector3, MAX_PTS_PER_BOX_PAIR> & pts,
                      const tVector3 & pt,
                      tScalar combinationDistanceSq)
@@ -43,20 +39,18 @@ static bool AddPoint(tFixedVector<tVector3, MAX_PTS_PER_BOX_PAIR> & pts,
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetBoxTriangleIntersectionPoints
-// Pushes intersection points onto the back of pts. Returns the
-// number of points found.
-// Points that are close together (compared to 
-// combinationDistance) get combined
-//==============================================================
+// Pushes intersection points onto the back of pts. Returns the number of points found.
+// Points that are close together (compared to combinationDistance) get combined
+//======================================================================================================================
 static unsigned GetBoxTriangleIntersectionPoints(
   tFixedVector<tVector3, MAX_PTS_PER_BOX_PAIR> & pts,
   const tBox & box,
   const tTriangle& triangle,
   tScalar combinationDistance)
 {
-  // first intersect each edge of the box with the triangle
+  // First intersect each edge of the box with the triangle
   const tBox::tEdge* edges = box.GetAllEdges();
   tVector3 boxPts[8];
   box.GetCornerPoints(boxPts);
@@ -74,7 +68,7 @@ static unsigned GetBoxTriangleIntersectionPoints(
   }
 
   tVector3 pos, n;
-  // now each edge of the triangle with the box
+  // Now each edge of the triangle with the box
   for (iEdge = 0 ; iEdge < 3 ; ++iEdge)
   {
     const tVector3 pt0 = triangle.GetPoint(iEdge);
@@ -88,13 +82,13 @@ static unsigned GetBoxTriangleIntersectionPoints(
   return pts.Size();
 }
 
-//========================================================
-// Disjoint Returns true if disjoint.  Returns false if intersecting,
-// and sets the overlap depth, d scaled by the axis length
-//========================================================
+//======================================================================================================================
+// Disjoint Returns true if disjoint. Returns false if intersecting, and sets the overlap depth, d
+// scaled by the axis length
+//======================================================================================================================
 static bool Disjoint(tScalar & d,
-                     const tVector3 & axis, 
-                     const tBox & box, 
+                     const tVector3 & axis,
+                     const tBox & box,
                      const tTriangle & triangle,
                      tScalar collTolerance)
 {
@@ -103,13 +97,13 @@ static bool Disjoint(tScalar & d,
   box.GetSpan(min0, max0, axis);
   triangle.GetSpan(min1, max1, axis);
 
-  if (min0 > (max1 + collTolerance + SCALAR_TINY) || 
+  if (min0 > (max1 + collTolerance + SCALAR_TINY) ||
       min1 > (max0 + collTolerance + SCALAR_TINY))
     return true;
 
   if ( (max0 > max1) && (min1 > min0) )
   {
-    // triangle is inside - choose the min dist to move it out
+    // Triangle is inside - choose the min dist to move it out
     d = Min(max0 - min1, max1 - min0);
   }
   else if ( (max1 > max0) && (min0 > min1) )
@@ -119,7 +113,7 @@ static bool Disjoint(tScalar & d,
   }
   else
   {
-    // objects overlap
+    // Objects overlap
     d  = (max0 < max1) ? max0 : max1;
     d -= (min0 > min1) ? min0 : min1;
   }
@@ -127,11 +121,11 @@ static bool Disjoint(tScalar & d,
   return false;
 }
 
-//====================================================================
+//======================================================================================================================
 // DoOverlapBoxTest
-//====================================================================
-static bool DoOverlapBoxTriangleTest(const tBox & oldBox, 
-                                     const tBox & newBox, 
+//======================================================================================================================
+static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
+                                     const tBox & newBox,
                                      const tIndexedTriangle& triangle,
                                      const tTriangleMesh& mesh,
                                      const tCollDetectInfo &info,
@@ -143,14 +137,14 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
     mesh.GetVertex(triangle.GetVertexIndex(0)),
     mesh.GetVertex(triangle.GetVertexIndex(1)),
     mesh.GetVertex(triangle.GetVertexIndex(2)));
-  tVector3 triEdge0 = (tri.GetPoint(1) - tri.GetPoint(0)).Normalise();  
-  tVector3 triEdge1 = (tri.GetPoint(2) - tri.GetPoint(1)).Normalise();  
-  tVector3 triEdge2 = (tri.GetPoint(0) - tri.GetPoint(2)).Normalise();  
+  tVector3 triEdge0 = (tri.GetPoint(1) - tri.GetPoint(0)).Normalise();
+  tVector3 triEdge1 = (tri.GetPoint(2) - tri.GetPoint(1)).Normalise();
+  tVector3 triEdge2 = (tri.GetPoint(0) - tri.GetPoint(2)).Normalise();
   const tVector3& triNormal = triangle.GetPlane().GetN();
 
-  // the 15 potential separating axes
+  // The 15 potential separating axes
   static const int numAxes = 13;
-  tVector3 axes[numAxes] = 
+  tVector3 axes[numAxes] =
     {
       triNormal,
       dirs0[0],
@@ -167,11 +161,11 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
       Cross(dirs0[2], triEdge2),
     };
 
-  // the overlap depths along each axis
+  // The overlap depths along each axis
   tScalar overlapDepths[numAxes];
 
-  // see if the boxes are separate along any axis, and if not keep a 
-  // record of the depths along each axis
+  // See if the boxes are separate along any axis, and if not keep a record of the depths along each
+  // axis
   int i;
   for (i = 0 ; i < numAxes ; ++i)
   {
@@ -180,31 +174,31 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
       return false;
   }
 
-  //-----------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   // The box overlap, find the separation depth closest to 0.
-  //-----------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   tScalar minDepth = SCALAR_HUGE;
   int minAxis = -1;
 
   for(i = 0; i < numAxes; ++i)
   {
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     // If we can't normalise the axis, skip it
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     tScalar l2 = axes[i].GetLengthSq();
     if (l2 < SCALAR_TINY)
       continue;
 
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     // Normalise the separation axis and the depth
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     tScalar invl = 1.0f / Sqrt(l2);
     axes[i] *= invl;
     overlapDepths[i] *= invl;
 
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     // If this axis is the minimum, select it
-    //-----------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------
     if (overlapDepths[i] < minDepth)
     {
       minDepth = overlapDepths[i];
@@ -215,10 +209,10 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
   if (minAxis == -1)
     return false;
 
-  //-----------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   // Make sure the axis is facing towards the 0th box.
-  // if not, invert it
-  //-----------------------------------------------------------------
+  // If not, invert it
+  //--------------------------------------------------------------------------------------------------------------------
   tVector3 D = newBox.GetCentre() - tri.GetCentre();
   tVector3 & N = axes[minAxis];
   tScalar depth = overlapDepths[minAxis];
@@ -229,25 +223,25 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
   const tVector3& boxOldPos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& boxNewPos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetPosition() : tVector3::Zero();
   const tVector3& meshPos   = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
-  
+
   static tFixedVector<tVector3, MAX_PTS_PER_BOX_PAIR> pts;
   pts.Clear();
 
   static const tScalar combinationDist = 0.05f;
   GetBoxTriangleIntersectionPoints(pts, newBox, tri, depth + combinationDist);
 
-  // adjust the depth 
+  // Adjust the depth
   tVector3 delta = boxNewPos - boxOldPos;
   tScalar oldDepth = depth + Dot(delta, N);
 
   static tFixedVector<tCollPointInfo, MAX_PTS_PER_BOX_PAIR> collPts;
   collPts.Clear();
 
-  // report collisions
+  // Report collisions
   unsigned numPts = pts.Size();
   if (numPts > 0)
   {
-    // adjust positions
+    // Adjust positions
     for (unsigned i = 0 ; i < numPts ; ++i)
     {
       collPts.PushBack(tCollPointInfo(pts[i] - boxNewPos, pts[i] - meshPos, oldDepth));
@@ -267,18 +261,18 @@ static bool DoOverlapBoxTriangleTest(const tBox & oldBox,
 }
 
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectBoxStaticMesh
-//==============================================================
+//======================================================================================================================
 tCollDetectBoxStaticMesh::tCollDetectBoxStaticMesh()
   :
   tCollDetectFunctor("BoxMesh", tPrimitive::BOX, tPrimitive::TRIANGLEMESH)
 {
 }
 
-//====================================================================
+//======================================================================================================================
 // CollDetectBoxStaticMeshOverlap
-//====================================================================
+//======================================================================================================================
 static bool CollDetectBoxStaticMeshOverlap(const tBox& oldBox,
                                            const tBox& newBox,
                                            const class tTriangleMesh& mesh,
@@ -299,7 +293,7 @@ static bool CollDetectBoxStaticMeshOverlap(const tBox& oldBox,
   {
     const tIndexedTriangle& meshTriangle = mesh.GetTriangle(potentialTriangles[iTriangle]);
 
-    // quick early test
+    // Quick early test
     tScalar dist = PointPlaneDistance(boxCentre, meshTriangle.GetPlane());
     if (dist > boxRadius || dist < 0.0f)
       continue;
@@ -316,16 +310,16 @@ static bool CollDetectBoxStaticMeshOverlap(const tBox& oldBox,
   return collision;
 }
 
-//==============================================================
+//======================================================================================================================
 // CollDetectOverlap
-//==============================================================
+//======================================================================================================================
 void tCollDetectBoxStaticMesh::CollDetectOverlap(const tCollDetectInfo &info,
                                                  tScalar collTolerance,
                                                  tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
 
-  // note - mesh is static and its triangles are in world space
+  // Note - mesh is static and its triangles are in world space
   const tTriangleMesh & mesh = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetTriangleMesh();
 
   const tBox & oldBox = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetBox();
@@ -335,17 +329,17 @@ void tCollDetectBoxStaticMesh::CollDetectOverlap(const tCollDetectInfo &info,
 }
 
 
-//==============================================================
+//======================================================================================================================
 // CollDetectOverlap
-//==============================================================
+//======================================================================================================================
 void tCollDetectBoxStaticMesh::CollDetectSweep(const tCollDetectInfo &info,
                                                tScalar collTolerance,
                                                tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
 
-  // todo - proper swept test
-  // note - mesh is static and its triangles are in world space
+  // TODO: proper swept test
+  // Note: mesh is static and its triangles are in world space
   const tTriangleMesh & mesh = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetTriangleMesh();
   static std::vector<unsigned> potentialTriangles;
 
@@ -357,7 +351,7 @@ void tCollDetectBoxStaticMesh::CollDetectSweep(const tCollDetectInfo &info,
   tVector3 delta = newCentre - oldCentre;
   tScalar boxMinLen = 0.5f * Min(newBox.GetSideLengths().x, newBox.GetSideLengths().y, newBox.GetSideLengths().z);
   int nPositions = 1 + (int) (delta.GetLength() / boxMinLen);
-  // limit the max positions...
+  // Limit the max positions...
   if (nPositions > 50)
   {
     TRACE_FILE_IF(ONCE_1)
@@ -384,26 +378,26 @@ void tCollDetectBoxStaticMesh::CollDetectSweep(const tCollDetectInfo &info,
         tMatrix33 orient = (1.0f - frac) * oldBox.GetOrient() + frac * newBox.GetOrient();
         orient.Orthonormalise();
         tBox box(centre - 0.5f * orient * newBox.GetSideLengths(), orient, newBox.GetSideLengths());
-        // ideally we'd break if we get one collision... but that stops us getting multiple collisions
-        // when we enter a corner (two walls meeting) - can let us pass through
+        // Ideally we'd break if we get one collision... But that stops us getting multiple
+        // collisions when we enter a corner (two walls meeting) - can let us pass through
         CollDetectBoxStaticMeshOverlap(oldBox, box, mesh, info, collTolerance, collisionFunctor);
       }
     }
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // CollDetect
-//====================================================================
+//======================================================================================================================
 void tCollDetectBoxStaticMesh::CollDetect(const tCollDetectInfo &infoOrig,
                                           tScalar collTolerance,
                                           tCollisionFunctor & collisionFunctor) const
 {
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
 

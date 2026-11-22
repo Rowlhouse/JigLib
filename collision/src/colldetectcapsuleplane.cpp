@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectcapsuleplane.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectcapsuleplane.hpp"
 #include "capsule.hpp"
 #include "plane.hpp"
@@ -16,9 +12,9 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectCapsulePlane
-//==============================================================
+//======================================================================================================================
 tCollDetectCapsulePlane::tCollDetectCapsulePlane()
   :
   tCollDetectFunctor("CapsulePlane", tPrimitive::CAPSULE, tPrimitive::PLANE)
@@ -26,27 +22,27 @@ tCollDetectCapsulePlane::tCollDetectCapsulePlane()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // operator
-//==============================================================
+//======================================================================================================================
 void tCollDetectCapsulePlane::CollDetect(const tCollDetectInfo &infoOrig,
                                          tScalar collTolerance,
                                          tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
 
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
-  
+
   const tVector3& body0Pos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& body1Pos = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
 
-  // todo - proper swept test
+  // TODO: proper swept test
   const tCapsule & oldCapsule = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetCapsule();
   const tCapsule & newCapsule = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetCapsule();
 
@@ -55,7 +51,7 @@ void tCollDetectCapsulePlane::CollDetect(const tCollDetectInfo &infoOrig,
 
   tFixedVector<tCollPointInfo, 2> pts;
 
-  // the start
+  // The start
   {
     tScalar oldDist = PointPlaneDistance(oldCapsule.GetPos(), oldPlane);
     tScalar newDist = PointPlaneDistance(newCapsule.GetPos(), newPlane);
@@ -67,7 +63,7 @@ void tCollDetectCapsulePlane::CollDetect(const tCollDetectInfo &infoOrig,
       pts.PushBack(tCollPointInfo(worldPos - body0Pos, worldPos - body1Pos, oldDepth));
     }
   }
-  // the end
+  // The end
   {
     tVector3 oldEnd = oldCapsule.GetEnd();
     tVector3 newEnd = newCapsule.GetEnd();

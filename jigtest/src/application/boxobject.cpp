@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file boxobject.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "boxobject.hpp"
 #include "debugconfig.hpp"
 #include "texture.hpp"
@@ -13,42 +9,42 @@
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // SetProperties
-//==============================================================
-void tBoxObject::SetProperties(tScalar elasticity, 
+//======================================================================================================================
+void tBoxObject::SetProperties(tScalar elasticity,
                                tScalar staticFriction,
                                tScalar dynamicFriction)
 {
   mCollisionSkin.SetMaterialProperties(0, tMaterialProperties(elasticity, staticFriction, dynamicFriction));
 }
 
-//==============================================================
+//======================================================================================================================
 // tBoxObject
-//==============================================================
+//======================================================================================================================
 tBoxObject::tBoxObject(JigLib::tVector3 sides, bool randomColour)
 {
   TRACE_METHOD_ONLY(ONCE_2);
-  
-  mCollisionSkin.AddPrimitive(tBox(-0.5f * sides, 
-                              tMatrix33::Identity(), 
-                              sides), tMaterialTable::UNSET, 
+
+  mCollisionSkin.AddPrimitive(tBox(-0.5f * sides,
+                              tMatrix33::Identity(),
+                              sides), tMaterialTable::UNSET,
                               tMaterialProperties(0.6f, 0.8f, 0.6f));
 
   mCollisionSkin.SetOwner(&mBody);
-  
+
   mBody.SetCollisionSkin(&mCollisionSkin);
   SetMass(1.0f);
-  
+
   mDisplayListNum = 0;
   mRandomColour = randomColour;
   mTexture = 0;
   mTexture = AllocateRGBAFileTexture("data/texture.png");
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tBoxObject
-//==============================================================
+//======================================================================================================================
 tBoxObject::~tBoxObject()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -56,21 +52,21 @@ tBoxObject::~tBoxObject()
   mTexture = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // SetDensity
-//==============================================================
+//======================================================================================================================
 void tBoxObject::SetDensity(tScalar density, tPrimitive::tPrimitiveProperties::tMassDistribution massType)
 {
   SetMass(density * mCollisionSkin.GetVolume(), massType);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetMass
-//==============================================================
+//======================================================================================================================
 void tBoxObject::SetMass(tScalar mass, tPrimitive::tPrimitiveProperties::tMassDistribution massType)
 {
   mBody.SetMass(mass);
-  tPrimitive::tPrimitiveProperties primitiveProperties(massType, 
+  tPrimitive::tPrimitiveProperties primitiveProperties(massType,
     tPrimitive::tPrimitiveProperties::MASS, mass);
   tScalar junk;
   tVector3 com;
@@ -80,7 +76,7 @@ void tBoxObject::SetMass(tScalar mass, tPrimitive::tPrimitiveProperties::tMassDi
   bool alignBodyWithGeometry = true;
   if (alignBodyWithGeometry)
   {
-    // move body to geometry
+    // Move body to geometry
     mBody.MoveTo(mBody.GetPosition() + com, mBody.GetOrientation());
     mCollisionSkin.ApplyLocalTransform(tTransform3(-com, tMatrix33::Identity()));
     mBody.SetBodyInertia(itCoM);
@@ -92,9 +88,9 @@ void tBoxObject::SetMass(tScalar mass, tPrimitive::tPrimitiveProperties::tMassDi
 }
 
 
-//==============================================================
+//======================================================================================================================
 // SetRenderPosition
-//==============================================================
+//======================================================================================================================
 void tBoxObject::SetRenderPosition(tScalar renderFraction)
 {
   TRACE_METHOD_ONLY(FRAME_2);
@@ -110,61 +106,60 @@ void tBoxObject::SetRenderPosition(tScalar renderFraction)
   }
   else
   {
-    mRenderPosition = 
-      mBody.GetPosition() * renderFraction + 
+    mRenderPosition =
+      mBody.GetPosition() * renderFraction +
       mBody.GetOldPosition() * (1.0f - renderFraction);
-    // should really use quaternions and SLERP... but maybe if the
-    // object is spinning so fast then it doesn't matter if it renders
-    // a bit wrong...
-    mRenderOrientation = 
-      mBody.GetOrientation() * renderFraction + 
+    // Should really use quaternions and SLERP... But maybe if the object is spinning so fast then
+    // it doesn't matter if it renders a bit wrong...
+    mRenderOrientation =
+      mBody.GetOrientation() * renderFraction +
       mBody.GetOldOrientation() * (1.0f - renderFraction);
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderBoundingBox
-//==============================================================
+//======================================================================================================================
 const tSphere & tBoxObject::GetRenderBoundingSphere() const
 {
   const tBox & box = mCollisionSkin.GetPrimitiveLocal(0)->GetBox();
   const tVector3 & sides = box.GetSideLengths();
-  // ugly...
+  // Ugly...
   static tSphere sphere;
   sphere.SetPos(box.GetCentre());
   sphere.SetRadius(sides.GetLength());
   return sphere;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderPosition
-//==============================================================
+//======================================================================================================================
 const tVector3 & tBoxObject::GetRenderPosition() const
 {
   return mRenderPosition;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetRenderOrientation
-//==============================================================
+//======================================================================================================================
 const tMatrix33 & tBoxObject::GetRenderOrientation() const
 {
   return mRenderOrientation;
 }
 
-//==============================================================
+//======================================================================================================================
 // Render
-//==============================================================
+//======================================================================================================================
 void tBoxObject::Render(tRenderObject::tRenderType renderType)
 {
   TRACE_METHOD_ONLY(FRAME_2);
-  
+
   if (mDisplayListNum == 0)
   {
     const tBox & box = mCollisionSkin.GetPrimitiveLocal(0)->GetBox();
     const tVector3 & sides = box.GetSideLengths();
     const tVector3 origin = box.GetPos();
-    
+
     mDisplayListNum = glGenLists(1);
     glNewList(mDisplayListNum, GL_COMPILE);
     if (0)
@@ -172,9 +167,9 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     }
     else if (mRandomColour)
     {
-      GLCOLOR4(RangedRandom(0.2f, 1.0f), 
+      GLCOLOR4(RangedRandom(0.2f, 1.0f),
                RangedRandom(0.2f, 1.0f),
-               RangedRandom(0.2f, 1.0f), 
+               RangedRandom(0.2f, 1.0f),
                0.5f);
     }
     else
@@ -202,14 +197,14 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     tVector3 back = -fwd;
     tVector3 right = -left;
     tVector3 down = -up;
-    
+
     tScalar minDim = Min(sides);
     tScalar texX = sides.x / minDim;
     tScalar texY = sides.y / minDim;
     tScalar texZ = sides.z / minDim;
-    
+
     glBegin(GL_QUADS);
-    
+
     GLNORMAL3V(fwd.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(FLD.GetData());
@@ -219,7 +214,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(FRU.GetData());
     GLTEXCOORD2(texY, 0);
     GLVERTEX3V(FRD.GetData());
-    
+
     GLNORMAL3V(back.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(BLU.GetData());
@@ -229,7 +224,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(BRD.GetData());
     GLTEXCOORD2(texY, 0);
     GLVERTEX3V(BRU.GetData());
-    
+
     GLNORMAL3V(left.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(BLD.GetData());
@@ -239,7 +234,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(FLU.GetData());
     GLTEXCOORD2(texX, 0);
     GLVERTEX3V(FLD.GetData());
-    
+
     GLNORMAL3V(right.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(BRU.GetData());
@@ -249,7 +244,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(FRD.GetData());
     GLTEXCOORD2(texX, 0);
     GLVERTEX3V(FRU.GetData());
-    
+
     GLNORMAL3V(up.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(BLU.GetData());
@@ -259,7 +254,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(FRU.GetData());
     GLTEXCOORD2(texX, 0);
     GLVERTEX3V(FLU.GetData());
-    
+
     GLNORMAL3V(down.GetData());
     GLTEXCOORD2(0, 0);
     GLVERTEX3V(BRD.GetData());
@@ -269,15 +264,15 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     GLVERTEX3V(FLD.GetData());
     GLTEXCOORD2(texX, 0);
     GLVERTEX3V(FRD.GetData());
-    
+
     glEnd();
-    
+
     glEndList();
   }
-  
+
   if (tDebugConfig::mRenderCollisionBoundingBoxes)
     RenderWorldBoundingBox();
-  
+
   ApplyTransformation(mRenderPosition, mRenderOrientation);
   bool translucent = !mBody.IsActive();
   if (translucent && tDebugConfig::mIndicateFrozenObjects)
@@ -285,7 +280,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
-  
+
   if (tAppConfig::mTextureLevel > 0 && mTexture)
   {
     glEnable(GL_TEXTURE_2D);
@@ -297,7 +292,7 @@ void tBoxObject::Render(tRenderObject::tRenderType renderType)
   }
 
   glCallList(mDisplayListNum);
-  
+
   if (tAppConfig::mTextureLevel > 0 && mTexture)
   {
     glDisable(GL_TEXTURE_2D);

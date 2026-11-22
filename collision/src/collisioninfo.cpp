@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file collisioninfo.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "collisioninfo.hpp"
 #include "collisionsystem.hpp"
 
@@ -15,9 +11,9 @@ using namespace JigLib;
 
 vector<tCollisionInfo *> tCollisionInfo::mFreeInfos;
 
-//==============================================================
+//======================================================================================================================
 // Init
-//==============================================================
+//======================================================================================================================
 void tCollisionInfo::Init(const tCollDetectInfo &info,
                           const tVector3 & dirToBody0,
                           const tCollPointInfo * pointInfos,
@@ -32,7 +28,7 @@ void tCollisionInfo::Init(const tCollDetectInfo &info,
 
   tMaterialTable::tMaterialID ID0 = info.skin0->GetMaterialID(info.iPrim0);
   tMaterialTable::tMaterialID ID1 = info.skin1->GetMaterialID(info.iPrim1);
-  
+
   const tMaterialTable &matTable = info.skin0->GetCollisionSystem()->GetMaterialTable();
   if (ID0 == tMaterialTable::USER_DEFINED || ID1 == tMaterialTable::USER_DEFINED)
   {
@@ -44,9 +40,9 @@ void tCollisionInfo::Init(const tCollDetectInfo &info,
   }
   else
   {
-    mMatPairProperties = matTable.GetPairProperties(ID0, ID1); 
+    mMatPairProperties = matTable.GetPairProperties(ID0, ID1);
   }
-  
+
   if (numPointInfos > MAX_COLLISION_POINTS)
     numPointInfos = MAX_COLLISION_POINTS;
   mPointInfo.Resize(numPointInfos);
@@ -54,9 +50,9 @@ void tCollisionInfo::Init(const tCollDetectInfo &info,
     mPointInfo[i] = pointInfos[i];
 }
 
-//==============================================================
+//======================================================================================================================
 // Destroy
-//==============================================================
+//======================================================================================================================
 void tCollisionInfo::Destroy()
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
@@ -64,9 +60,9 @@ void tCollisionInfo::Destroy()
   mSkinInfo.skin1 = mSkinInfo.skin0;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetCollisionInfo
-//==============================================================
+//======================================================================================================================
 tCollisionInfo & tCollisionInfo::GetCollisionInfo(const tCollDetectInfo &info,
                                                   const tVector3 & dirToBody0,
                                                   const tCollPointInfo * pointInfos,
@@ -82,9 +78,9 @@ tCollisionInfo & tCollisionInfo::GetCollisionInfo(const tCollDetectInfo &info,
   return *collInfo;
 }
 
-//==============================================================
+//======================================================================================================================
 // FreeCollisionInfo
-//==============================================================
+//======================================================================================================================
 void tCollisionInfo::FreeCollisionInfo(tCollisionInfo & info)
 {
   TRACE_FUNCTION_ONLY(MULTI_FRAME_2);

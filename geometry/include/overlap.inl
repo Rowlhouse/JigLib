@@ -1,15 +1,11 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file overlap.inl 
-//                     
-//==============================================================
+//======================================================================================================================
 
-//====================================================================
+//======================================================================================================================
 // SegmentPlaneOverlap
-//====================================================================
+//======================================================================================================================
 inline bool SegmentPlaneOverlap(const tSegment& seg, const tPlane& plane)
 {
   tScalar denom = Dot(plane.GetN(), seg.GetDelta());
@@ -22,18 +18,18 @@ inline bool SegmentPlaneOverlap(const tSegment& seg, const tPlane& plane)
   }
   else
   {
-    // parallel - return false even if it's in the plane
+    // Parallel - return false even if it's in the plane
     return false;
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // SegmentTriangleOverlap
 // See Real-Time Rendering p581
-//====================================================================
+//======================================================================================================================
 inline bool SegmentTriangleOverlap(const tSegment& seg, const tTriangle& triangle)
 {
-  /// the parameters - if hit then they get copied into the args
+  // The parameters - if hit then they get copied into the args
   tScalar u, v, t;
 
   const tVector3& e1 = triangle.GetEdge0();
@@ -57,12 +53,12 @@ inline bool SegmentTriangleOverlap(const tSegment& seg, const tTriangle& triangl
   return true;
 }
 
-//====================================================================
+//======================================================================================================================
 // SweptSpherePlaneOverlap
-//====================================================================
+//======================================================================================================================
 inline bool SweptSpherePlaneOverlap(tVector3& pt, tScalar& finalPenetration,
-                                    const tSphere& oldSphere, const tSphere& newSphere, 
-                                    const tPlane& plane, 
+                                    const tSphere& oldSphere, const tSphere& newSphere,
+                                    const tPlane& plane,
                                     tScalar* pOldDistToPlane, tScalar* pNewDistToPlane)
 {
   const tScalar oldDistToPlane = pOldDistToPlane ? *pOldDistToPlane : PointPlaneDistance(oldSphere.GetPos(), plane);
@@ -74,7 +70,7 @@ inline bool SweptSpherePlaneOverlap(tVector3& pt, tScalar& finalPenetration,
   if (newDistToPlane > radius)
     return false;
 
-  // intersect with plane
+  // Intersect with plane
   tScalar t = (newDistToPlane - radius) / (newDistToPlane - oldDistToPlane);
   if (t < 0.0f || t > 1.0f)
     return false;
@@ -85,24 +81,24 @@ inline bool SweptSpherePlaneOverlap(tVector3& pt, tScalar& finalPenetration,
 }
 
 
-//====================================================================
+//======================================================================================================================
 // SegmentAABoxOverlap
-//====================================================================
+//======================================================================================================================
 inline bool SegmentAABoxOverlap(const tSegment& seg, const tAABox AABox)
 {
   const tVector3& p0 = seg.GetOrigin();
   const tVector3  p1 = seg.GetEnd();
-  // The AABox faces are aligned with the world directions. Loop 
-  // over the 3 directions and do the two tests.
+  // The AABox faces are aligned with the world directions. Loop over the 3 directions and do the
+  // two tests.
   for (unsigned iDir = 0 ; iDir < 3 ; ++iDir)
   {
     unsigned jDir = (iDir + 1) % 3;
     unsigned kDir = (iDir + 2) % 3;
-    // one plane goes through the origin, one is offset
+    // One plane goes through the origin, one is offset
     tScalar faceOffsets[] = {AABox.GetMinPos()[iDir], AABox.GetMaxPos()[iDir]};
     for (unsigned iFace = 0 ; iFace < 2 ; ++iFace)
     {
-      // distance of each point from to the face plane
+      // Distance of each point from to the face plane
       tScalar dist0 = p0[iDir] - faceOffsets[iFace];
       tScalar dist1 = p1[iDir] - faceOffsets[iFace];
       tScalar frac = -1.0f;
@@ -116,10 +112,10 @@ inline bool SegmentAABoxOverlap(const tSegment& seg, const tAABox AABox)
       {
         Assert(frac <= 1.0f);
         tVector3 pt = seg.GetPoint(frac);
-        // check the point is within the face rectangle
-        if ((pt[jDir] > AABox.GetMinPos()[jDir] - SCALAR_TINY) && 
-            (pt[jDir] < AABox.GetMaxPos()[jDir] + SCALAR_TINY) && 
-            (pt[kDir] > AABox.GetMinPos()[kDir] - SCALAR_TINY) && 
+        // Check the point is within the face rectangle
+        if ((pt[jDir] > AABox.GetMinPos()[jDir] - SCALAR_TINY) &&
+            (pt[jDir] < AABox.GetMaxPos()[jDir] + SCALAR_TINY) &&
+            (pt[kDir] > AABox.GetMinPos()[kDir] - SCALAR_TINY) &&
             (pt[kDir] < AABox.GetMaxPos()[kDir] + SCALAR_TINY) )
         {
           return true;

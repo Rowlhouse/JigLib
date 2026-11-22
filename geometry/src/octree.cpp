@@ -7,25 +7,25 @@
 using namespace std;
 using namespace JigLib;
 
-//====================================================================
+//======================================================================================================================
 // tOctree
-//====================================================================
+//======================================================================================================================
 tOctree::tOctree()
   :
   m_testCounter(0)
 {
 }
 
-//====================================================================
+//======================================================================================================================
 // tOctree
-//====================================================================
+//======================================================================================================================
 tOctree::~tOctree()
 {
 }
 
-//====================================================================
+//======================================================================================================================
 // Clear
-//====================================================================
+//======================================================================================================================
 void tOctree::Clear(bool freeMemory)
 {
   if( freeMemory )
@@ -42,16 +42,16 @@ void tOctree::Clear(bool freeMemory)
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // CreateMesh
-//====================================================================
+//======================================================================================================================
 void tOctree::AddTriangles(const tVector3 * vertices, unsigned numVertices,
                            const tTriangleVertexIndices * triangleVertexIndices, unsigned numTriangles)
 {
   mVertices.resize(0);
   mTriangles.resize(0);
   mCells.resize(0);
-  
+
   Assert(vertices);
   Assert(triangleVertexIndices);
 
@@ -73,8 +73,8 @@ void tOctree::AddTriangles(const tVector3 * vertices, unsigned numVertices,
     tVector3 dr2 = vertices[i2] - vertices[i0];
     tVector3 N = Cross(dr1, dr2);
     tScalar NLen = N.GetLength();
-    // only add if it's not degenerate. Note that this could be a problem it we use connectivity info
-    // since we're actually making a hole in the mesh...
+    // Only add if it's not degenerate. Note that this could be a problem if we use connectivity
+    // info since we're actually making a hole in the mesh...
     if (NLen > SCALAR_TINY)
     {
       mTriangles.push_back(tIndexedTriangle());
@@ -83,9 +83,9 @@ void tOctree::AddTriangles(const tVector3 * vertices, unsigned numVertices,
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // Clear
-//====================================================================
+//======================================================================================================================
 void tOctree::tOctreeCell::Clear()
 {
   for (unsigned i = 0 ; i < NUM_CHILDREN ; ++i)
@@ -93,17 +93,17 @@ void tOctree::tOctreeCell::Clear()
   mTriangleIndices.clear();
 }
 
-//====================================================================
+//======================================================================================================================
 // tOctreeCell
-//====================================================================
+//======================================================================================================================
 tOctree::tOctreeCell::tOctreeCell()
 {
   Clear();
 }
 
-//====================================================================
+//======================================================================================================================
 // tOctreeCell
-//====================================================================
+//======================================================================================================================
 tOctree::tOctreeCell::tOctreeCell(const tAABox & aabb)
   :
   mAABox(aabb)
@@ -111,9 +111,9 @@ tOctree::tOctreeCell::tOctreeCell(const tAABox & aabb)
   Clear();
 }
 
-//====================================================================
+//======================================================================================================================
 // IncrementTestCounter
-//====================================================================
+//======================================================================================================================
 inline void tOctree::IncrementTestCounter() const
 {
   ++m_testCounter;
@@ -127,23 +127,25 @@ inline void tOctree::IncrementTestCounter() const
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // DoesTriangleIntersectCell
-//====================================================================
-bool tOctree::DoesTriangleIntersectCell(const tIndexedTriangle & triangle, 
+//======================================================================================================================
+bool tOctree::DoesTriangleIntersectCell(const tIndexedTriangle & triangle,
                                         const tOctreeCell & cell) const
 {
   if (!OverlapTest(triangle.GetBoundingBox(), cell.mAABox))
     return false;
 
-  // quick test
+  // Quick test
   if (cell.mAABox.IsPointInside(GetVertex(triangle.GetVertexIndex(0))) ||
       cell.mAABox.IsPointInside(GetVertex(triangle.GetVertexIndex(1))) ||
       cell.mAABox.IsPointInside(GetVertex(triangle.GetVertexIndex(2))) )
     return true;
-  // all points are outside... so if there is intersection it must be due to the
-  // box edges and the triangle...
-  tTriangle tri(GetVertex(triangle.GetVertexIndex(0)), GetVertex(triangle.GetVertexIndex(1)), GetVertex(triangle.GetVertexIndex(2)));
+  // All points are outside... So if there is intersection it must be due to the box edges and the
+  // triangle...
+  tTriangle tri(GetVertex(triangle.GetVertexIndex(0)),
+                GetVertex(triangle.GetVertexIndex(1)),
+                GetVertex(triangle.GetVertexIndex(2)));
   tBox box(cell.mAABox.GetMinPos(), tMatrix33::Identity(), cell.mAABox.GetSideLengths());
   tVector3 pts[8];
   box.GetCornerPoints(pts);
@@ -157,7 +159,7 @@ bool tOctree::DoesTriangleIntersectCell(const tIndexedTriangle & triangle,
   }
   // Unless it's the triangle edges and the box
   tVector3 pos, n;
-  // now each edge of the triangle with the box
+  // Now each edge of the triangle with the box
   for (unsigned iEdge = 0 ; iEdge < 3 ; ++iEdge)
   {
     const tVector3 pt0 = tri.GetPoint(iEdge);
@@ -169,9 +171,9 @@ bool tOctree::DoesTriangleIntersectCell(const tIndexedTriangle & triangle,
   return false;
 }
 
-//====================================================================
+//======================================================================================================================
 // CreateAABox
-//====================================================================
+//======================================================================================================================
 tAABox tOctree::CreateAABox(const tAABox & aabb, tOctreeCell::EChild child) const
 {
   tVector3 dims = 0.5f * (aabb.GetMaxPos() - aabb.GetMinPos());
@@ -195,7 +197,7 @@ tAABox tOctree::CreateAABox(const tAABox & aabb, tOctreeCell::EChild child) cons
   tAABox result;
   result.SetMinPos(aabb.GetMinPos() + tVector3(offset.x * dims.x, offset.y * dims.y, offset.z * dims.z));
   result.SetMaxPos(result.GetMinPos() + dims);
-  // expand it just a tiny bit just to be safe!
+  // Expand it just a tiny bit just to be safe!
   tScalar extra = 0.00001f;
   result.SetMinPos(result.GetMinPos() - extra * dims);
   result.SetMaxPos(result.GetMaxPos() + extra * dims);
@@ -203,9 +205,9 @@ tAABox tOctree::CreateAABox(const tAABox & aabb, tOctreeCell::EChild child) cons
 }
 
 
-//====================================================================
+//======================================================================================================================
 // BuildOctree
-//====================================================================
+//======================================================================================================================
 void tOctree::BuildOctree(unsigned maxTrianglesPerCell, tScalar minCellSize)
 {
   mBoundingBox.Clear();
@@ -213,25 +215,24 @@ void tOctree::BuildOctree(unsigned maxTrianglesPerCell, tScalar minCellSize)
   for (i = 0 ; i < mVertices.size() ; ++i)
     mBoundingBox.AddPoint(mVertices[i]);
 
-  // clear any existing cells
+  // Clear any existing cells
   mCells.clear();
 
-  // set up the root
+  // Set up the root
   mCells.push_back(tOctreeCell(mBoundingBox));
   unsigned numTriangles = mTriangles.size();
   mCells.back().mTriangleIndices.resize(numTriangles);
   for (i = 0 ; i < numTriangles ; ++i)
     mCells.back().mTriangleIndices[i] = i;
 
-  // rather than doing things recursively, use a stack of cells that need
-  // to be processed - for each cell if it contains too many triangles we 
-  // create child cells and move the triangles down into them (then we
-  // clear the parent triangles).
+  // Rather than doing things recursively, use a stack of cells that need to be processed - for each
+  // cell if it contains too many triangles we create child cells and move the triangles down into
+  // them (then we clear the parent triangles).
   std::vector<int> cellsToProcess;
   cellsToProcess.push_back(0);
 
-  // bear in mind during this that any time a new cell gets created any pointer
-  // or reference to an existing cell may get invalidated - so use indexing.
+  // Bear in mind during this that any time a new cell gets created any pointer or reference to an
+  // existing cell may get invalidated - so use indexing.
   while (!cellsToProcess.empty())
   {
     int cellIndex = cellsToProcess.back();
@@ -241,12 +242,12 @@ void tOctree::BuildOctree(unsigned maxTrianglesPerCell, tScalar minCellSize)
          (mCells[cellIndex].mAABox.GetRadiusAboutCentre() < minCellSize) )
       continue;
 
-    // we need to put these triangles into the children
+    // We need to put these triangles into the children
     for (unsigned iChild = 0 ; iChild < tOctreeCell::NUM_CHILDREN ; ++iChild)
     {
       mCells[cellIndex].mChildCellIndices[iChild] = (int) mCells.size();
       cellsToProcess.push_back((int) mCells.size());
-      mCells.push_back(tOctreeCell(CreateAABox(mCells[cellIndex].mAABox, 
+      mCells.push_back(tOctreeCell(CreateAABox(mCells[cellIndex].mAABox,
                                                (tOctreeCell::EChild) iChild)));
 
       tOctreeCell & childCell = mCells.back();
@@ -261,20 +262,20 @@ void tOctree::BuildOctree(unsigned maxTrianglesPerCell, tScalar minCellSize)
         }
       }
     }
-    // the children handle all the triangles now - we no longer need them
+    // The children handle all the triangles now - we no longer need them
     mCells[cellIndex].mTriangleIndices.clear();
   }
 }
 
-//====================================================================
+//======================================================================================================================
 // GetTrianglesIntersectingtAABox
-//====================================================================
+//======================================================================================================================
 unsigned tOctree::GetTrianglesIntersectingtAABox(
   std::vector<unsigned>& triangles, const tAABox& aabb) const
 {
   if (mCells.empty())
     return 0;
-  
+
   triangles.resize(0);
   mCellsToTest.resize(0);
   mCellsToTest.push_back(0);
@@ -306,7 +307,7 @@ unsigned tOctree::GetTrianglesIntersectingtAABox(
     }
     else
     {
-      // if non-leaf, just add the children to check
+      // If non-leaf, just add the children to check
       for (unsigned iChild = 0 ; iChild < tOctreeCell::NUM_CHILDREN ; ++iChild)
       {
         int childIndex = cell.mChildCellIndices[iChild];
@@ -317,9 +318,9 @@ unsigned tOctree::GetTrianglesIntersectingtAABox(
   return triangles.size();
 }
 
-//====================================================================
+//======================================================================================================================
 // DumpStats
-//====================================================================
+//======================================================================================================================
 void tOctree::DumpStats() const
 {
   TRACE("tOctree::DumpStats:");
@@ -337,7 +338,7 @@ void tOctree::DumpStats() const
 
     if (cell.IsLeaf())
     {
-      // check this hasn't got any children
+      // Check this hasn't got any children
       for (unsigned i = 0 ; i < tOctreeCell::NUM_CHILDREN ; ++i)
       {
         if (cell.mChildCellIndices[i] != -1)

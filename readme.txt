@@ -20,9 +20,14 @@ word is capitalised.
 Macros are in capitals (unless they're pretending not to be macros)
 and underscore is used to separate words.
 
-Everything is in namespace "JigLib". 
+Everything is in namespace "JigLib". Code inside a top-level namespace
+is not indented.
 
 Indentation is two spaces - NOT TABS
+
+Lines are at most 120 characters. Comments use // (not /// or /* */)
+and are wrapped at 100 characters. Separator lines (//====) extend to
+120 characters.
 
 Every header/file has to have a newline at the end (MSVC doesn't
 enforce this, but gcc does!).

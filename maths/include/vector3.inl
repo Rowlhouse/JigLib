@@ -1,32 +1,28 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file vector3.inl 
-//                     
-//==============================================================
+//======================================================================================================================
 // should only be included from vector3.hpp
 
-inline tScalar & tVector3::operator[](unsigned i) 
+inline tScalar & tVector3::operator[](unsigned i)
 {
   Assert(i < 3);
   return (&x)[i];
 }
 
-inline const tScalar & tVector3::operator[](unsigned i) const 
+inline const tScalar & tVector3::operator[](unsigned i) const
 {
   Assert(i < 3);
   return (&x)[i];
 }
 
-inline tScalar & tVector3::operator()(unsigned i) 
+inline tScalar & tVector3::operator()(unsigned i)
 {
   Assert(i < 3);
   return (&x)[i];
 }
 
-inline const tScalar & tVector3::operator()(unsigned i) const 
+inline const tScalar & tVector3::operator()(unsigned i) const
 {
   Assert(i < 3);
   return (&x)[i];
@@ -42,7 +38,7 @@ inline void tVector3::Set(tScalar _x, tScalar _y, tScalar _z)
   x = _x; y = _y; z = _z;
 }
 
-inline tVector3::tVector3(tScalar val) : x(val), y(val), z(val) 
+inline tVector3::tVector3(tScalar val) : x(val), y(val), z(val)
 {
 }
 
@@ -50,7 +46,7 @@ inline tVector3::tVector3(tScalar _x, tScalar _y, tScalar _z) : x(_x), y(_y), z(
 {
 }
 
-inline tVector3::tVector3(tScalar scale, const tVector3& vec) : x(scale * vec.x), y(scale * vec.y), z(scale * vec.z) 
+inline tVector3::tVector3(tScalar scale, const tVector3& vec) : x(scale * vec.x), y(scale * vec.y), z(scale * vec.z)
 {
 }
 
@@ -110,12 +106,12 @@ inline tVector3 & tVector3::Negate()
   return *this;
 }
 
-inline tVector3 & tVector3::Normalise() 
+inline tVector3 & tVector3::Normalise()
 {
   (*this) *= (1.0f / GetLength()); return *this;
 }
 
-inline tVector3 tVector3::GetNormalised() const 
+inline tVector3 tVector3::GetNormalised() const
 {
   return tVector3(*this).Normalise();
 }
@@ -134,7 +130,7 @@ inline tVector3 & tVector3::NormaliseSafe(const tVector3& safe)
   return *this;
 }
 
-inline tVector3 tVector3::GetNormalisedSafe(const tVector3& safe) const 
+inline tVector3 tVector3::GetNormalisedSafe(const tVector3& safe) const
 {
   return tVector3(*this).NormaliseSafe(safe);
 }
@@ -158,7 +154,7 @@ inline void tVector3::Show(const char * str) const
   TRACE("\n");
 }
 
-// global operators
+// Global operators
 inline tScalar Dot(const tVector3 & lhs, const tVector3 & rhs)
 {
   return (lhs.x * rhs.x +
@@ -173,8 +169,8 @@ inline tVector3 Cross(const tVector3 & lhs, const tVector3 & rhs)
                   lhs.x*rhs.y - lhs.y*rhs.x);
 }
 
-inline bool ApproxEqual(const tVector3 & a, 
-                        const tVector3 & b, 
+inline bool ApproxEqual(const tVector3 & a,
+                        const tVector3 & b,
                         tScalar tol)
 {
   if (!ApproxEqual(a.x, b.x, tol)) return false;
@@ -190,8 +186,8 @@ inline tVector3 ElementMult(const tVector3 & lhs, const tVector3 & rhs)
                   lhs.z * rhs.z);
 }
 
-inline void AddVector3(tVector3 & out, 
-                       const tVector3 & vec1, 
+inline void AddVector3(tVector3 & out,
+                       const tVector3 & vec1,
                        const tVector3 & vec2)
 {
   out.x = vec1.x + vec2.x;
@@ -199,9 +195,9 @@ inline void AddVector3(tVector3 & out,
   out.z = vec1.z + vec2.z;
 }
 
-inline void AddVector3(tVector3 & out, 
-                       const tVector3 & vec1, 
-                       const tVector3 & vec2, 
+inline void AddVector3(tVector3 & out,
+                       const tVector3 & vec1,
+                       const tVector3 & vec2,
                        const tVector3 & vec3)
 {
   out.x = vec1.x + vec2.x + vec3.x;
@@ -209,8 +205,8 @@ inline void AddVector3(tVector3 & out,
   out.z = vec1.z + vec2.z + vec3.z;
 }
 
-inline void SubVector3(tVector3 & out, 
-                       const tVector3 & vec1, 
+inline void SubVector3(tVector3 & out,
+                       const tVector3 & vec1,
                        const tVector3 & vec2)
 {
   out.x = vec1.x - vec2.x;

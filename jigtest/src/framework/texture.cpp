@@ -1,11 +1,7 @@
-/*!
-  Sss - a slope soaring simulater.
-  Copyright (C) 2002 Danny Chapman - flight@rowlhouse.freeserve.co.uk
-
-  \file texture.cpp
-
-  \todo improve this texture implementation!
-*/
+// Sss - a slope soaring simulator.
+// Copyright (C) 2002 Danny Chapman - flight@rowlhouse.freeserve.co.uk
+//
+// TODO: improve this texture implementation!
 #include "texture.hpp"
 #include "imageloader.hpp"
 
@@ -15,10 +11,10 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tRGBAFileTexture
-//==============================================================
-tRGBAFileTexture::tRGBAFileTexture(const string & file, 
+//======================================================================================================================
+tRGBAFileTexture::tRGBAFileTexture(const string & file,
                                    bool useMipmap,
                                    tRGBAFileTexture::tEdge edge,
                                    tRGBAFileTexture::tType type)
@@ -41,14 +37,14 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
   TRACE_FILE_IF(ONCE_2)
     TRACE("%d %d\n", mW, mH);
   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
+
   GLint glEdge = GL_CLAMP;
   GLenum glType = GL_RGBA;
 
   switch (edge)
   {
   case CLAMP: glEdge = GL_CLAMP; break;
-  case CLAMP_TO_EDGE: 
+  case CLAMP_TO_EDGE:
 //    glEdge = GL_CLAMP; break;
     glEdge = GL_CLAMP_TO_EDGE; break;
   case REPEAT: glEdge = GL_REPEAT; break;
@@ -59,7 +55,7 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
 
   switch (type)
   {
-  case RGBA: 
+  case RGBA:
   {
     data = new GLubyte[mW*mH*4];
     for (int i = 0 ; i < mW ; ++i)
@@ -77,13 +73,13 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
   }
   case LUM:
   {
-    // detail is just a "light map" - use the intensity of the original image
+    // Detail is just a "light map" - use the intensity of the original image
     data = new GLubyte[mW*mH];
     for (int i = 0 ; i < mW ; ++i)
     {
       for (int j = 0 ; j < mH ; ++j)
       {
-        data[i + j * mW] = 
+        data[i + j * mW] =
           (GLubyte) ((image(i, j).r + image(i, j).g + image(i, j).b) / 3.0f);
       }
     }
@@ -112,7 +108,7 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
   {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, glType, mW, mH, 0, glType, 
+    glTexImage2D(GL_TEXTURE_2D, 0, glType, mW, mH, 0, glType,
                  GL_UNSIGNED_BYTE, data);
   }
 
@@ -140,18 +136,18 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
   delete [] data;
 }
 
-//==============================================================
+//======================================================================================================================
 // tRGBAFileTexture
-//==============================================================
+//======================================================================================================================
 tRGBAFileTexture::~tRGBAFileTexture()
 {
   glDeleteTextures(1, &mTextureLow);
   glDeleteTextures(1, &mTextureHigh);
 }
 
-//==============================================================
+//======================================================================================================================
 // tTextureRecord
-//==============================================================
+//======================================================================================================================
 struct tTextureRecord
 {
   string file;
@@ -162,20 +158,19 @@ struct tTextureRecord
   int refCount;
 };
 
-// speed isn't an issue - anyway we don't know what key we'll be doing
-// a lookup on
+// speed isn't an issue - anyway we don't know what key we'll be doing a lookup on
 typedef list<tTextureRecord> tTextureRecords;
 tTextureRecords textureRecords;
 
-//==============================================================
+//======================================================================================================================
 // allocate_rgba_file_texture
-//==============================================================
-tRGBAFileTexture * AllocateRGBAFileTexture(const std::string & file, 
+//======================================================================================================================
+tRGBAFileTexture * AllocateRGBAFileTexture(const std::string & file,
                                            bool useMipmap,
                                            tRGBAFileTexture::tEdge edge,
                                            tRGBAFileTexture::tType type)
 {
-  // walk through the list
+  // Walk through the list
   tTextureRecords::iterator it;
   for (it = textureRecords.begin() ; it != textureRecords.end() ; ++it)
   {
@@ -189,7 +184,7 @@ tRGBAFileTexture * AllocateRGBAFileTexture(const std::string & file,
     }
   }
 
-  // got to the end - need to add a new one
+  // Got to the end - need to add a new one
   tTextureRecord newRecord;
   newRecord.file = file;
   newRecord.useMipmap = useMipmap;
@@ -201,14 +196,14 @@ tRGBAFileTexture * AllocateRGBAFileTexture(const std::string & file,
   return newRecord.texture;
 }
 
-//==============================================================
+//======================================================================================================================
 // FreeRGBAFileTexture
-//==============================================================
+//======================================================================================================================
 void FreeRGBAFileTexture(tRGBAFileTexture * texture)
 {
   if (texture == 0)
     return;
-  // walk through the list
+  // Walk through the list
   tTextureRecords::iterator it;
   for (it = textureRecords.begin() ; it != textureRecords.end() ; ++it)
   {

@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file appconfig.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef APPCONFIG_HPP
 #define APPCONFIG_HPP
 
@@ -13,7 +9,7 @@
 
 #include <string>
 
-/// helper class/struct internal to tJigTestApp
+// Helper class/struct internal to tJigTestApp
 class tAppConfig
 {
 public:
@@ -37,7 +33,7 @@ public:
   static JigLib::tScalar mPhysicsOrientThreshold;
   static JigLib::tScalar mPhysicsDeactivationTime;
   static int mMaxPhysicsStepsPerFrame;
-	static bool mNullPhysicsUpdate;
+        static bool mNullPhysicsUpdate;
   static bool mRenderEnable;
   static int mTextureLevel;
   static bool mRenderInterpolate;

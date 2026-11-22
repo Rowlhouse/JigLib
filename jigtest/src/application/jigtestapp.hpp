@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file jigtestapp.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef JIGTESTAPP_HPP
 #define JIGTESTAPP_HPP
 
@@ -23,12 +19,12 @@ class tJigTestApp : public tSDLApplicationBase
 public:
   tJigTestApp(int & argc, char * argv[]);
   ~tJigTestApp();
-  
-  // inherited from tSDLApplicationBase
+
+  // Inherited from tSDLApplicationBase
   class JigLib::tPhysicsSystem * GetPhysicsSystem() {return &mPhysics;}
   bool Initialise(const std::string app_name);
   void StartMainLoop();
-  
+
   // event handlers
   void HandleKeyDown(const SDL_keysym & keysym );
   void HandleKeyUp(const SDL_keysym & keysym );
@@ -39,53 +35,52 @@ public:
   void HandleMouseButtonDown(const SDL_MouseButtonEvent & event);
   void HandleMouseButtonUp(const SDL_MouseButtonEvent & event);
   void ProcessMainEvent();
-  
+
   void AddObject(class tObject * object);
 
 private:
   void LoadAppConfig();
-  
-  /// height is the number of levels
-  /// pos is the position of the centre of the bottom of the stack
-  void BuildJengaStack(int height, 
+
+  // height is the number of levels. pos is the position of the centre of the bottom of the stack
+  void BuildJengaStack(int height,
                        const JigLib::tVector3 & boxDims,
                        const JigLib::tVector3 & pos);
-  
-  void BuildWall(int height, 
+
+  void BuildWall(int height,
                  int width,
                  const JigLib::tVector3 & boxDims,
                  const JigLib::tVector3 & pos,
                  bool pyramid);
 
   void CreateBumpyHeightmap();
-  
+
   void CreateFileHeightmap(const std::string & fileName);
 
   void SetupExperiment();
-  
+
   void SetupUnequalExperiment();
-  
+
   void FireObject();
-  
-  /// Fires the last created object, but doesn't change the camera focus
+
+  // Fires the last created object, but doesn't change the camera focus
   void FireLastCreatedObject();
 
   void RemoveAllObjects(bool onlyPhysical);
-  
+
   void RestartExperiment();
-  
+
   void SetSleepingParams();
 
   class tBoxObject * CreateBox();
-  
+
   class tBoxSphereObject * CreateCompound();
-  
+
   class tSphereObject * CreateSphere();
-  
+
   class tCapsuleObject * CreateCapsule();
 
   class tCarObject * CreateCar();
-  
+
   class tCharacterObject * CreateCharacter();
 
   class tRagdoll * CreateRagdoll();
@@ -95,7 +90,7 @@ private:
   enum tObjectControl {CONTROL_UP, CONTROL_DOWN, CONTROL_LEFT, CONTROL_RIGHT};
   void ControlMainObject(tObjectControl control, bool down);
   void ControlMainCar(tObjectControl control, bool down);
-  
+
   enum tMoveDir {MOVE_NONE  = 1 << 0,
                  MOVE_FWD   = 1 << 1,
                  MOVE_BACK  = 1 << 2,
@@ -103,83 +98,83 @@ private:
                  MOVE_RIGHT = 1 << 4,
                  MOVE_UP    = 1 << 5,
                  MOVE_DOWN  = 1 << 6};
-  
-  /// Our physics system
+
+  // Our physics system
   JigLib::tPhysicsSystem mPhysics;
-  
-  /// create the collision system on the heap since we might want to
-  /// choose the type at run-time (from config)
+
+  // Create the collision system on the heap since we might want to choose the type at run-time
+  // (from config)
   JigLib::tCollisionSystem * mCollisionSystem;
-  
-  /// The thing we use to manager all renderable objects
+
+  // The thing we use to manager all renderable objects
   tRenderManager mRenderManager;
-  
-  /// could have a number of viewports...
+
+  // Could have a number of viewports...
   std::vector<class tViewport *> mViewports;
-  
-  /// could have a number of cameras, for example one per viewport
+
+  // Could have a number of cameras, for example one per viewport
   std::vector<class tCamera *> mCameras;
-  
-  /// Used to move objects by constraining their velocity
+
+  // Used to move objects by constraining their velocity
   JigLib::tConstraintVelocity mObjectController;
 
-  /// Used to move objects by constraining their position
+  // Used to move objects by constraining their position
   JigLib::tConstraintWorldPoint mObjectPositionController;
-  /// damps velocity on the position-controlled object
+  // Damps velocity on the position-controlled object
   JigLib::tConstraintVelocity mObjectPositionDamperController;
 
-  /// all our things
+  // All our things
   typedef std::vector<class tObject *> tObjects;
   tObjects mObjects;
-  
-  /// Additional list for cars so that the user can control them
+
+  // Additional list for cars so that the user can control them
   typedef std::vector<class tCarObject *> tCarObjects;
   tCarObjects mCarObjects;
-  
-  /// Additional list for characters so that the user can control them
+
+  // Additional list for characters so that the user can control them
   typedef std::vector<class tCharacterObject *> tCharacterObjects;
   tCharacterObjects mCharacterObjects;
-  
-  /// index into mObjects for the camera target. if -1 then stops following
+
+  // Index into mObjects for the camera target. If -1 then stops following
   int mCameraTargetIndex;
-  
-  /// For camera movement
+
+  // For camera movement
   unsigned mCameraMoveDir;
-  /// actual camera vel
+  // Actual camera vel
   JigLib::tVector3 mCameraMoveVel;
 
   enum tCameraMode {CAMERA_FIXED, CAMERA_FOLLOW};
   tCameraMode mCameraMode;
-  
-  /// the average duration of each physics step
+
+  // The average duration of each physics step
   JigLib::tScalar mPhysicsDuration;
-  
-  /// pause physics
+
+  // Pause physics
   bool mPaused;
-  
-  /// allow single-stepping
+
+  // Allow single-stepping
   bool mPauseAfterNextPhysicsStep;
-  
-  /// AI controlled cars
+
+  // AI controlled cars
   tCarAI mCarAI;
 
-  /// maybe have a skybox
+  // Maybe have a skybox
   class tSkybox * mSkybox;
 
-  /// true if we're picking/moving an object with the mouse
+  // true if we're picking/moving an object with the mouse
   bool mPicking;
 
-  /// When picking this is the original distance from the camera to the object
+  // When picking this is the original distance from the camera to the object
   JigLib::tScalar mPickDist;
 
-  /// Record a movie?
+  // Record a movie?
   bool mDoMovie;
 
-  /// if non-zero then quit after this many physics updates -
-  /// e.g. when profiling
+  // If non-zero then quit after this many physics updates -
+  // e.g. when profiling
   int mQuitIterations;
 
-  /// Counts the number of physics updates we've done
+  // Counts the number of physics updates we've done
   int mPhysicsCounter;
 };
 

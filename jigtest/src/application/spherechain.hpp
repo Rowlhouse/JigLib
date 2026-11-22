@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file spherechain.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #ifndef SPHERECHAIN_HPP
 #define SPHERECHAIN_HPP
 
@@ -19,14 +15,14 @@ class tSphereChain : public tObject
 {
 public:
   enum tChainType {CHAIN_HINGE, CHAIN_BALLNSOCKET};
-  
+
   tSphereChain(class tRenderManager * render,
                unsigned chainLength,
                const JigLib::tVector3 & pos,
                JigLib::tScalar radius,
                JigLib::tScalar boxDensity,
                tChainType type);
-  
+
   ~tSphereChain();
 
   JigLib::tBody * GetBody();

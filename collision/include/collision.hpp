@@ -4,8 +4,8 @@
 
 #include "../collision/include/materials.hpp"
 
-// Each skin contains a number of of basic geometry primitives, and it
-// also stores the "old" and "new" position/orientations of the primitives.
+// Each skin contains a number of basic geometry primitives, and it also stores the "old" and
+// "new" position/orientations of the primitives.
 #include "../collision/include/collisionskin.hpp"
 
 #include "../collision/include/colldetectboxbox.hpp"

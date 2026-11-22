@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file hingejoint.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "hingejoint.hpp"
 #include "body.hpp"
 #include "constraintpoint.hpp"
@@ -14,9 +10,9 @@
 
 using namespace JigLib;
 
-//========================================================
+//======================================================================================================================
 // tHingeJoint
-//========================================================
+//======================================================================================================================
 tHingeJoint::tHingeJoint()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -28,18 +24,18 @@ tHingeJoint::tHingeJoint()
   mDamping = 0.0f;
 }
 
-//========================================================
+//======================================================================================================================
 // ~tHingeJoint
-//========================================================
+//======================================================================================================================
 tHingeJoint::~tHingeJoint()
 {
   TRACE_METHOD_ONLY(ONCE_2);
   DisableHinge();
 }
 
-//========================================================
+//======================================================================================================================
 // EnableHinge
-//========================================================
+//======================================================================================================================
 void tHingeJoint::EnableHinge()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -58,9 +54,9 @@ void tHingeJoint::EnableHinge()
   mHingeEnabled = true;
 }
 
-//========================================================
+//======================================================================================================================
 // DisableHinge
-//========================================================
+//======================================================================================================================
 void tHingeJoint::DisableHinge()
 {
   TRACE_METHOD_ONLY(ONCE_2);
@@ -79,9 +75,9 @@ void tHingeJoint::DisableHinge()
   mHingeEnabled = false;
 }
 
-//========================================================
+//======================================================================================================================
 // Break
-//========================================================
+//======================================================================================================================
 void tHingeJoint::Break()
 {
   TRACE_METHOD_ONLY(ONCE_3);
@@ -92,9 +88,9 @@ void tHingeJoint::Break()
   mBroken = true;
 }
 
-//========================================================
+//======================================================================================================================
 // Mend
-//========================================================
+//======================================================================================================================
 void tHingeJoint::Mend()
 {
   TRACE_METHOD_ONLY(ONCE_3);
@@ -105,11 +101,11 @@ void tHingeJoint::Mend()
   mBroken = false;
 }
 
-//========================================================
+//======================================================================================================================
 // Init
-//========================================================
-void tHingeJoint::Initialise(tBody * body0, tBody * body1, 
-                             const tVector3 & hingeAxis, 
+//======================================================================================================================
+void tHingeJoint::Initialise(tBody * body0, tBody * body1,
+                             const tVector3 & hingeAxis,
                              const tVector3 & hingePosRel0,
                              const tScalar hingeHalfWidth,
                              const tScalar hingeFwdAngle,
@@ -128,10 +124,10 @@ void tHingeJoint::Initialise(tBody * body0, tBody * body1,
   //  tScalar allowedDistance = 0.005f;
   mHingeAxis.Normalise();
 
-  tVector3 hingePosRel1 = 
+  tVector3 hingePosRel1 =
     body0->GetPosition() + hingePosRel0 - body1->GetPosition();
 
-  // generate the two positions relative to each body
+  // Generate the two positions relative to each body
   tVector3 relPos0a = hingePosRel0 + hingeHalfWidth * hingeAxis;
   tVector3 relPos0b = hingePosRel0 - hingeHalfWidth * hingeAxis;
 
@@ -148,34 +144,32 @@ void tHingeJoint::Initialise(tBody * body0, tBody * body1,
     body0, relPos0b, body1, relPos1b, allowedDistanceSide);
 
   mMidPointConstraint.Initialise(
-    body0, hingePosRel0, body1, hingePosRel1, 
+    body0, hingePosRel0, body1, hingePosRel1,
     allowedDistanceMid, timescale);
 
   if (hingeFwdAngle <= MAX_HINGE_ANGLE_LIMIT)
   {
-    // choose a direction that is perpendicular to the hinge
+    // Choose a direction that is perpendicular to the hinge
     tVector3 perpDir(0.0f, 0.0f, 1.0f);
     if (Dot(perpDir, hingeAxis) > 0.1f)
       perpDir.Set(0.0f, 1.0f, 0.0f);
-    // now make it perpendicular to the hinge
+    // Now make it perpendicular to the hinge
     tVector3 sideAxis = Cross(hingeAxis, perpDir);
     perpDir = Cross(sideAxis, hingeAxis).Normalise();
-    
-    // the length of the "arm" TODO take this as a parameter? what's
-    // the effect of changing it?
+
+    // The length of the "arm" TODO: take this as a parameter? What's the effect of changing it?
     tScalar len = 10.0f * hingeHalfWidth;
-    
-    // Choose a position using that dir. this will be the anchor point
+
+    // Choose a position using that dir. This will be the anchor point
     // for body 0. relative to hinge
     tVector3 hingeRelAnchorPos0 = perpDir * len;
 
-    // anchor point for body 2 is chosen to be in the middle of the
-    // angle range.  relative to hinge
+    // Anchor point for body 2 is chosen to be in the middle of the angle range. Relative to hinge
     tScalar angleToMiddle = 0.5f * (hingeFwdAngle - hingeBckAngle);
-    tVector3 hingeRelAnchorPos1 = 
+    tVector3 hingeRelAnchorPos1 =
       RotationMatrix(-angleToMiddle, hingeAxis) * hingeRelAnchorPos0;
-    
-    // work out the "string" length
+
+    // Work out the "string" length
     tScalar hingeHalfAngle = 0.5f * (hingeFwdAngle + hingeBckAngle);
     tScalar allowedDistance = len * 2.0f * SinDeg(hingeHalfAngle * 0.5f);
 
@@ -184,20 +178,20 @@ void tHingeJoint::Initialise(tBody * body0, tBody * body1,
     tVector3 relPos1c = hingePos + hingeRelAnchorPos1 - body1->GetPosition();
 
     mMaxDistanceConstraint.Initialise(
-      body0, relPos0c, 
+      body0, relPos0c,
       body1, relPos1c,
       allowedDistance);
     mUsingLimit = true;
   }
   if (mDamping <= 0.0f)
-    mDamping = -1.0f; // just make sure that a value of 0.0 doesn't mess up...
+    mDamping = -1.0f; // Just make sure that a value of 0.0 doesn't mess up...
   else
     Limit(mDamping, SCALAR(0.0f), SCALAR(1.0f));
 }
 
-//========================================================
+//======================================================================================================================
 // UpdateController
-//========================================================
+//======================================================================================================================
 void tHingeJoint::UpdateController(const tScalar dt)
 {
   TRACE_METHOD_ONLY(FRAME_2);
@@ -205,8 +199,8 @@ void tHingeJoint::UpdateController(const tScalar dt)
   Assert(0 != mBody1);
   if(mDamping > 0.0f)
   {
-    // Some hinges can bend in wonky ways. Derive the effective hinge axis
-    // using the relative rotation of the bodies.
+    // Some hinges can bend in wonky ways. Derive the effective hinge axis using the relative
+    // rotation of the bodies.
     tVector3 hingeAxis = mBody1->GetAngVel() - mBody0->GetAngVel();
     hingeAxis.NormaliseSafe();
 
@@ -219,19 +213,19 @@ void tHingeJoint::UpdateController(const tScalar dt)
     const tScalar newAngRot1 = avAngRot + (angRot1 - avAngRot) * frac;
     const tScalar newAngRot2 = avAngRot + (angRot2 - avAngRot) * frac;
 
-    const tVector3 newAngVel1 = 
+    const tVector3 newAngVel1 =
       mBody0->GetAngVel() + (newAngRot1 - angRot1) * hingeAxis;
-    const tVector3 newAngVel2 = 
+    const tVector3 newAngVel2 =
       mBody1->GetAngVel() + (newAngRot2 - angRot2) * hingeAxis;
 
     mBody0->SetAngVel(newAngVel1);
     mBody1->SetAngVel(newAngVel2);
   }
 
-  // the extra torque
+  // The extra torque
   if (mExtraTorque != 0.0f)
   {
-    tVector3 torque1 = 
+    tVector3 torque1 =
       mExtraTorque * (mBody0->GetOrientation() * mHingeAxis);
     mBody0->AddWorldTorque(torque1);
     mBody1->AddWorldTorque(-torque1);

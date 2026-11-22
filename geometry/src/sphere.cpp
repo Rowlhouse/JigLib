@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file sphere.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "sphere.hpp"
 #include "intersection.hpp"
 
@@ -13,17 +9,17 @@ using namespace JigLib;
 
 tSphere tSphere::mHugeSphere(tVector3(0.0f), SCALAR_HUGE);
 
-//==============================================================
+//======================================================================================================================
 // Clone
-//==============================================================
+//======================================================================================================================
 tPrimitive* tSphere::Clone() const
 {
   return new tSphere(*this);
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentIntersect
-//==============================================================
+//======================================================================================================================
 bool tSphere::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, const class tSegment &seg) const
 {
   bool result;
@@ -31,17 +27,17 @@ bool tSphere::SegmentIntersect(tScalar &frac, tVector3 &pos, tVector3 &normal, c
   {
     pos = seg.GetPoint(frac);
     normal = pos - mPos;
-    normal.NormaliseSafe(); // TODO could just divide by radius...?
+    normal.NormaliseSafe(); // TODO: could just divide by radius...?
   }
   return result;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetMassProperties
-//==============================================================
-void tSphere::GetMassProperties(const tPrimitiveProperties &primitiveProperties, 
-                               tScalar &mass, 
-                               tVector3 &centerOfMass, 
+//======================================================================================================================
+void tSphere::GetMassProperties(const tPrimitiveProperties &primitiveProperties,
+                               tScalar &mass,
+                               tVector3 &centerOfMass,
                                tMatrix33 &inertiaTensor) const
 {
   if (primitiveProperties.mMassType == tPrimitiveProperties::MASS)
@@ -62,7 +58,7 @@ void tSphere::GetMassProperties(const tPrimitiveProperties &primitiveProperties,
     Ixx = 0.2f * mass * GetRadius() * GetRadius();
   else
     Ixx = (2.0f / 3.0f) * mass * GetRadius() * GetRadius();
-    
+
   inertiaTensor.Set(Ixx, 0.0f, 0.0f,
                     0.0f, Ixx, 0.0f,
                     0.0f, 0.0f, Ixx);

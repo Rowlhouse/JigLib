@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file collisionsystembrute.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "collisionsystembrute.hpp"
 #include "collisionskin.hpp"
 #include "body.hpp"
@@ -14,19 +10,19 @@
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tCollisionSystemBrute
-//==============================================================
+//======================================================================================================================
 tCollisionSystemBrute::tCollisionSystemBrute()
 {
   TRACE_METHOD_ONLY(ONCE_1);
   mDetecting = false;
-  
+
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tCollisionSystemBrute
-//==============================================================
+//======================================================================================================================
 tCollisionSystemBrute::~tCollisionSystemBrute()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -35,9 +31,9 @@ tCollisionSystemBrute::~tCollisionSystemBrute()
     mSkins[i]->SetCollisionSystem(0);
 }
 
-//==============================================================
+//======================================================================================================================
 // AddCollisionSkin
-//==============================================================
+//======================================================================================================================
 void tCollisionSystemBrute::AddCollisionSkin(tCollisionSkin * skin)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -51,9 +47,9 @@ void tCollisionSystemBrute::AddCollisionSkin(tCollisionSkin * skin)
   skin->SetCollisionSystem(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // RemoveCollisionSkin
-//==============================================================
+//======================================================================================================================
 bool tCollisionSystemBrute::RemoveCollisionSkin(tCollisionSkin * skin)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -66,37 +62,37 @@ bool tCollisionSystemBrute::RemoveCollisionSkin(tCollisionSkin * skin)
   return true;
 }
 
-//==============================================================
+//======================================================================================================================
 // CheckCollidables
 // returns true if these two skins could collide
-//==============================================================
+//======================================================================================================================
 static inline bool CheckCollidables(const tCollisionSkin * skin0,
                                     const tCollisionSkin * skin1)
 {
   const vector<const tCollisionSkin *> & nonColl0 = skin0->GetNonCollidables();
   const vector<const tCollisionSkin *> & nonColl1 = skin1->GetNonCollidables();
-  // most common case
+  // Most common case
   if (nonColl0.empty() && nonColl1.empty())
     return true;
-  
+
   for (unsigned i0 = nonColl0.size() ; i0-- != 0 ; )
   {
     if (nonColl0[i0] == skin1)
       return false;
   }
-  
+
   for (unsigned i1 = nonColl1.size() ; i1-- != 0 ; )
   {
     if (nonColl1[i1] == skin0)
       return false;
   }
-  
+
   return true;
 }
 
-//==============================================================
-// DetectCollisions 
-//==============================================================
+//======================================================================================================================
+// DetectCollisions
+//======================================================================================================================
 void tCollisionSystemBrute::DetectCollisions(
   tBody & body,
   tCollisionFunctor & collisionFunctor,
@@ -105,15 +101,15 @@ void tCollisionSystemBrute::DetectCollisions(
 {
   if (!body.IsActive())
     return;
-  
+
   tCollDetectInfo info;
 
   info.skin0 = body.GetCollisionSkin();
   if (!info.skin0)
     return;
-  
+
   mDetecting = true;
-  
+
   unsigned nBodyPrimitives = info.skin0->GetNumPrimitives();
 
   unsigned numSkins = mSkins.size();
@@ -129,8 +125,8 @@ void tCollisionSystemBrute::DetectCollisions(
       {
         for (info.iPrim1 = 0 ; info.iPrim1 < nPrimitives ; ++info.iPrim1)
         {
-          const tCollDetectFunctor * f = 
-            GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(), 
+          const tCollDetectFunctor * f =
+            GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(),
             info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetType());
           if (f)
             f->CollDetect(info, collTolerance, collisionFunctor);
@@ -138,15 +134,15 @@ void tCollisionSystemBrute::DetectCollisions(
       }
     }
   }
-    
+
 
   mDetecting = false;
 }
 
 
-//==============================================================
+//======================================================================================================================
 // DetectAllCollisions
-//==============================================================
+//======================================================================================================================
 void tCollisionSystemBrute::DetectAllCollisions(
   const vector<tBody *> & bodies,
   tCollisionFunctor & collisionFunctor,
@@ -158,7 +154,7 @@ void tCollisionSystemBrute::DetectAllCollisions(
   unsigned numBodies = bodies.size();
 
   tCollDetectInfo info;
-  
+
   for (unsigned iBody = 0 ; iBody < numBodies ; ++iBody)
   {
     tBody * body = bodies[iBody];
@@ -180,16 +176,16 @@ void tCollisionSystemBrute::DetectAllCollisions(
       bool skinSleeping = true;
       if (info.skin1->GetOwner() && (info.skin1->GetOwner()->IsActive()))
         skinSleeping = false;
-    
-      // only do one per pair
+
+      // Only do one per pair
       if ( (skinSleeping == false) && (info.skin1 < info.skin0) )
         continue;
-    
+
       if ( (collisionPredicate != 0) &&
            (collisionPredicate->ConsiderSkinPair(info.skin0, info.skin1) == false) )
         continue;
 
-      // basic bbox test
+      // Basic bbox test
       if (OverlapTest(info.skin0->GetWorldBoundingBox(),
                       info.skin1->GetWorldBoundingBox(),
                       collTolerance))
@@ -203,47 +199,47 @@ void tCollisionSystemBrute::DetectAllCollisions(
           {
             for (info.iPrim1 = 0 ; info.iPrim1 < nPrimitives ; ++info.iPrim1)
             {
-              const tCollDetectFunctor * f = 
-                GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(), 
+              const tCollDetectFunctor * f =
+                GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(),
                 info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetType());
               if (f)
                 f->CollDetect(info, collTolerance, collisionFunctor);
             }
           }
         }
-      } // overlap test
-    } // loop over mSkins
-  } // loop over bodies
-  
+      } // Overlap test
+    } // Loop over mSkins
+  } // Loop over bodies
+
   mDetecting = false;
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentIntersect
-//==============================================================
+//======================================================================================================================
 bool tCollisionSystemBrute::SegmentIntersect(
-  tScalar & fracOut, 
-  tCollisionSkin *& skinOut, 
-  tVector3 & posOut, 
-  tVector3 & normalOut, 
-  const class tSegment & seg, 
+  tScalar & fracOut,
+  tCollisionSkin *& skinOut,
+  tVector3 & posOut,
+  tVector3 & normalOut,
+  const class tSegment & seg,
   const tCollisionSkinPredicate1 * collisionPredicate)
 {
   mDetecting = true;
   unsigned numSkins = mSkins.size();
-  
+
   tAABox segAABox;
   segAABox.AddSegment(seg);
-  
-  // initialise the outputs
+
+  // Initialise the outputs
   fracOut = SCALAR_HUGE;
   skinOut = 0;
-  
-  // working vars
+
+  // Working vars
   tScalar frac;
   tVector3 pos;
   tVector3 normal;
-  
+
   for (unsigned iSkin = 0 ; iSkin < numSkins ; ++iSkin)
   {
     tCollisionSkin * skin = mSkins[iSkin];
@@ -251,7 +247,7 @@ bool tCollisionSystemBrute::SegmentIntersect(
     if ( (collisionPredicate == 0) ||
          (collisionPredicate->ConsiderSkin(skin) == true) )
     {
-      // basic bbox test
+      // Basic bbox test
       if (OverlapTest(skin->GetWorldBoundingBox(),
                       segAABox))
       {
@@ -265,12 +261,12 @@ bool tCollisionSystemBrute::SegmentIntersect(
             fracOut = frac;
           }
         }
-        
+
       }
     }
   }
   mDetecting = false;
-  
+
   if (fracOut > SCALAR(1.0f))
     return false;
   Limit(fracOut, SCALAR(0.0f), SCALAR(1.0f));

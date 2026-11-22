@@ -1,37 +1,33 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file collisionskin.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "collisionskin.hpp"
 #include "collisionsystem.hpp"
 #include "body.hpp"
 
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // SetOwner
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::SetOwner(class tBody *owner)
 {
   mOwner = owner;
 }
 
-//==============================================================
+//======================================================================================================================
 // AddPrimitive
-//==============================================================
-int tCollisionSkin::AddPrimitive(const tPrimitive &prim, 
-				 tMaterialTable::tMaterialID matID, 
-				 tMaterialProperties matProps)
+//======================================================================================================================
+int tCollisionSkin::AddPrimitive(const tPrimitive &prim,
+                                 tMaterialTable::tMaterialID matID,
+                                 tMaterialProperties matProps)
 {
   tPrimitive *newPrim = prim.Clone();
   if (!newPrim)
   {
-    TRACE("tCollisionSkin::AddPrimitive Unable to clone primitive type %d\n", 
-	  prim.GetType());
+    TRACE("tCollisionSkin::AddPrimitive Unable to clone primitive type %d\n",
+          prim.GetType());
     return -1;
   }
   mPrimitivesOldWorld.push_back(prim.Clone());
@@ -45,9 +41,9 @@ int tCollisionSkin::AddPrimitive(const tPrimitive &prim,
   return mMaterialIDs.size() - 1;
 }
 
-//==============================================================
+//======================================================================================================================
 // RemoveAllPrimitives
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::RemoveAllPrimitives()
 {
   for (unsigned iPrim = mPrimitivesNewWorld.size() ; iPrim-- != 0 ; )
@@ -64,9 +60,9 @@ void tCollisionSkin::RemoveAllPrimitives()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // UpdateWorldBoundingBox
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::UpdateWorldBoundingBox()
 {
   mWorldBoundingBox.Clear();
@@ -81,9 +77,9 @@ void tCollisionSkin::UpdateWorldBoundingBox()
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // SetPosAndOrient
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::SetNewTransform(const tTransform3 &transform)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
@@ -98,9 +94,9 @@ void tCollisionSkin::SetNewTransform(const tTransform3 &transform)
   if (mCollSystem) mCollSystem->CollisionSkinMoved(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetOldPosAndOrient
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::SetOldTransform(const tTransform3 &transform)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
@@ -115,9 +111,9 @@ void tCollisionSkin::SetOldTransform(const tTransform3 &transform)
   if (mCollSystem) mCollSystem->CollisionSkinMoved(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // SetPosAndOrient
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::SetTransform(const tTransform3 &transformOld, const tTransform3 &transformNew)
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_2);
@@ -134,12 +130,12 @@ void tCollisionSkin::SetTransform(const tTransform3 &transformOld, const tTransf
   if (mCollSystem) mCollSystem->CollisionSkinMoved(this);
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentIntersect
-//==============================================================
-bool tCollisionSkin::SegmentIntersect(tScalar & frac, 
-                                      tVector3 & pos, 
-                                      tVector3 & normal, 
+//======================================================================================================================
+bool tCollisionSkin::SegmentIntersect(tScalar & frac,
+                                      tVector3 & pos,
+                                      tVector3 & normal,
                                       const tSegment & seg) const
 {
   tVector3 segEnd = seg.GetEnd();
@@ -157,20 +153,20 @@ bool tCollisionSkin::SegmentIntersect(tScalar & frac,
       thisSegLenRelToOrig *= frac;
     }
   }
-  
+
   if (frac <= 1.0f)
     return true;
   else
     return false;
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tCollisionSkin
-//==============================================================
+//======================================================================================================================
 tCollisionSkin::~tCollisionSkin()
 {
   TRACE_METHOD_ONLY(ONCE_2);
-  // don't care if this fails
+  // Don't care if this fails
   if (mCollSystem)
     mCollSystem->RemoveCollisionSkin(this);
   if (mOwner)
@@ -179,31 +175,31 @@ tCollisionSkin::~tCollisionSkin()
   RemoveAllPrimitives();
 }
 
-//==============================================================
+//======================================================================================================================
 // tCollisionSkin
-//==============================================================
-tCollisionSkin::tCollisionSkin(class tBody *owner) : 
-mOwner(owner) 
+//======================================================================================================================
+tCollisionSkin::tCollisionSkin(class tBody *owner) :
+mOwner(owner)
 {
   TRACE_METHOD_ONLY(ONCE_2);
   mCollisions.reserve(16);
   mWorldBoundingBox.Clear();
-  
+
   mCollSystem = 0;
 }
 
-//==============================================================
+//======================================================================================================================
 // SetMaterialProperties
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::SetMaterialProperties(unsigned iPrim, const tMaterialProperties & matProperties)
 {
   mMaterialProperties[iPrim] = matProperties;
   mMaterialIDs[iPrim] = tMaterialTable::USER_DEFINED;
 }
 
-//==============================================================
+//======================================================================================================================
 // ApplyLocalTransform
-//==============================================================
+//======================================================================================================================
 void tCollisionSkin::ApplyLocalTransform(const tTransform3 &transform)
 {
   tTransform3 t;
@@ -215,12 +211,12 @@ void tCollisionSkin::ApplyLocalTransform(const tTransform3 &transform)
   SetTransform(mTransformOld, mTransformNew);
 }
 
-//==============================================================
+//======================================================================================================================
 // GetMassProperties
-//==============================================================
-void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties primitiveProperties[], 
-                                       tScalar &mass, 
-                                       tVector3 &centerOfMass, 
+//======================================================================================================================
+void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties primitiveProperties[],
+                                       tScalar &mass,
+                                       tVector3 &centerOfMass,
                                        tMatrix33 &inertiaTensor,
                                        tMatrix33 &inertiaTensorCoM)
 {
@@ -253,12 +249,12 @@ void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties pr
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // GetMassProperties
-//==============================================================
-void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties &primitiveProperties, 
-                                       tScalar &mass, 
-                                       tVector3 &centerOfMass, 
+//======================================================================================================================
+void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties &primitiveProperties,
+                                       tScalar &mass,
+                                       tVector3 &centerOfMass,
                                        tMatrix33 &inertiaTensor,
                                        tMatrix33 &inertiaTensorCoM)
 {
@@ -319,9 +315,9 @@ void tCollisionSkin::GetMassProperties(const tPrimitive::tPrimitiveProperties &p
     mass = primitiveProperties.mMassOrDensity;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetVolume
-//==============================================================
+//======================================================================================================================
 tScalar tCollisionSkin::GetVolume() const
 {
   tScalar result = 0.0f;
@@ -330,9 +326,9 @@ tScalar tCollisionSkin::GetVolume() const
   return result;
 }
 
-//==============================================================
+//======================================================================================================================
 // GetSurfaceArea
-//==============================================================
+//======================================================================================================================
 tScalar tCollisionSkin::GetSurfaceArea() const
 {
   tScalar result = 0.0f;

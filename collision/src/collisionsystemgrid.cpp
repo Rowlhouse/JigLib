@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file collisionsystemgrid.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "collisionsystemgrid.hpp"
 #include "collisionskin.hpp"
 #include "body.hpp"
@@ -16,54 +12,54 @@ using namespace std;
 
 namespace JigLib
 {
-  /// doubly linked list used to contain all the skins in a grid box
-  class tGridEntry
-  {
-  public:
-    tGridEntry(tCollisionSkin * skin = 0) : 
-      mSkin(skin), mPrev(0), mNext(0), mGridIndex(-2) {}
+// Doubly linked list used to contain all the skins in a grid box
+class tGridEntry
+{
+public:
+  tGridEntry(tCollisionSkin * skin = 0) :
+    mSkin(skin), mPrev(0), mNext(0), mGridIndex(-2) {}
 
-    tCollisionSkin * mSkin;
-    tGridEntry * mPrev;
-    tGridEntry * mNext;
-    int mGridIndex;
-  };
+  tCollisionSkin * mSkin;
+  tGridEntry * mPrev;
+  tGridEntry * mNext;
+  int mGridIndex;
+};
 
-  /// Removes the entry by updating its neighbours. Also zaps the prev/next
-  /// pointers in the entry, to help debugging
-  void RemoveGridEntry(tGridEntry * entry)
-  {
-    Assert(entry);
-    // only the first entry should have prev = 0, and that shouldn't be removed
-    Assert(entry->mPrev);
-    // link the previous to the next (may be 0)
-    entry->mPrev->mNext = entry->mNext;
-    // link the next (if it exists) to the previous.
-    if (entry->mNext)
-      entry->mNext->mPrev = entry->mPrev;
-    // tidy up this entry
-    entry->mPrev = entry->mNext = 0;
-    entry->mGridIndex = -2;
-  }
-
-  /// Inserts an entry after prev, updating all links
-  void InsertGridEntryAfter(tGridEntry * entry, tGridEntry * prev)
-  {
-    Assert(entry);
-    Assert(prev);
-    tGridEntry * next = prev->mNext;
-    prev->mNext = entry;
-    entry->mPrev = prev;
-    entry->mNext = next;
-    if (next)
-      next->mPrev = entry;
-    entry->mGridIndex = prev->mGridIndex;
-  }
+// Removes the entry by updating its neighbours. Also zaps the prev/next pointers in the entry, to
+// help debugging
+void RemoveGridEntry(tGridEntry * entry)
+{
+  Assert(entry);
+  // Only the first entry should have prev = 0, and that shouldn't be removed
+  Assert(entry->mPrev);
+  // Link the previous to the next (may be 0)
+  entry->mPrev->mNext = entry->mNext;
+  // Link the next (if it exists) to the previous.
+  if (entry->mNext)
+    entry->mNext->mPrev = entry->mPrev;
+  // Tidy up this entry
+  entry->mPrev = entry->mNext = 0;
+  entry->mGridIndex = -2;
 }
 
-//==============================================================
+// Inserts an entry after prev, updating all links
+void InsertGridEntryAfter(tGridEntry * entry, tGridEntry * prev)
+{
+  Assert(entry);
+  Assert(prev);
+  tGridEntry * next = prev->mNext;
+  prev->mNext = entry;
+  entry->mPrev = prev;
+  entry->mNext = next;
+  if (next)
+    next->mPrev = entry;
+  entry->mGridIndex = prev->mGridIndex;
+}
+}
+
+//======================================================================================================================
 // tCollisionSystemGrid
-//==============================================================
+//======================================================================================================================
 tCollisionSystemGrid::tCollisionSystemGrid(
   unsigned nx, unsigned ny, unsigned nz,
   tScalar dx, tScalar dy, tScalar dz)
@@ -98,17 +94,17 @@ tCollisionSystemGrid::tCollisionSystemGrid(
         Assert(index >= 0);
         tAABox & box = mGridBoxes[index];
         box.AddPoint(tVector3(iX * mDx, iY * mDy, iZ * mDz));
-        box.AddPoint(tVector3(iX * mDx, iY * mDy, iZ * mDz) + 
+        box.AddPoint(tVector3(iX * mDx, iY * mDy, iZ * mDz) +
                      tVector3(mDx, mDy, mDz));
       }
     }
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // ~tCollisionSystemGrid
-// todo delete the grid entries
-//==============================================================
+// TODO: delete the grid entries
+//======================================================================================================================
 tCollisionSystemGrid::~tCollisionSystemGrid()
 {
   TRACE_METHOD_ONLY(ONCE_1);
@@ -117,9 +113,9 @@ tCollisionSystemGrid::~tCollisionSystemGrid()
     mSkins[i]->SetCollisionSystem(0);
 }
 
-//========================================================
+//======================================================================================================================
 // tCollisionSystemGrid
-//========================================================
+//======================================================================================================================
 inline int tCollisionSystemGrid::CalcIndex(int i, int j, int k) const
 {
   Assert(i >= 0 && j >= 0 && k >= 0);
@@ -131,9 +127,9 @@ inline int tCollisionSystemGrid::CalcIndex(int i, int j, int k) const
   return result;
 }
 
-//========================================================
+//======================================================================================================================
 // CalcGridForSkin
-//========================================================
+//======================================================================================================================
 void tCollisionSystemGrid::CalcGridForSkin(int & i, int & j, int & k,
                                            const tCollisionSkin * skin)
 {
@@ -156,9 +152,9 @@ void tCollisionSystemGrid::CalcGridForSkin(int & i, int & j, int & k,
   k = (int) (min.z / mDz) % mNz;
 }
 
-//========================================================
+//======================================================================================================================
 // CalcGridForSkin
-//========================================================
+//======================================================================================================================
 void tCollisionSystemGrid::CalcGridForSkin(
   int & i, int & j, int & k,
   tScalar & fi, tScalar & fj, tScalar &fk,
@@ -187,22 +183,22 @@ void tCollisionSystemGrid::CalcGridForSkin(
   j = (int) fj;
   k = (int) fk;
 
-  if (i < 0) {i = 0 ; fi = SCALAR(0.0f);} 
+  if (i < 0) {i = 0 ; fi = SCALAR(0.0f);}
   else if (i >= (int) mNx) {i = 0; fi = SCALAR(0.0f);}
   else fi -= (tScalar) i;
 
-  if (j < 0) {j = 0 ; fj = SCALAR(0.0f);} 
+  if (j < 0) {j = 0 ; fj = SCALAR(0.0f);}
   else if (j >= (int) mNy) {j = 0; fj = SCALAR(0.0f);}
   else fj -= (tScalar) j;
 
-  if (k < 0) {k = 0 ; fk = SCALAR(0.0f);} 
+  if (k < 0) {k = 0 ; fk = SCALAR(0.0f);}
   else if (k >= (int) mNz) {k = 0; fk = SCALAR(0.0f);}
   else fk -= (tScalar) k;
 }
 
-//========================================================
+//======================================================================================================================
 // CalcGridIndexForSkin
-//========================================================
+//======================================================================================================================
 int tCollisionSystemGrid::CalcGridIndexForSkin(const tCollisionSkin * skin)
 {
   int i, j, k;
@@ -213,9 +209,9 @@ int tCollisionSystemGrid::CalcGridIndexForSkin(const tCollisionSkin * skin)
 }
 
 
-//==============================================================
+//======================================================================================================================
 // AddCollisionSkin
-//==============================================================
+//======================================================================================================================
 void tCollisionSystemGrid::AddCollisionSkin(tCollisionSkin * skin)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -227,20 +223,20 @@ void tCollisionSystemGrid::AddCollisionSkin(tCollisionSkin * skin)
           "it's already registered\n", skin);
   skin->SetCollisionSystem(this);
 
-  // also do the grid stuff - for now put it on the overflow list
+  // Also do the grid stuff - for now put it on the overflow list
   tGridEntry * entry = new tGridEntry(skin);
   skin->GetExternalData().mPointer = (void *) entry;
-  // add entry to the start of the list
+  // Add entry to the start of the list
   Assert(mOverflowEntries);
   InsertGridEntryAfter(entry, mOverflowEntries);
 
-  // now put it in its proper place
+  // Now put it in its proper place
   CollisionSkinMoved(skin);
 }
 
-//==============================================================
+//======================================================================================================================
 // RemoveCollisionSkin
-//==============================================================
+//======================================================================================================================
 bool tCollisionSystemGrid::RemoveCollisionSkin(tCollisionSkin * skin)
 {
   TRACE_METHOD_ONLY(FRAME_1);
@@ -265,9 +261,9 @@ bool tCollisionSystemGrid::RemoveCollisionSkin(tCollisionSkin * skin)
   return true;
 }
 
-//========================================================
+//======================================================================================================================
 // CollisionSkinMoved
-//========================================================
+//======================================================================================================================
 void tCollisionSystemGrid::CollisionSkinMoved(
   const class tCollisionSkin * skin)
 {
@@ -280,18 +276,18 @@ void tCollisionSystemGrid::CollisionSkinMoved(
 
   int gridIndex = CalcGridIndexForSkin(skin);
 
-  // see if it's moved grid
+  // See if it's moved grid
   if (gridIndex == entry->mGridIndex)
     return;
 
-  // get the start of the list for the grid
+  // Get the start of the list for the grid
   tGridEntry * start;
   if (gridIndex >= 0)
     start = mGridEntries[gridIndex];
   else
     start = mOverflowEntries;
   Assert(start);
-  // start should just be a placeholder
+  // Start should just be a placeholder
   Assert(start->mPrev == 0);
   Assert(start->mSkin == 0);
 
@@ -299,9 +295,9 @@ void tCollisionSystemGrid::CollisionSkinMoved(
   InsertGridEntryAfter(entry, start);
 }
 
-//========================================================
+//======================================================================================================================
 // GetListsToCheck
-//========================================================
+//======================================================================================================================
 void tCollisionSystemGrid::GetListsToCheck(
   vector<class tGridEntry *> & entries,
   const tCollisionSkin * skin)
@@ -316,20 +312,20 @@ void tCollisionSystemGrid::GetListsToCheck(
     return;
   }
 
-  // todo - work back from the mGridIndex rather than calculating it again...
+  // TODO: work back from the mGridIndex rather than calculating it again...
   int i, j, k;
   tScalar fi, fj, fk;
   CalcGridForSkin(i, j, k, fi, fj, fk, skin);
 
   if (-1 == i)
   {
-    // oh dear - add everything!
+    // Oh dear - add everything!
     entries = mGridEntries;
     entries.push_back(mOverflowEntries);
     return;
   }
 
-  // always add the overflow
+  // Always add the overflow
   entries.push_back(mOverflowEntries);
 
   tAABox skinAABox = skin->GetWorldBoundingBox();
@@ -343,7 +339,7 @@ void tCollisionSystemGrid::GetListsToCheck(
   if (fk + (delta.z / mDz) < 1.0f)
     maxK = 0;
 
-  // now add the contents of all 18 grid boxes - their contents may extend beyond the bounds
+  // Now add the contents of all 18 grid boxes - their contents may extend beyond the bounds
   for (int di = -1 ; di <= maxI ; ++di)
   {
     for (int dj = -1 ; dj <= maxJ ; ++dj)
@@ -359,16 +355,16 @@ void tCollisionSystemGrid::GetListsToCheck(
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // CheckCollidables
 // returns true if these two skins could collide
-//==============================================================
+//======================================================================================================================
 static inline bool CheckCollidables(const tCollisionSkin * skin0,
                                     const tCollisionSkin * skin1)
 {
   const vector<const tCollisionSkin *> & nonColl0 = skin0->GetNonCollidables();
   const vector<const tCollisionSkin *> & nonColl1 = skin1->GetNonCollidables();
-  // most common case
+  // Most common case
   if (nonColl0.empty() && nonColl1.empty())
     return true;
 
@@ -388,9 +384,9 @@ static inline bool CheckCollidables(const tCollisionSkin * skin0,
 
   return true;
 }
-//==============================================================
-// DetectCollisions 
-//==============================================================
+//======================================================================================================================
+// DetectCollisions
+//======================================================================================================================
 void tCollisionSystemGrid::DetectCollisions(
   tBody & body,
   tCollisionFunctor & collisionFunctor,
@@ -423,8 +419,8 @@ void tCollisionSystemGrid::DetectCollisions(
       {
         for (info.iPrim1 = 0 ; info.iPrim1 < nPrimitives ; ++info.iPrim1)
         {
-          const tCollDetectFunctor * f = 
-            GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(), 
+          const tCollDetectFunctor * f =
+            GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(),
             info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetType());
           if (f)
             f->CollDetect(info, collTolerance, collisionFunctor);
@@ -435,9 +431,9 @@ void tCollisionSystemGrid::DetectCollisions(
   mDetecting = false;
 }
 
-//==============================================================
+//======================================================================================================================
 // DetectAllCollisions
-//==============================================================
+//======================================================================================================================
 void tCollisionSystemGrid::DetectAllCollisions(
   const vector<tBody *> & bodies,
   tCollisionFunctor & collisionFunctor,
@@ -464,7 +460,7 @@ void tCollisionSystemGrid::DetectAllCollisions(
     GetListsToCheck(lists, info.skin0);
     for (unsigned iList = lists.size() ; iList-- != 0 ; )
     {
-      // first one is a placeholder.
+      // First one is a placeholder.
       tGridEntry * entry = lists[iList];
       Assert(entry);
       for (entry = entry->mNext ; entry != 0 ; entry = entry->mNext)
@@ -478,7 +474,7 @@ void tCollisionSystemGrid::DetectAllCollisions(
         if (info.skin1->GetOwner() && (info.skin1->GetOwner()->IsActive()))
           skinSleeping = false;
 
-        // only do one per pair
+        // Only do one per pair
         if ( (skinSleeping == false) && (info.skin1 < info.skin0) )
           continue;
 
@@ -486,7 +482,7 @@ void tCollisionSystemGrid::DetectAllCollisions(
              (!collisionPredicate->ConsiderSkinPair(info.skin0, info.skin1)))
           continue;
 
-        // basic bbox test
+        // Basic bbox test
         if (OverlapTest(info.skin1->GetWorldBoundingBox(),
                         info.skin0->GetWorldBoundingBox(),
                         collTolerance))
@@ -500,31 +496,31 @@ void tCollisionSystemGrid::DetectAllCollisions(
             {
               for (info.iPrim1 = 0 ; info.iPrim1 < nPrimitives ; ++info.iPrim1)
               {
-                const tCollDetectFunctor * f = 
-                  GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(), 
+                const tCollDetectFunctor * f =
+                  GetCollDetectFunctor(info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetType(),
                   info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetType());
                 if (f)
                   f->CollDetect(info, collTolerance, collisionFunctor);
               }
             }
-          } // check collidables
-        } // overlap test
-      } // loop over entries
-    } // loop over lists
-  } // loop over bodies
+          } // Check collidables
+        } // Overlap test
+      } // Loop over entries
+    } // Loop over lists
+  } // Loop over bodies
 
   mDetecting = false;
 }
 
-//==============================================================
+//======================================================================================================================
 // SegmentIntersect
-//==============================================================
+//======================================================================================================================
 bool tCollisionSystemGrid::SegmentIntersect(
-  tScalar & fracOut, 
-  tCollisionSkin *& skinOut, 
-  tVector3 & posOut, 
-  tVector3 & normalOut, 
-  const class tSegment & seg, 
+  tScalar & fracOut,
+  tCollisionSkin *& skinOut,
+  tVector3 & posOut,
+  tVector3 & normalOut,
+  const class tSegment & seg,
   const tCollisionSkinPredicate1 * collisionPredicate)
 {
   mDetecting = true;
@@ -533,11 +529,11 @@ bool tCollisionSystemGrid::SegmentIntersect(
   tAABox segAABox;
   segAABox.AddSegment(seg);
 
-  // initialise the outputs
+  // Initialise the outputs
   fracOut = SCALAR_HUGE;
   skinOut = 0;
 
-  // working vars
+  // Working vars
   tScalar frac;
   tVector3 pos;
   tVector3 normal;
@@ -549,7 +545,7 @@ bool tCollisionSystemGrid::SegmentIntersect(
     if ( (collisionPredicate == 0) ||
          (collisionPredicate->ConsiderSkin(skin) == true) )
     {
-      // basic bbox test
+      // Basic bbox test
       if (OverlapTest(skin->GetWorldBoundingBox(),
                       segAABox))
       {

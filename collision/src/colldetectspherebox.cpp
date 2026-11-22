@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectspherebox.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectspherebox.hpp"
 #include "sphere.hpp"
 #include "box.hpp"
@@ -15,9 +11,9 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectSphereBox
-//==============================================================
+//======================================================================================================================
 tCollDetectSphereBox::tCollDetectSphereBox()
   :
   tCollDetectFunctor("SphereBox", tPrimitive::SPHERE, tPrimitive::BOX)
@@ -25,26 +21,26 @@ tCollDetectSphereBox::tCollDetectSphereBox()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // operator
-//==============================================================
+//======================================================================================================================
 void tCollDetectSphereBox::CollDetect(const tCollDetectInfo &infoOrig,
                                       tScalar collTolerance,
                                       tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
-  
+
   const tVector3& body0Pos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& body1Pos = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
 
-  // todo - proper swept test
+  // TODO: proper swept test
   const tSphere & oldSphere = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetSphere();
   const tSphere & newSphere = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetSphere();
 
@@ -56,7 +52,7 @@ void tCollDetectSphereBox::CollDetect(const tCollDetectInfo &infoOrig,
                                               oldSphere.GetPos());
   tScalar newDist = newBox.GetDistanceToPoint(newBoxPoint,
                                               newSphere.GetPos());
-  // normally point will be outside
+  // Normally point will be outside
   tScalar oldDepth = oldSphere.GetRadius() - oldDist;
   tScalar newDepth = newSphere.GetRadius() - newDist;
 
@@ -76,7 +72,7 @@ void tCollDetectSphereBox::CollDetect(const tCollDetectInfo &infoOrig,
       dir = (oldSphere.GetPos() - oldBox.GetCentre()).NormaliseSafe();
     }
     tCollPointInfo collInfo(oldBoxPoint - body0Pos, oldBoxPoint - body1Pos, oldDepth);
-    
+
     collisionFunctor.CollisionNotify(
       info,
       dir,

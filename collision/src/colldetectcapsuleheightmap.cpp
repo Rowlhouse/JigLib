@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectcapsuleheightmap.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectcapsuleheightmap.hpp"
 #include "capsule.hpp"
 #include "heightmap.hpp"
@@ -15,9 +11,9 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectCapsuleHeightmap
-//==============================================================
+//======================================================================================================================
 tCollDetectCapsuleHeightmap::tCollDetectCapsuleHeightmap()
   :
   tCollDetectFunctor("CapsuleHeightmap", tPrimitive::CAPSULE, tPrimitive::HEIGHTMAP)
@@ -25,36 +21,36 @@ tCollDetectCapsuleHeightmap::tCollDetectCapsuleHeightmap()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // operator
-//==============================================================
+//======================================================================================================================
 void tCollDetectCapsuleHeightmap::CollDetect(const tCollDetectInfo &infoOrig,
                                              tScalar collTolerance,
                                              tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
-  
+
   const tVector3& body0Pos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& body1Pos = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
 
-  // todo - proper swept test
+  // TODO: proper swept test
   const tCapsule & oldCapsule = info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetCapsule();
   const tCapsule & newCapsule = info.skin0->GetPrimitiveNewWorld(info.iPrim0)->GetCapsule();
 
   const tHeightmap & oldHeightmap = info.skin1->GetPrimitiveOldWorld(info.iPrim1)->GetHeightmap();
   const tHeightmap & newHeightmap = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetHeightmap();
-      
+
   tFixedVector<tCollPointInfo, 2> pts;
   tVector3 averageNormal(0.0f);
-  
-  // the start
+
+  // The start
   {
     tScalar oldDist, newDist;
     tVector3 normal;
@@ -69,7 +65,7 @@ void tCollDetectCapsuleHeightmap::CollDetect(const tCollDetectInfo &infoOrig,
       averageNormal += normal;
     }
   }
-  // the end
+  // The end
   {
     tVector3 oldEnd = oldCapsule.GetEnd();
     tVector3 newEnd = newCapsule.GetEnd();

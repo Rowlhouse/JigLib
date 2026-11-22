@@ -1,27 +1,23 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file materials.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "materials.hpp"
 
 using namespace JigLib;
 using namespace std;
 
-//==============================================================
+//======================================================================================================================
 // tMaterialTable
-//==============================================================
+//======================================================================================================================
 tMaterialTable::tMaterialTable()
 {
   Reset();
 }
 
-//==============================================================
+//======================================================================================================================
 // Reset
-//==============================================================
+//======================================================================================================================
 void tMaterialTable::Reset()
 {
   Clear();
@@ -42,18 +38,18 @@ void tMaterialTable::Reset()
   SetMaterialProperties(BOUNCY_ROUGH,     tMaterialProperties(1.0f, roughRoughS,  roughRoughD));
 }
 
-//==============================================================
+//======================================================================================================================
 // Clear
-//==============================================================
+//======================================================================================================================
 void tMaterialTable::Clear()
 {
   mMaterials.clear();
   mMaterialPairs.clear();
 }
 
-//==============================================================
+//======================================================================================================================
 // SetMaterialProperties
-//==============================================================
+//======================================================================================================================
 void tMaterialTable::SetMaterialProperties(tMaterialID id, const tMaterialProperties &properties)
 {
   mMaterials[id] = properties;
@@ -61,18 +57,21 @@ void tMaterialTable::SetMaterialProperties(tMaterialID id, const tMaterialProper
   {
     tMaterialID otherId = it->first;
     const tMaterialProperties &mat = it->second;
-    mMaterialPairs[std::pair<tMaterialID, tMaterialID>(otherId, id)] = mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id, otherId)] = tMaterialPairProperties(
+    mMaterialPairs[std::pair<tMaterialID, tMaterialID>(otherId, id)] =
+      mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id, otherId)] = tMaterialPairProperties(
       properties.mElasticity * mat.mElasticity,
       properties.mStaticRoughness * mat.mStaticRoughness,
       properties.mDynamicRoughness * mat.mDynamicRoughness);
   }
 }
 
-//==============================================================
+//======================================================================================================================
 // SetMaterialPairProperties
-//==============================================================
-void tMaterialTable::SetMaterialPairProperties(tMaterialID id1, tMaterialID id2, const tMaterialPairProperties &pairProperties)
+//======================================================================================================================
+void tMaterialTable::SetMaterialPairProperties(tMaterialID id1, tMaterialID id2,
+                                               const tMaterialPairProperties &pairProperties)
 {
-  mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id1, id2)] = mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id2, id1)] = pairProperties;
+  mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id1, id2)] =
+    mMaterialPairs[std::pair<tMaterialID, tMaterialID>(id2, id1)] = pairProperties;
 }
 

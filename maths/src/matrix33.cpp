@@ -5,11 +5,11 @@ using namespace JigLib;
 
 tMatrix33 tMatrix33::mIdentity = tMatrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
-//==============================================================
+//======================================================================================================================
 // CalculateRotFromMatrix
-//==============================================================
-void CalculateRotFromMatrix(const tMatrix33 & matrix, 
-                            tVector3 & axis, 
+//======================================================================================================================
+void CalculateRotFromMatrix(const tMatrix33 & matrix,
+                            tVector3 & axis,
                             tScalar & degrees)
 {
   tScalar factor = (Trace(matrix) - 1.0f) * 0.5f;
@@ -18,7 +18,7 @@ void CalculateRotFromMatrix(const tMatrix33 & matrix,
   else if (factor < -1.0f)
     factor = -1.0f;
   degrees = AcosDeg(factor);
-  
+
   if (degrees == 0.0f)
   {
     axis = tVector3(1.0f, 0.0f, 0.0f);

@@ -1,14 +1,10 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file jiglib.hpp 
-//                     
-//==============================================================
+//======================================================================================================================
 /*
-Copyright (c) 2007 Danny Chapman 
-http://www.rowlhouse.co.uk
+Copyright (c) 2007 Danny Chapman
+http://Www.rowlhouse.co.uk
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,37 +29,34 @@ distribution.
 #ifndef JIGLIB_HPP
 #define JIGLIB_HPP
 
-// Single header so this is all that applications need to include
-// Everything uses namespace JigLib, so nothing under here explictly
-// uses the "Jig" prefix.
+// Single header so this is all that applications need to include. Everything uses namespace JigLib,
+// so nothing under here explicitly uses the "Jig" prefix.
 
 namespace JigLib
 {
-  // Version 0.84. Let's face facts... we're not going to reach 1!!
+// Version 0.84. Let's face facts... We're not going to reach 1!!
 #define JIGLIB_VERSION 84
-  inline int GetVersion() {return JIGLIB_VERSION;}
+inline int GetVersion() {return JIGLIB_VERSION;}
 }
 
 #include "../include/jiglibconfig.hpp"
 
-// utils contains misc stuff like tracing
+// Utils contains misc stuff like tracing
 #include "../utils/include/utils.hpp"
 
-// maths contains extra utility maths stuff and vector/matrix classes
+// Maths contains extra utility maths stuff and vector/matrix classes
 #include "../maths/include/maths.hpp"
 
-// geometry defines shapes like planes, boxes etc and functions for
-// comparing them
+// Geometry defines shapes like planes, boxes etc and functions for comparing them
 #include "../geometry/include/geometry.hpp"
 
-// collision defines collision skins and collision structures used in
-// physics
+// Collision defines collision skins and collision structures used in physics
 #include "../collision/include/collision.hpp"
 
-// physics handles, errr, physics
+// Physics handles, errr, physics
 #include "../physics/include/physics.hpp"
 
-// Various vehicles - physics only. 
+// Various vehicles - physics only.
 #include "../vehicles/include/vehicles.hpp"
 
 #endif

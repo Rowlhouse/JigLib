@@ -1,11 +1,7 @@
-//==============================================================
-// Copyright (C) 2004 Danny Chapman 
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
 //               danny@rowlhouse.freeserve.co.uk
-//--------------------------------------------------------------
-//               
-/// @file colldetectboxplane.cpp 
-//                     
-//==============================================================
+//======================================================================================================================
 #include "colldetectboxplane.hpp"
 #include "mathsmisc.hpp"
 #include "fixedvector.hpp"
@@ -15,9 +11,9 @@
 using namespace std;
 using namespace JigLib;
 
-//==============================================================
+//======================================================================================================================
 // tCollDetectBoxPlane
-//==============================================================
+//======================================================================================================================
 tCollDetectBoxPlane::tCollDetectBoxPlane()
   :
   tCollDetectFunctor("BoxPlane", tPrimitive::BOX, tPrimitive::PLANE)
@@ -25,22 +21,22 @@ tCollDetectBoxPlane::tCollDetectBoxPlane()
 }
 
 
-//==============================================================
+//======================================================================================================================
 // operator
-//==============================================================
+//======================================================================================================================
 void tCollDetectBoxPlane::CollDetect(const tCollDetectInfo &infoOrig,
                                      tScalar collTolerance,
                                      tCollisionFunctor & collisionFunctor) const
 {
   TRACE_METHOD_ONLY(MULTI_FRAME_1);
-  // get the skins in the order that we're expecting
+  // Get the skins in the order that we're expecting
   tCollDetectInfo info(infoOrig);
   if (info.skin0->GetPrimitiveOldWorld(info.iPrim0)->GetType() == mType1)
   {
-    Swap(info.skin0, info.skin1); 
+    Swap(info.skin0, info.skin1);
     Swap(info.iPrim0, info.iPrim1);
   }
-  
+
   const tVector3& body0Pos = info.skin0->GetOwner() ? info.skin0->GetOwner()->GetOldPosition() : tVector3::Zero();
   const tVector3& body1Pos = info.skin1->GetOwner() ? info.skin1->GetOwner()->GetOldPosition() : tVector3::Zero();
 
@@ -49,8 +45,8 @@ void tCollDetectBoxPlane::CollDetect(const tCollDetectInfo &infoOrig,
 
   const tPlane & oldPlane = info.skin1->GetPrimitiveOldWorld(info.iPrim1)->GetPlane();
   const tPlane & newPlane = info.skin1->GetPrimitiveNewWorld(info.iPrim1)->GetPlane();
-      
-  // quick check
+
+  // Quick check
   tScalar centreDist = PointPlaneDistance(newBox.GetCentre(), newPlane);
   if (centreDist > collTolerance + newBox.GetBoundingRadiusAboutCentre())
     return;
@@ -62,7 +58,7 @@ void tCollDetectBoxPlane::CollDetect(const tCollDetectInfo &infoOrig,
 
   static tFixedVector<tCollPointInfo, 8> collPts;
   collPts.Clear();
-  
+
   for (unsigned i = 0 ; i < 8 ; ++i)
   {
     const tVector3 & newPt = newPts[i];
