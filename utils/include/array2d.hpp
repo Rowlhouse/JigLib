@@ -235,7 +235,7 @@ void tArray2D<T>::CalcGradientX()
     {
       for (i = 0 ; i < mNx ; ++i)
       {
-        operator()(i, j) = (orig.at(i+1, j) - orig.at(i-1, j))/2;
+        operator()(i, j) = (orig.At(i+1, j) - orig.At(i-1, j))/2;
       }
     }
   }
