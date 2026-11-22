@@ -1,6 +1,7 @@
-// Sss - a slope soaring simulator.
-// Copyright (C) 2002 Danny Chapman - flight@rowlhouse.freeserve.co.uk
-//
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
+//               danny@rowlhouse.freeserve.co.uk
+//======================================================================================================================
 // TODO: improve this texture implementation!
 #include "texture.hpp"
 #include "imageloader.hpp"
