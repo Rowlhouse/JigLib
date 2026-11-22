@@ -6,19 +6,17 @@
 /// @file timer.hpp 
 //                     
 //==============================================================
+#ifndef JIGTIMER_HPP
+#define JIGTIMER_HPP
+
 #include "../utils/include/time.hpp"
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <chrono>
 
 namespace JigLib
 {
-#ifdef WIN32
-  typedef LARGE_INTEGER tHighResTimeVal;
-#else
-  typedef int tHighResTimeVal;
-#endif
+  typedef std::chrono::steady_clock::time_point tHighResTimeVal;
+
   // convert time delta into useable values
   tTime GetTimeDelta(tHighResTimeVal t0, tHighResTimeVal t1);
   
@@ -27,3 +25,5 @@ namespace JigLib
   tHighResTimeVal GetHighResTime(bool & available);
   
 }
+
+#endif

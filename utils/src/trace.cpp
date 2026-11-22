@@ -4,6 +4,8 @@
 
 #include "trace.hpp"
 #include <stdio.h>
+#include <filesystem>
+#include <string>
 
 namespace JigLib
 {
@@ -39,22 +41,19 @@ namespace JigLib
       if (logFile == NULL)
       {
         fprintf(stderr, "Unable to open program.log\n");
-        // We have a backup plan!! Assume that non-win32 is unix based.
-#ifdef WIN32
-        fprintf(stderr, "Trying C:\\program.log\n");
-        char logFileName[] = "C:\\program.log";
-#else
-        fprintf(stderr, "Trying /tmp/program.log\n");
-        char logFileName[] = "/tmp/program.log";
-#endif
-        logFile = fopen(logFileName, "w");
+        // We have a backup plan!! Try the system temporary directory.
+        std::error_code ec;
+        std::string logFileName =
+          (std::filesystem::temp_directory_path(ec) / "program.log").string();
+        fprintf(stderr, "Trying %s\n", logFileName.c_str());
+        logFile = fopen(logFileName.c_str(), "w");
         if (logFile == NULL)
         {
-          fprintf(stderr, "Unable to open backup %s\n", logFileName);
+          fprintf(stderr, "Unable to open backup %s\n", logFileName.c_str());
         }
         else
         {
-          printf("Opened log file: %s\n", logFileName);
+          printf("Opened log file: %s\n", logFileName.c_str());
         }
       }
       else
