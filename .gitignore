@@ -1,0 +1,25 @@
+# CMake build trees
+/build/
+/out/
+CMakeUserPresets.json
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+ipch/
+
+# Editors and OS
+.vscode/
+.idea/
+*~
+.DS_Store
+Thumbs.db
+
+# Runtime output from the demo
+program.log
+screenshot-*.ppm
