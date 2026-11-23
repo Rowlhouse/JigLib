@@ -2640,9 +2640,7 @@ void tJigTestApp::RenderHelp()
   std::string sceneList;
   for (size_t i = 0 ; i < mConfigNames.size() && i < 9 ; ++i)
   {
-    char number[8];
-    snprintf(number, sizeof(number), "%d ", (int) i + 1);
-    sceneList += (i == 0 ? "" : "    ") + std::string(number) + mConfigNames[i];
+    sceneList += (i == 0 ? "" : "    ") + std::to_string(i + 1) + " " + mConfigNames[i];
   }
   std::string sceneKeys = mConfigNames.size() > 1 ?
     "1 - " + std::to_string(std::min((int) mConfigNames.size(), 9)) : "1";
