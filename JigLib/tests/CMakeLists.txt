@@ -1,0 +1,17 @@
+add_executable(jiglib_smoketest smoketest.cpp)
+target_link_libraries(jiglib_smoketest PRIVATE JigLib::jiglib)
+
+if(MSVC)
+  target_compile_options(jiglib_smoketest PRIVATE /W3 /permissive-)
+  if(JIGLIB_WARNINGS_AS_ERRORS)
+    target_compile_options(jiglib_smoketest PRIVATE /WX)
+  endif()
+else()
+  target_compile_options(jiglib_smoketest PRIVATE -Wall)
+  if(JIGLIB_WARNINGS_AS_ERRORS)
+    target_compile_options(jiglib_smoketest PRIVATE -Werror)
+  endif()
+endif()
+
+add_test(NAME jiglib_smoketest COMMAND jiglib_smoketest)
+set_tests_properties(jiglib_smoketest PROPERTIES TIMEOUT 60)

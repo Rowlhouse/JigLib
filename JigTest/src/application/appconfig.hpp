@@ -33,7 +33,7 @@ public:
   static JigLib::tScalar mPhysicsOrientThreshold;
   static JigLib::tScalar mPhysicsDeactivationTime;
   static int mMaxPhysicsStepsPerFrame;
-        static bool mNullPhysicsUpdate;
+  static bool mNullPhysicsUpdate;
   static bool mRenderEnable;
   static int mTextureLevel;
   static bool mRenderInterpolate;

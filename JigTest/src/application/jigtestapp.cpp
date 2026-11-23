@@ -758,7 +758,7 @@ void tJigTestApp::ProcessMainEvent()
   {
     if (!mPaused)
     {
-        mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
+      mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
       // The idea is that we run physics until it progresses just beyond where we want to be.
       int maxLoops = tAppConfig::mMaxPhysicsStepsPerFrame;
       while ( (iLoop < maxLoops) &&
@@ -807,7 +807,7 @@ void tJigTestApp::ProcessMainEvent()
     }
     else
     {
-        mPhysics.SetNullUpdate(true);
+      mPhysics.SetNullUpdate(true);
       mPhysics.Integrate(1.0f / tAppConfig::mPhysicsFrequency);
       mPhysics.ResetTime(GetStartOfFrameTime());
       iLoop = 1;
@@ -1523,12 +1523,12 @@ void tJigTestApp::LoadAppConfig()
   mPhysics.SetCollToll(tAppConfig::mPhysicsCollToll);
   mPhysics.SetDoShockStep(tAppConfig::mDoShockStep);
   mPhysics.EnableFreezing(tAppConfig::mEnableFreezing);
-        mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
+  mPhysics.SetNullUpdate(tAppConfig::mNullPhysicsUpdate);
   if (tAppConfig::mSolverType == "fast")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_FAST);
   else if (tAppConfig::mSolverType == "normal")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_NORMAL);
-  else if (tAppConfig::mSolverType == "normal")
+  else if (tAppConfig::mSolverType == "combined")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_COMBINED);
   else if (tAppConfig::mSolverType == "accumulated")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_ACCUMULATED);

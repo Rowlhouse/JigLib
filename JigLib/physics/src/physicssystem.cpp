@@ -52,6 +52,7 @@ tPhysicsSystem::tPhysicsSystem()
   mTargetTime = 0.0f;
   mOldTime = 0.0f;
   mDoingIntegration = false;
+  mNullUpdate = false;
 
   SetCollisionFns();
 }

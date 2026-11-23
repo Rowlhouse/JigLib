@@ -26,7 +26,7 @@ namespace JigLib
 printf(\
 "This program has crashed\n" \
 "Press 'c <RET>' to continue (bad idea!) or 'q <RET>' to exit.\n"); \
-for (;;) {int c = getc(stdin); if (c == 'c') break; else if (c == 'q') abort();}
+for (;;) {int c = getc(stdin); if (c == 'c') break; else if (c == 'q' || c == EOF) abort();}
 #define Assert(exp) \
 if (!(exp)) { \
 TRACE("Assert %s at %s:%d\n", #exp, __FILE__, __LINE__); \

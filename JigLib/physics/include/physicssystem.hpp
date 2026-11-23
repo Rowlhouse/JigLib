@@ -64,8 +64,8 @@ public:
   void SetCollToll(tScalar toll) {mCollToll = toll;}
   enum tSolverType {SOLVER_FAST, SOLVER_NORMAL, SOLVER_COMBINED, SOLVER_ACCUMULATED};
   void SetSolverType(tSolverType type) {mSolverType = type;}
-              // if nullUpdate then all updates will use dt = 0 (for debugging/profiling)
-              void SetNullUpdate(bool nullUpdate) {mNullUpdate = nullUpdate;}
+  // If nullUpdate then all updates will use dt = 0 (for debugging/profiling)
+  void SetNullUpdate(bool nullUpdate) {mNullUpdate = nullUpdate;}
 
   const tVector3 & GetGravity() const {return mGravity;}
   void SetGravity(const tVector3 & gravity);
@@ -223,8 +223,8 @@ private:
   // Allow objects to freeze
   bool mFreezingEnabled;
 
-              // Force null updates - i.e. dt = 0
-              bool mNullUpdate;
+  // Force null updates - i.e. dt = 0
+  bool mNullUpdate;
 
   // Flag used internally to see if we're doing the integration, during which time certain things
   // mustn't happen (i.e. objects be added etc).

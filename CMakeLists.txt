@@ -12,6 +12,11 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
+option(JIGLIB_BUILD_TESTS "Build the JigLib smoke test (run with ctest)" ON)
+if(JIGLIB_BUILD_TESTS)
+  enable_testing()
+endif()
+
 add_subdirectory(JigLib)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/JigTest/CMakeLists.txt)

@@ -10,6 +10,7 @@ project(JigLib
 
 option(JIGLIB_USE_DOUBLE "Use double precision for tScalar" OFF)
 option(JIGLIB_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (used by CI)" OFF)
+option(JIGLIB_BUILD_TESTS "Build the JigLib smoke test (run with ctest)" ${PROJECT_IS_TOP_LEVEL})
 
 # Default to a Release build for single-config generators
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -118,3 +119,8 @@ else()
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${JIGLIB_SOURCES} ${JIGLIB_HEADERS})
+
+if(JIGLIB_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
