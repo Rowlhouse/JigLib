@@ -5,8 +5,9 @@ JigTest, an interactive demo that shows it in action. It was originally availabl
 website. This repository keeps it in one place, updated so that it builds with current compilers on
 Windows, Linux and macOS.
 
-It isn't under active development. The version number is 0.84, and a comment in the code says
-"Let's face facts... We're not going to reach 1!!"
+It isn't under active development, and was always more of a platform to try out ideas than a serious 
+library for use in production. The version number is 0.84, and a comment in the code says "Let's face 
+facts... We're not going to reach 1!!"
 
 ## Features
 
