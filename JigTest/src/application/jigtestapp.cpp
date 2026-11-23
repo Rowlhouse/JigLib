@@ -834,9 +834,16 @@ void tJigTestApp::ProcessMainEvent()
     }
 
     {
+      // While an object is being dragged with the mouse, the follow camera stays where it is.
+      // Otherwise it would move as things move, which makes dragging very awkward.
+      bool holdFollowCamera = mPicking && mCameraFollowing;
       int nCameras = mCameras.size();
       for (i = 0 ; i < nCameras ; ++i)
+      {
+        if (i == 0 && holdFollowCamera)
+          continue;
         mCameras[i]->Update(GetStartOfFrameTime() - GetOldStartOfFrameTime());
+      }
       CheckGLErrors("after camera updates");
     }
 
