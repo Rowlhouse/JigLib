@@ -239,7 +239,9 @@ void tSDLApplicationBase::ProcessEvents()
   {
     switch( event.type ) {
     case SDL_EVENT_KEY_DOWN:
-      HandleKeyDown( event.key );
+      // Ignore auto-repeat, so held keys don't keep toggling things
+      if (!event.key.repeat)
+        HandleKeyDown( event.key );
       break;
     case SDL_EVENT_KEY_UP:
       HandleKeyUp( event.key );

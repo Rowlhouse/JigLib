@@ -18,42 +18,44 @@ Run jigtest on its own to use configs/default.cfg, or give the name of another c
 You can also give the path to your own config file. Screenshots and program.log are written to
 the current folder.
 
-Keys:
+Press H in the demo to show or hide a list of these controls.
 
-'F1': Saves a screenshot as a PNG file
-'F2': Dumps a screenshot every 2 physics steps (by default - see config file) for movie generation
-'t':  Resets everything
-'y':  Removes all physical objects
-'\':  Create a ragdoll
-'/':  Create a compound object
-'z':  Create a sphere
-'x':  Create a box
-'n':  Create a capsule
-'c':  Create a car (first car is under human control)
-'m':  Create a first-person character (very primitive movement etc for now)
-'ARROWS': Control the first car or the current object (if no car)
-'k':  toggle rendering collision/contact points
-'b':  toggle rendering AA bounding boxes
-'v':  toggle viewing sleeping objects transparent
-'wasdqe': move camera
-'1':  toggle fixed/follow camera
-'h':  toggle the physics "shock" step
-'p':  toggle pausing the physics
-'o':  pause and single step the physics
-'r':	toggle rendering updates
-'f':	toggle the freezing algorithm
-'='/'-'	select the next/previous object as a camera target
-'SPACE' takes the object the camera is focussed on and shoots it
-'PAGEUP/PAGEDOWN' increase/decrease the texturing etc
-'ESC'	Quit
+Camera:
 
-Pressing control when you create an object shoots it from the camera. Otherwise
-it gets created in its default location (specified in the config file)
+W A S D            move (hold Shift to go faster)
+Q E                move down / up
+Right drag         look around
+Arrow keys         look around (or drive the selected car)
+Alt + left drag    orbit around the selected object (or the last place clicked)
+Mouse wheel        move forwards / backwards
 
-You can select objects with the left mouse button. Right mouse button picks objects up (and
-freezes the camera) - you can move the object towards/away from the camera with the mouse wheel.
-Pressing the mouse wheel fires the object from where it is. Note that picking an object doesn't
-actually select it.
+Objects:
+
+Left click         select (clicking on nothing clears the selection)
+Left drag          pull it around (mouse wheel: nearer / further)
+Middle click       throw the object you're dragging
+Space              fire the selected object from the camera
+= -                select the next / previous object
+X Z N              drop a box, sphere or capsule
+/ \                drop a compound object or a ragdoll
+C                  drop a car (select it to drive it with the arrow keys)
+Ctrl + any of them fire it from the camera instead
+M                  first-person character (W A S D to walk, mouse to turn, Space to jump)
+T Y                reset / remove all the objects
+
+Simulation:
+
+P O                pause / single step
+F G                freezing / shock step on or off
+K B V              show contacts / bounding boxes / sleeping objects
+Page Up / Down     texture detail
+R                  rendering on or off
+F1                 save a screenshot as a PNG file
+F2                 save a screenshot every few physics steps (see movie_interval in the config)
+H                  show / hide the help
+Esc                quit
+
+The help is shown at startup unless the config file has "show_help false".
 
 Lots of stuff can be configured by editing configs/default.cfg (or whichever config you use)
 with a text editor.

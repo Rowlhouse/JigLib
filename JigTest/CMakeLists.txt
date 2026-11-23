@@ -78,6 +78,7 @@ add_executable(jigtest
   src/framework/resources.cpp
   src/framework/sdlapplicationbase.cpp
   src/framework/skybox.cpp
+  src/framework/textoverlay.cpp
   src/framework/texture.cpp
   src/framework/viewport.cpp
 )

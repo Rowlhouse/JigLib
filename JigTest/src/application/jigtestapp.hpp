@@ -61,9 +61,10 @@ private:
 
   void SetupUnequalExperiment();
 
-  void FireObject();
+  // Fires an object (index into mObjects) from the camera
+  void FireObject(int index);
 
-  // Fires the last created object, but doesn't change the camera focus
+  // Fires the last created object, but doesn't change the selection
   void FireLastCreatedObject();
 
   void RemoveAllObjects(bool onlyPhysical);
@@ -89,8 +90,36 @@ private:
   class tNewton * CreateNewton();
 
   enum tObjectControl {CONTROL_UP, CONTROL_DOWN, CONTROL_LEFT, CONTROL_RIGHT};
-  void ControlMainObject(tObjectControl control, bool down);
-  void ControlMainCar(tObjectControl control, bool down);
+  void ControlCar(class tCarObject * car, tObjectControl control, bool down);
+
+  // Selection. The index is into mObjects, or -1 for nothing selected.
+  void SelectObject(int index);
+  // Steps through the objects that have bodies, forwards (step = 1) or backwards (step = -1)
+  void SelectNextObject(int step);
+  class tObject * GetSelectedObject();
+  class tCarObject * GetSelectedCar();
+
+  // Finds what's under the mouse. Returns false if nothing is hit. body is 0 if what was hit has
+  // no body (e.g. the ground).
+  bool PickPoint(const JigLib::tVector2 & mousePt, JigLib::tVector3 & hitPos, JigLib::tBody *& body);
+  const class tViewport * GetViewportAt(const JigLib::tVector2 & mousePt);
+
+  // The free camera
+  void UpdateFreeCamera(JigLib::tScalar dt);
+  // Turns the camera by these angles (degrees). If orbit is set then the camera also moves around
+  // the orbit pivot.
+  void RotateCamera(JigLib::tScalar deltaYaw, JigLib::tScalar deltaPitch, bool orbit);
+  void SetCameraDirection(const JigLib::tVector3 & dir);
+  JigLib::tVector3 GetCameraDirection() const;
+  JigLib::tVector3 GetOrbitPivot();
+  void StartMouseLook(int mode);
+  void StopMouseLook();
+
+  // Moves the dragged object to follow the mouse
+  void UpdateDrag();
+  void StopDrag();
+
+  void RenderHelp();
 
   enum tMoveDir {MOVE_NONE  = 1 << 0,
                  MOVE_FWD   = 1 << 1,
@@ -136,16 +165,31 @@ private:
   typedef std::vector<class tCharacterObject *> tCharacterObjects;
   tCharacterObjects mCharacterObjects;
 
-  // Index into mObjects for the camera target. If -1 then stops following
-  int mCameraTargetIndex;
+  // Index into mObjects of the selected object, or -1 if nothing is selected
+  int mSelectedIndex;
 
   // For camera movement
   unsigned mCameraMoveDir;
   // Actual camera vel
   JigLib::tVector3 mCameraMoveVel;
 
-  enum tCameraMode {CAMERA_FIXED, CAMERA_FOLLOW};
-  tCameraMode mCameraMode;
+  // Free camera direction in degrees. Yaw is about the up axis, measured from the x axis.
+  JigLib::tScalar mCameraYaw, mCameraPitch;
+
+  // Arrow keys held down for looking around
+  enum tLookDir {LOOK_LEFT = 1 << 0, LOOK_RIGHT = 1 << 1, LOOK_UP = 1 << 2, LOOK_DOWN = 1 << 3};
+  unsigned mCameraLookDir;
+
+  // What dragging the mouse does
+  enum tMouseMode {MOUSE_NONE, MOUSE_LOOK, MOUSE_ORBIT};
+  tMouseMode mMouseMode;
+  JigLib::tVector2 mMousePos;
+
+  // The camera orbits around the selected object, or this point (the last place clicked)
+  JigLib::tVector3 mOrbitPoint;
+
+  // Show the help overlay
+  bool mShowHelp;
 
   // The average duration of each physics step
   JigLib::tScalar mPhysicsDuration;

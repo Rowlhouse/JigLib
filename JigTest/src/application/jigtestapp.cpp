@@ -23,6 +23,7 @@
 #include "camera.hpp"
 #include "contactrender.hpp"
 #include "skybox.hpp"
+#include "textoverlay.hpp"
 
 #include <algorithm>
 
@@ -50,10 +51,16 @@ tJigTestApp::tJigTestApp(int & argc, char * argv[])
   mCarAI(100.0f)
 {
   TRACE_METHOD_ONLY(ONCE_1);
-  mCameraTargetIndex = -1;
+  mSelectedIndex = -1;
   mCameraMoveDir = MOVE_NONE;
   mCameraMoveVel.SetTo(0.0f);
-  mCameraMode = CAMERA_FIXED;
+  mCameraYaw = 0.0f;
+  mCameraPitch = 0.0f;
+  mCameraLookDir = 0;
+  mMouseMode = MOUSE_NONE;
+  mMousePos = tVector2(0.0f, 0.0f);
+  mOrbitPoint = tVector3::Zero();
+  mShowHelp = true;
   mPhysicsDuration = 0.0f;
   mPaused = false;
   mPauseAfterNextPhysicsStep = false;
@@ -146,6 +153,9 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_KeyboardEvent & event )
   case SDLK_F2:
     mDoMovie = !mDoMovie;
     break;
+  case SDLK_H:
+    mShowHelp = !mShowHelp;
+    break;
   case SDLK_ESCAPE:
     ExitMainLoop();
     break;
@@ -199,6 +209,7 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
   }
 
   SDL_Keymod keyMod = SDL_GetModState();
+  tCarObject * car = GetSelectedCar();
 
   switch( event.key )
   {
@@ -207,6 +218,9 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
     break;
   case SDLK_F2:
     mDoMovie = !mDoMovie;
+    break;
+  case SDLK_H:
+    mShowHelp = !mShowHelp;
     break;
   case SDLK_W:
     mCameraMoveDir |= MOVE_FWD;
@@ -225,9 +239,6 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
     break;
   case SDLK_Q:
     mCameraMoveDir |= MOVE_DOWN;
-    break;
-  case SDLK_1:
-    mCameraMode = (mCameraMode == CAMERA_FIXED ? CAMERA_FOLLOW : CAMERA_FIXED);
     break;
   case SDLK_R:
     tAppConfig::mRenderEnable = !tAppConfig::mRenderEnable;
@@ -248,7 +259,7 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
     tAppConfig::mEnableFreezing = !tAppConfig::mEnableFreezing;
     mPhysics.EnableFreezing(tAppConfig::mEnableFreezing);
     break;
-  case SDLK_H:
+  case SDLK_G:
     tAppConfig::mDoShockStep = !tAppConfig::mDoShockStep;
     mPhysics.SetDoShockStep(tAppConfig::mDoShockStep);
     break;
@@ -260,13 +271,13 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
     mPauseAfterNextPhysicsStep = true;
     break;
   case SDLK_EQUALS:
-    mCameraTargetIndex += 1;
+    SelectNextObject(1);
     break;
   case SDLK_MINUS:
-    mCameraTargetIndex -= 1;
+    SelectNextObject(-1);
     break;
   case SDLK_SPACE:
-    FireObject();
+    FireObject(mSelectedIndex);
     break;
   case SDLK_X:
     CreateBox();
@@ -308,17 +319,30 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
   case SDLK_T:
     RestartExperiment();
     break;
+  // The arrow keys drive the selected car, or otherwise turn the camera
   case SDLK_LEFT:
-    ControlMainObject(CONTROL_LEFT, true);
+    if (car)
+      ControlCar(car, CONTROL_LEFT, true);
+    else
+      mCameraLookDir |= LOOK_LEFT;
     break;
   case SDLK_RIGHT:
-    ControlMainObject(CONTROL_RIGHT, true);
+    if (car)
+      ControlCar(car, CONTROL_RIGHT, true);
+    else
+      mCameraLookDir |= LOOK_RIGHT;
     break;
   case SDLK_UP:
-    ControlMainObject(CONTROL_UP, true);
+    if (car)
+      ControlCar(car, CONTROL_UP, true);
+    else
+      mCameraLookDir |= LOOK_UP;
     break;
   case SDLK_DOWN:
-    ControlMainObject(CONTROL_DOWN, true);
+    if (car)
+      ControlCar(car, CONTROL_DOWN, true);
+    else
+      mCameraLookDir |= LOOK_DOWN;
     break;
   case SDLK_ESCAPE:
     ExitMainLoop();
@@ -352,6 +376,8 @@ void tJigTestApp::HandleKeyUp( const SDL_KeyboardEvent & event )
     return;
   }
 
+  tCarObject * car = GetSelectedCar();
+
   switch( event.key )
   {
   case SDLK_W:
@@ -373,22 +399,29 @@ void tJigTestApp::HandleKeyUp( const SDL_KeyboardEvent & event )
     mCameraMoveDir &= ~MOVE_DOWN;
     break;
   case SDLK_LEFT:
-    ControlMainObject(CONTROL_LEFT, false);
+    mCameraLookDir &= ~LOOK_LEFT;
+    if (car)
+      ControlCar(car, CONTROL_LEFT, false);
     break;
   case SDLK_RIGHT:
-    ControlMainObject(CONTROL_RIGHT, false);
+    mCameraLookDir &= ~LOOK_RIGHT;
+    if (car)
+      ControlCar(car, CONTROL_RIGHT, false);
     break;
   case SDLK_UP:
-    ControlMainObject(CONTROL_UP, false);
+    mCameraLookDir &= ~LOOK_UP;
+    if (car)
+      ControlCar(car, CONTROL_UP, false);
     break;
   case SDLK_DOWN:
-    ControlMainObject(CONTROL_DOWN, false);
+    mCameraLookDir &= ~LOOK_DOWN;
+    if (car)
+      ControlCar(car, CONTROL_DOWN, false);
     break;
   default:
     break;
   }
 }
-
 
 //======================================================================================================================
 // HandleMouseButtonDown
@@ -398,100 +431,78 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
   if (!GetPhysicsSystem())
     return;
 
-  if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
-    mObjectPositionController.GetBody()->SetActive();
+  mMousePos = tVector2(event.x, event.y);
 
-  if (event.button == SDL_BUTTON_MIDDLE && mPicking)
+  if (event.button == SDL_BUTTON_MIDDLE)
   {
-    if (tBody* body = mObjectPositionController.GetBody())
+    // Throw the object that's being dragged
+    if (mPicking)
     {
-      mObjectPositionController.DisableConstraint();
-      mObjectPositionDamperController.DisableConstraint();
-      const tVector3& camPos = mCameras[0]->GetPosition();
-      tVector3 dir = (body->GetPosition() - camPos).GetNormalisedSafe();
-      body->SetVelocity(tAppConfig::mProjectileSpeed * dir);
-
-      mPicking = false;
-      return;
+      if (tBody * body = mObjectPositionController.GetBody())
+      {
+        StopDrag();
+        const tVector3 & camPos = mCameras[0]->GetPosition();
+        tVector3 dir = (body->GetPosition() - camPos).GetNormalisedSafe();
+        body->SetVelocity(tAppConfig::mProjectileSpeed * dir);
+      }
     }
+    return;
   }
 
-  tVector2 mousePt(event.x, event.y);
-  // Get the object from physics
-  tViewport* viewport = 0;
-  unsigned nViewports = mViewports.size();
-  unsigned i;
-  for (i = 0 ; i < nViewports ; ++i)
+  if (event.button == SDL_BUTTON_RIGHT)
   {
-    viewport = mViewports[i];
-    tVector2 pos, size;
-    viewport->GetPositionAndSize(pos, size);
-    if (mousePt.x > pos.x &&
-        mousePt.x < pos.x + size.x &&
-        mousePt.y > pos.y &&
-        mousePt.y < pos.y + size.y)
-    {
-      break;
-    }
+    StartMouseLook(MOUSE_LOOK);
+    return;
   }
-  if (!viewport)
+
+  if (event.button != SDL_BUTTON_LEFT)
     return;
 
-  tVector3 worldPos = viewport->GetCamera()->Unproject(mousePt, viewport);
-  const tVector3& camPos = viewport->GetCamera()->GetPosition();
-  tVector3 dir = (worldPos - camPos).NormaliseSafe();
-  worldPos = camPos + 100.0f * dir;
-
-  tCollisionSystem* coll = GetPhysicsSystem()->GetCollisionSystem();
-  if (!coll)
+  if (SDL_GetModState() & SDL_KMOD_ALT)
+  {
+    StartMouseLook(MOUSE_ORBIT);
     return;
+  }
 
-  tScalar frac = 0;
-  tCollisionSkin * skin = 0;
+  // A left click selects whatever is under the mouse, and starts dragging it
   tVector3 pos;
-  tVector3 normal;
-  tSegment seg(camPos, worldPos - camPos);
-
-  bool result = coll->SegmentIntersect(frac, skin, pos, normal, seg, 0);
-
-  if (!result || !skin)
+  tBody * body = 0;
+  if (!PickPoint(mMousePos, pos, body))
   {
-    TRACE("No collision skin to pick\n");
+    SelectObject(-1);
     return;
   }
+  mOrbitPoint = pos;
 
-  tBody* body = skin->GetOwner();
-  if (!body)
+  int index = -1;
+  if (body)
   {
-    TRACE("got collision skin but no owner\n");
-    return;
-  }
-
-  if (event.button == SDL_BUTTON_LEFT)
-  {
-    for (i = 0 ; i < mObjects.size() ; ++i)
+    for (unsigned i = 0 ; i < mObjects.size() ; ++i)
     {
       if (mObjects[i]->GetBody() == body)
       {
-        mCameraTargetIndex = (int) i;
+        index = (int) i;
         break;
       }
     }
   }
-  else if (event.button == SDL_BUTTON_RIGHT)
-  {
-    mPickDist = (pos - camPos).GetLength();
+  SelectObject(index);
 
-    // Need to get the position in body coords
-    tVector3 delta = pos - body->GetPosition();
-    delta = body->GetOrientation().GetTranspose() * delta;
-    mObjectPositionController.Initialise(body, delta, pos);
-    mObjectPositionDamperController.Initialise(body, tConstraintVelocity::BODY, 0, &tVector3::Zero());
-    mObjectPositionController.EnableConstraint();
-    mObjectPositionDamperController.EnableConstraint();
-    viewport->GetCamera()->Update(1);
-    mPicking = true;
-  }
+  if (!body)
+    return;
+
+  const tVector3 & camPos = mCameras[0]->GetPosition();
+  mPickDist = (pos - camPos).GetLength();
+
+  // Need to get the position in body coords
+  tVector3 delta = pos - body->GetPosition();
+  delta = body->GetOrientation().GetTranspose() * delta;
+  body->SetActive();
+  mObjectPositionController.Initialise(body, delta, pos);
+  mObjectPositionDamperController.Initialise(body, tConstraintVelocity::BODY, 0, &tVector3::Zero());
+  mObjectPositionController.EnableConstraint();
+  mObjectPositionDamperController.EnableConstraint();
+  mPicking = true;
 }
 
 //======================================================================================================================
@@ -499,14 +510,12 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
 //======================================================================================================================
 void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
 {
-  if (event.button == SDL_BUTTON_MIDDLE || event.button == SDL_BUTTON_RIGHT)
-  {
-    if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
-      mObjectPositionController.GetBody()->SetActive();
-    mObjectPositionController.DisableConstraint();
-    mObjectPositionDamperController.DisableConstraint();
-    mPicking = false;
-  }
+  if (event.button == SDL_BUTTON_LEFT && mPicking)
+    StopDrag();
+
+  if ( (event.button == SDL_BUTTON_RIGHT && mMouseMode == MOUSE_LOOK) ||
+       (event.button == SDL_BUTTON_LEFT && mMouseMode == MOUSE_ORBIT) )
+    StopMouseLook();
 }
 
 //======================================================================================================================
@@ -514,22 +523,24 @@ void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
 //======================================================================================================================
 void tJigTestApp::HandleMouseWheel( const SDL_MouseWheelEvent & event )
 {
-  // When picking, the wheel moves the picked object towards/away from the camera
-  if (!mPicking || event.y == 0.0f)
+  if (event.y == 0.0f || mCameras.empty())
     return;
 
-  if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
-    mObjectPositionController.GetBody()->SetActive();
+  if (mPicking)
+  {
+    // The wheel moves the dragged object towards/away from the camera
+    if (event.y > 0.0f)
+      mPickDist *= 1.1f;
+    else
+      mPickDist *= 0.9f;
+    UpdateDrag();
+    return;
+  }
 
-  if (event.y > 0.0f)
-    mPickDist *= 1.1f;
-  else
-    mPickDist *= 0.9f;
-
-  SDL_MouseMotionEvent motionEvent = {};
-  motionEvent.x = event.mouse_x;
-  motionEvent.y = event.mouse_y;
-  HandleMouseMotion( motionEvent );
+  // Otherwise it moves the camera forwards/backwards
+  tScalar step = (SDL_GetModState() & SDL_KMOD_SHIFT) ? 4.0f : 1.0f;
+  tCamera * camera = mCameras[0];
+  camera->SetPosition(camera->GetPosition() + (event.y * step) * GetCameraDirection());
 }
 
 //======================================================================================================================
@@ -545,128 +556,43 @@ void tJigTestApp::HandleMouseMotion( const SDL_MouseMotionEvent & event )
     return;
   }
 
-  tVector2 mousePt(event.x, event.y);
+  if (mMouseMode != MOUSE_NONE)
+  {
+    // Degrees per pixel
+    static const tScalar sensitivity = 0.2f;
+    RotateCamera(-sensitivity * event.xrel, -sensitivity * event.yrel, mMouseMode == MOUSE_ORBIT);
+    return;
+  }
+
+  mMousePos = tVector2(event.x, event.y);
   if (mPicking)
-  {
-    if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
-      mObjectPositionController.GetBody()->SetActive();
-    const tViewport* viewport = 0;
-    unsigned nViewports = mViewports.size();
-    unsigned i;
-    for (i = 0 ; i < nViewports ; ++i)
-    {
-      viewport = mViewports[i];
-      tVector2 pos, size;
-      viewport->GetPositionAndSize(pos, size);
-      if (mousePt.x > pos.x &&
-          mousePt.x < pos.x + size.x &&
-          mousePt.y > pos.y &&
-          mousePt.y < pos.y + size.y)
-      {
-        break;
-      }
-    }
-    if (!viewport)
-      return;
-    tVector3 worldPos = viewport->GetCamera()->Unproject(mousePt, viewport);
-    const tVector3& camPos = viewport->GetCamera()->GetPosition();
-
-    tVector3 dir = (worldPos - camPos).NormaliseSafe();
-    tVector3 constraintPos = camPos + mPickDist * dir;
-
-    mObjectPositionController.SetWorldPosition(constraintPos);
-  }
+    UpdateDrag();
 }
 
+
 //======================================================================================================================
-// ControlMainObject
+// ControlCar
 //======================================================================================================================
-void tJigTestApp::ControlMainObject(tObjectControl control, bool down)
+void tJigTestApp::ControlCar(tCarObject * car, tObjectControl control, bool down)
 {
-  for (int i = Max(mCameraTargetIndex, 0) ; i < (int) mObjects.size() ; ++i)
-  {
-    tObject * obj = mObjects[i];
-    if (obj->GetBody())
-    {
-      mCameraTargetIndex = i;
-      break;
-    }
-  }
-  if (mCameraTargetIndex < 0)
+  if (!car)
     return;
 
-  if (!mCarObjects.empty())
-  {
-    int ind = mCameraTargetIndex;
-    if (mObjects[ind] == mCarObjects[0])
-    {
-      ControlMainCar(control, down);
-      return;
-    }
-  }
-
-  if (!down)
-  {
-    mObjectController.DisableConstraint();
-    return;
-  }
-
-  if (mObjects.empty())
-    return;
-
-  tScalar speed = tAppConfig::mObjectControllerSpeed;
-  tVector3 vel;
-  const tMatrix33 & orient = mCameras[0]->GetOrient();
-  switch (control)
-  {
-  case CONTROL_UP: vel = speed * orient.GetUp(); break;
-  case CONTROL_DOWN: vel = -speed * orient.GetLook(); break;
-  case CONTROL_LEFT: vel = speed * orient.GetLeft(); break;
-  case CONTROL_RIGHT: vel = -speed * orient.GetLeft(); break;
-  }
-  int ind = mCameraTargetIndex;
-  if (ind < (int) mObjects.size())
-  {
-    for (int i = Max(ind, 0) ; i < (int) mObjects.size() ; ++i)
-    {
-      tObject * obj = mObjects[i];
-      if (obj->GetBody())
-      {
-        tBody * body = obj->GetBody();
-        mCameraTargetIndex = i;
-
-        mObjectController.Initialise(body, tConstraintVelocity::WORLD, &vel, 0);
-        mObjectController.EnableConstraint();
-        return;
-      }
-    }
-  }
-}
-
-//======================================================================================================================
-// ControlMainCar
-//======================================================================================================================
-void tJigTestApp::ControlMainCar(tObjectControl control, bool down)
-{
-  if (mCarObjects.empty())
-    return;
-  tCarObject * mainCar = mCarObjects[0];
-
-  mainCar->GetBody()->SetActive();
+  car->GetBody()->SetActive();
 
   switch(control)
   {
   case CONTROL_UP:
-    mainCar->GetCar().SetAccelerate(down ? 1.0f : 0.0f);
+    car->GetCar().SetAccelerate(down ? 1.0f : 0.0f);
     break;
   case CONTROL_DOWN:
-    mainCar->GetCar().SetAccelerate(down ? -1.0f : 0.0f);
+    car->GetCar().SetAccelerate(down ? -1.0f : 0.0f);
     break;
   case CONTROL_LEFT:
-    mainCar->GetCar().SetSteer(down ? 1.0f : 0.0f);
+    car->GetCar().SetSteer(down ? 1.0f : 0.0f);
     break;
   case CONTROL_RIGHT:
-    mainCar->GetCar().SetSteer(down ? -1.0f : 0.0f);
+    car->GetCar().SetSteer(down ? -1.0f : 0.0f);
     break;
   default:
     break;
@@ -678,37 +604,24 @@ void tJigTestApp::ControlMainCar(tObjectControl control, bool down)
 //======================================================================================================================
 void tJigTestApp::FireLastCreatedObject()
 {
-  int origIndex = mCameraTargetIndex;
-  mCameraTargetIndex = mObjects.size() - 1;
-  FireObject();
-  mCameraTargetIndex = origIndex;
+  if (!mObjects.empty())
+    FireObject((int) mObjects.size() - 1);
 }
-
 
 //======================================================================================================================
 // FireObject
 //======================================================================================================================
-void tJigTestApp::FireObject()
+void tJigTestApp::FireObject(int index)
 {
-  if (mObjects.empty())
+  if (index < 0 || index >= (int) mObjects.size() || mCameras.empty())
     return;
-  int ind = mCameraTargetIndex;
-  if (ind < (int) mObjects.size())
-  {
-    for (int i = Max(ind, 0) ; i < (int) mObjects.size() ; ++i)
-    {
-      tObject * obj = mObjects[i];
-      if (obj->GetBody())
-      {
-        mCameraTargetIndex = i;
-        tVector3 camPos = mCameras[0]->GetPosition();
-        tVector3 dir = (mCameras[0]->GetTarget() - camPos).GetNormalised();
-        obj->SetPhysicsPosition(camPos + 0.001f * dir, obj->GetBody()->GetOrientation());
-        obj->SetPhysicsVelocity(tAppConfig::mProjectileSpeed * dir);
-        return;
-      }
-    }
-  }
+  tObject * obj = mObjects[index];
+  if (!obj->GetBody())
+    return;
+  tVector3 camPos = mCameras[0]->GetPosition();
+  tVector3 dir = (mCameras[0]->GetTarget() - camPos).GetNormalisedSafe();
+  obj->SetPhysicsPosition(camPos + 0.001f * dir, obj->GetBody()->GetOrientation());
+  obj->SetPhysicsVelocity(tAppConfig::mProjectileSpeed * dir);
 }
 
 //======================================================================================================================
@@ -817,26 +730,13 @@ void tJigTestApp::ProcessMainEvent()
   // Update car ai
   mCarAI.Update(iLoop / tAppConfig::mPhysicsFrequency);
 
-  // Update camera[0] speed
-  if (0 == mCameras[0]->GetPositionObject())
+  // Move the free camera (unless there's a first-person character, which has its own camera)
+  if (mCharacterObjects.empty())
   {
-    tVector3 desiredCamVel =
-      !!(mCameraMoveDir & MOVE_FWD) * tVector3::Look() +
-      !!(mCameraMoveDir & MOVE_BACK) * -tVector3::Look() +
-      !!(mCameraMoveDir & MOVE_LEFT) * tVector3::Left() +
-      !!(mCameraMoveDir & MOVE_RIGHT) * -tVector3::Left() +
-      !!(mCameraMoveDir & MOVE_UP) * tVector3::Up() +
-      !!(mCameraMoveDir & MOVE_DOWN) * -tVector3::Up();
-    desiredCamVel = tAppConfig::mCamSpeed *
-      mCameras[0]->GetOrient() * desiredCamVel;
-    // Cam vel is relative to a reference distance
-    desiredCamVel *= (mCameras[0]->GetTarget() - mCameras[0]->GetPosition()).GetLength() / 10.0f;
-    tVector3 camPos = mCameras[0]->GetPosition();
     tScalar dt = GetStartOfFrameTime() - GetOldStartOfFrameTime();
     if (mDoMovie)
       dt = 1.0f / tAppConfig::mPhysicsFrequency;
-    camPos += desiredCamVel * dt;
-    mCameras[0]->SetPosition(camPos);
+    UpdateFreeCamera(dt);
   }
 
   // Do rendering
@@ -867,35 +767,8 @@ void tJigTestApp::ProcessMainEvent()
     CheckGLErrors("After setting render position");
 
     // Now update all our cameras and render stuff via the viewports
-    if (mCameraTargetIndex >= (int) mObjects.size())
-      mCameraTargetIndex = -1;
-    else if (mCameraTargetIndex < -1)
-      mCameraTargetIndex = mObjects.size() - 1;
-    mCameras[0]->SetChase(true);
-    if (mCameraTargetIndex >= 0)
-    {
-      if (mCameras[0]->GetTargetObject() != mObjects[mCameraTargetIndex])
-        mCameras[0]->SetTargetObject(mObjects[mCameraTargetIndex]);
-      if (mCameraMode == CAMERA_FIXED)
-      {
-        mCameras[0]->SetTrackTarget(
-          0, 8.0f, 3.0f, 50.0f);
-      }
-      else if (mCameras[0]->GetTrackObject() != mObjects[mCameraTargetIndex])
-      {
-        mCameras[0]->SetTrackTarget(
-          mObjects[mCameraTargetIndex], 8.0f, 3.0f, 50.0f);
-        mCameras[0]->SetPositionOffset(tVector3(-7.0f, 0.0f, 0.0f));
-      }
-    }
-    else
-    {
-      if (mCameras[0]->GetTargetObject() != 0)
-      {
-        mCameras[0]->SetTargetObject(0);
-        mCameras[0]->SetPositionOffset(tVector3::Zero());
-      }
-    }
+    if (mSelectedIndex >= (int) mObjects.size())
+      SelectObject(-1);
 
     // If we have a character ignore everything else
     if (!mCharacterObjects.empty())
@@ -907,13 +780,16 @@ void tJigTestApp::ProcessMainEvent()
       mCameras[0]->SetPositionOffset(tVector3(-7.0f, 0.0f, 4.0f));
     }
 
-    if (!mPicking)
     {
       int nCameras = mCameras.size();
       for (i = 0 ; i < nCameras ; ++i)
         mCameras[i]->Update(GetStartOfFrameTime() - GetOldStartOfFrameTime());
       CheckGLErrors("after camera updates");
     }
+
+    // Keep the dragged object under the mouse as the camera moves
+    if (mPicking)
+      UpdateDrag();
 
     // Clear
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
@@ -925,18 +801,14 @@ void tJigTestApp::ProcessMainEvent()
       mViewports[i]->Render();
       if (tDebugConfig::mRenderCollisionContacts)
         RenderAllContacts(tDebugConfig::mRenderCollisionContacts);
-      if ( (mCameraTargetIndex >= 0) &&
-           (mCameraTargetIndex < (int) mObjects.size()) )
-      {
-        tObject * obj = mObjects[mCameraTargetIndex];
-        if (mCarObjects.empty() || (mCarObjects[0] != mObjects[mCameraTargetIndex]) )
-        {
-          if (obj->GetBody())
-            obj->RenderWorldBoundingBox(&tVector3::Look()); // look = red
-        }
-      }
+      // Show the selected object
+      tObject * selected = GetSelectedObject();
+      if (selected && selected->GetBody())
+        selected->RenderWorldBoundingBox(&tVector3::Look()); // look = red
     }
-    CheckGLErrors("After vewport renders");
+    CheckGLErrors("After viewport renders");
+
+    RenderHelp();
   }
 
   SDL_GL_SwapWindow(GetMainWindow());
@@ -1417,17 +1289,16 @@ void tJigTestApp::SetupExperiment()
   camera0->SetPosition(tVector3(-20.0f, 1.0f, 15.0f));
   camera0->SetTarget(tVector3::Zero());
   camera0->SetUp(tVector3::Up());
+  SetCameraDirection(tVector3::Zero() - camera0->GetPosition());
+  mOrbitPoint = tVector3::Zero();
 
-  // If there's a car, look at it
+  // If there's a car, select it so that the arrow keys drive it
   if (!mCarObjects.empty())
   {
-    tCarObject * car = mCarObjects[0];
     for (int i = 0 ; i < (int) mObjects.size() ; ++i)
     {
-      if (mObjects[i] == car)
-      {
-        mCameraTargetIndex = i;
-      }
+      if (mObjects[i] == mCarObjects[0])
+        SelectObject(i);
     }
   }
 
@@ -1509,6 +1380,8 @@ void tJigTestApp::LoadAppConfig()
 
   GetConfigFile().GetValue("physics_quit_iterations",
                            mQuitIterations);
+
+  GetConfigFile().GetValue("show_help", mShowHelp);
 
   GetConfigFile().GetValue("skybox",
                            tAppConfig::mSkybox);
@@ -1944,7 +1817,8 @@ void tJigTestApp::RemoveAllObjects(bool onlyPhysical)
   TRACE_METHOD_ONLY(ONCE_1);
 
   mObjectController.DisableConstraint();
-  mCameraTargetIndex = -1;
+  StopDrag();
+  mSelectedIndex = -1;
 
   unsigned i;
   unsigned nCameras = mCameras.size();
@@ -2288,3 +2162,354 @@ tNewton* tJigTestApp::CreateNewton()
   return newton;
 }
 
+//======================================================================================================================
+// SelectObject
+//======================================================================================================================
+void tJigTestApp::SelectObject(int index)
+{
+  if (index < 0 || index >= (int) mObjects.size())
+    index = -1;
+
+  tCarObject * oldCar = GetSelectedCar();
+  mSelectedIndex = index;
+  tCarObject * newCar = GetSelectedCar();
+  if (oldCar == newCar)
+    return;
+
+  // The selected car is driven with the arrow keys. Other cars (apart from the first one) are
+  // driven by the AI.
+  if (oldCar)
+  {
+    oldCar->GetCar().SetAccelerate(0.0f);
+    oldCar->GetCar().SetSteer(0.0f);
+    if (oldCar != mCarObjects[0])
+      mCarAI.AddControlledCar(oldCar);
+  }
+  if (newCar)
+    mCarAI.RemoveControlledCar(newCar);
+}
+
+//======================================================================================================================
+// SelectNextObject
+//======================================================================================================================
+void tJigTestApp::SelectNextObject(int step)
+{
+  int n = (int) mObjects.size();
+  if (n == 0)
+    return;
+  int index = mSelectedIndex;
+  if (index < 0)
+    index = (step > 0) ? n - 1 : 0;
+  for (int count = 0 ; count < n ; ++count)
+  {
+    index = ((index + step) % n + n) % n;
+    if (mObjects[index]->GetBody())
+    {
+      SelectObject(index);
+      return;
+    }
+  }
+}
+
+//======================================================================================================================
+// GetSelectedObject
+//======================================================================================================================
+tObject * tJigTestApp::GetSelectedObject()
+{
+  if (mSelectedIndex < 0 || mSelectedIndex >= (int) mObjects.size())
+    return 0;
+  return mObjects[mSelectedIndex];
+}
+
+//======================================================================================================================
+// GetSelectedCar
+//======================================================================================================================
+tCarObject * tJigTestApp::GetSelectedCar()
+{
+  tObject * obj = GetSelectedObject();
+  for (tCarObject * car : mCarObjects)
+  {
+    if (car == obj)
+      return car;
+  }
+  return 0;
+}
+
+//======================================================================================================================
+// GetViewportAt
+//======================================================================================================================
+const tViewport * tJigTestApp::GetViewportAt(const tVector2 & mousePt)
+{
+  for (const tViewport * viewport : mViewports)
+  {
+    tVector2 pos, size;
+    viewport->GetPositionAndSize(pos, size);
+    if (mousePt.x > pos.x &&
+        mousePt.x < pos.x + size.x &&
+        mousePt.y > pos.y &&
+        mousePt.y < pos.y + size.y)
+    {
+      return viewport;
+    }
+  }
+  return mViewports.empty() ? 0 : mViewports[0];
+}
+
+//======================================================================================================================
+// PickPoint
+//======================================================================================================================
+bool tJigTestApp::PickPoint(const tVector2 & mousePt, tVector3 & hitPos, tBody *& body)
+{
+  body = 0;
+  const tViewport * viewport = GetViewportAt(mousePt);
+  tCollisionSystem * coll = GetPhysicsSystem()->GetCollisionSystem();
+  if (!viewport || !coll)
+    return false;
+
+  const tCamera * camera = viewport->GetCamera();
+  tVector3 worldPos = camera->Unproject(mousePt, viewport);
+  const tVector3 & camPos = camera->GetPosition();
+  tVector3 dir = (worldPos - camPos).GetNormalisedSafe();
+  tSegment seg(camPos, 500.0f * dir);
+
+  tScalar frac = 0;
+  tCollisionSkin * skin = 0;
+  tVector3 normal;
+  if (!coll->SegmentIntersect(frac, skin, hitPos, normal, seg, 0) || !skin)
+    return false;
+  body = skin->GetOwner();
+  return true;
+}
+
+//======================================================================================================================
+// RotateAbout
+//======================================================================================================================
+// Rotates v about a unit axis by an angle in degrees
+static tVector3 RotateAbout(const tVector3 & v, const tVector3 & axis, tScalar degrees)
+{
+  tScalar angle = Deg2Rad(degrees);
+  tScalar c = Cos(angle);
+  tScalar s = Sin(angle);
+  return c * v + s * Cross(axis, v) + ((1.0f - c) * Dot(axis, v)) * axis;
+}
+
+//======================================================================================================================
+// GetCameraDirection
+//======================================================================================================================
+tVector3 tJigTestApp::GetCameraDirection() const
+{
+  tScalar yaw = Deg2Rad(mCameraYaw);
+  tScalar pitch = Deg2Rad(mCameraPitch);
+  return tVector3(Cos(pitch) * Cos(yaw), Cos(pitch) * Sin(yaw), Sin(pitch));
+}
+
+//======================================================================================================================
+// SetCameraDirection
+//======================================================================================================================
+void tJigTestApp::SetCameraDirection(const tVector3 & dir)
+{
+  if (dir.GetLengthSq() < SCALAR_TINY)
+    return;
+  tVector3 d = dir.GetNormalised();
+  mCameraYaw = Rad2Deg(ATan2(d.y, d.x));
+  mCameraPitch = Rad2Deg(ASin(d.z));
+  Limit(mCameraPitch, SCALAR(-89.0f), SCALAR(89.0f));
+}
+
+//======================================================================================================================
+// GetOrbitPivot
+//======================================================================================================================
+tVector3 tJigTestApp::GetOrbitPivot()
+{
+  if (tObject * obj = GetSelectedObject())
+    return obj->GetRenderPosition();
+  return mOrbitPoint;
+}
+
+//======================================================================================================================
+// RotateCamera
+//======================================================================================================================
+void tJigTestApp::RotateCamera(tScalar deltaYaw, tScalar deltaPitch, bool orbit)
+{
+  tScalar newPitch = mCameraPitch + deltaPitch;
+  Limit(newPitch, SCALAR(-89.0f), SCALAR(89.0f));
+  deltaPitch = newPitch - mCameraPitch;
+
+  if (orbit && !mCameras.empty())
+  {
+    // Move the camera around the pivot by the same rotation that's applied to its direction, so the
+    // pivot stays in the same place on screen
+    tCamera * camera = mCameras[0];
+    tVector3 pivot = GetOrbitPivot();
+    tVector3 offset = RotateAbout(camera->GetPosition() - pivot, tVector3::Up(), deltaYaw);
+    tScalar newYaw = Deg2Rad(mCameraYaw + deltaYaw);
+    tVector3 left(-Sin(newYaw), Cos(newYaw), 0.0f);
+    // A positive rotation about the left axis tips the view down
+    offset = RotateAbout(offset, left, -deltaPitch);
+    camera->SetPosition(pivot + offset);
+  }
+
+  mCameraYaw += deltaYaw;
+  if (mCameraYaw > 180.0f)
+    mCameraYaw -= 360.0f;
+  else if (mCameraYaw < -180.0f)
+    mCameraYaw += 360.0f;
+  mCameraPitch = newPitch;
+}
+
+//======================================================================================================================
+// UpdateFreeCamera
+//======================================================================================================================
+void tJigTestApp::UpdateFreeCamera(tScalar dt)
+{
+  if (mCameras.empty())
+    return;
+  tCamera * camera = mCameras[0];
+
+  // The arrow keys turn the camera (unless a car is selected)
+  tScalar lookAngle = 90.0f * dt;
+  tScalar yaw = 0.0f, pitch = 0.0f;
+  if (mCameraLookDir & LOOK_LEFT)
+    yaw += lookAngle;
+  if (mCameraLookDir & LOOK_RIGHT)
+    yaw -= lookAngle;
+  if (mCameraLookDir & LOOK_UP)
+    pitch += lookAngle;
+  if (mCameraLookDir & LOOK_DOWN)
+    pitch -= lookAngle;
+  if (yaw != 0.0f || pitch != 0.0f)
+    RotateCamera(yaw, pitch, false);
+
+  // W/S move along the view direction, A/D to the side, and Q/E down and up
+  tVector3 dir = GetCameraDirection();
+  tVector3 left = Cross(tVector3::Up(), dir).GetNormalisedSafe();
+  tVector3 move(0.0f);
+  if (mCameraMoveDir & MOVE_FWD)
+    move += dir;
+  if (mCameraMoveDir & MOVE_BACK)
+    move -= dir;
+  if (mCameraMoveDir & MOVE_LEFT)
+    move += left;
+  if (mCameraMoveDir & MOVE_RIGHT)
+    move -= left;
+  if (mCameraMoveDir & MOVE_UP)
+    move += tVector3::Up();
+  if (mCameraMoveDir & MOVE_DOWN)
+    move -= tVector3::Up();
+
+  tVector3 pos = camera->GetPosition();
+  if (move.GetLengthSq() > SCALAR_TINY)
+  {
+    tScalar speed = tAppConfig::mCamSpeed;
+    if (SDL_GetModState() & SDL_KMOD_SHIFT)
+      speed *= 4.0f;
+    pos += (speed * dt) * move.GetNormalised();
+  }
+
+  camera->SetPosition(pos);
+  camera->SetTarget(pos + dir);
+  camera->SetUp(tVector3::Up());
+}
+
+//======================================================================================================================
+// StartMouseLook
+//======================================================================================================================
+void tJigTestApp::StartMouseLook(int mode)
+{
+  mMouseMode = (tMouseMode) mode;
+  // Hide the pointer and report relative movement, so the drag isn't limited by the window edge
+  SDL_SetWindowRelativeMouseMode(GetMainWindow(), true);
+}
+
+//======================================================================================================================
+// StopMouseLook
+//======================================================================================================================
+void tJigTestApp::StopMouseLook()
+{
+  mMouseMode = MOUSE_NONE;
+  SDL_SetWindowRelativeMouseMode(GetMainWindow(), false);
+}
+
+//======================================================================================================================
+// UpdateDrag
+//======================================================================================================================
+void tJigTestApp::UpdateDrag()
+{
+  tBody * body = mObjectPositionController.GetBody();
+  if (!mPicking || !body || !mObjectPositionController.GetConstraintEnabled())
+    return;
+  body->SetActive();
+
+  const tViewport * viewport = GetViewportAt(mMousePos);
+  if (!viewport)
+    return;
+  tVector3 worldPos = viewport->GetCamera()->Unproject(mMousePos, viewport);
+  const tVector3 & camPos = viewport->GetCamera()->GetPosition();
+  tVector3 dir = (worldPos - camPos).GetNormalisedSafe();
+  mObjectPositionController.SetWorldPosition(camPos + mPickDist * dir);
+}
+
+//======================================================================================================================
+// StopDrag
+//======================================================================================================================
+void tJigTestApp::StopDrag()
+{
+  if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
+    mObjectPositionController.GetBody()->SetActive();
+  mObjectPositionController.DisableConstraint();
+  mObjectPositionDamperController.DisableConstraint();
+  mPicking = false;
+}
+
+//======================================================================================================================
+// RenderHelp
+//======================================================================================================================
+void tJigTestApp::RenderHelp()
+{
+  static const char * helpLines[] = {
+    "#Camera",
+    "W  A  S  D\tmove (hold Shift to go faster)",
+    "Q  E\tmove down / up",
+    "Right drag\tlook around",
+    "Arrow keys\tlook around (or drive the selected car)",
+    "Alt + left drag\torbit around the selected object",
+    "Mouse wheel\tmove forwards / backwards",
+    "#Objects",
+    "Left click\tselect",
+    "Left drag\tpull it around (mouse wheel: nearer / further)",
+    "Middle click\tthrow the object you're dragging",
+    "Space\tfire the selected object from the camera",
+    "=  -\tselect the next / previous object",
+    "X  Z  N\tdrop a box, sphere or capsule",
+    "/  \\\tdrop a compound object or a ragdoll",
+    "C\tdrop a car (select it to drive it)",
+    "Ctrl + any of these\tfire it from the camera",
+    "M\tfirst-person character (W A S D, mouse, Space)",
+    "T  Y\treset / remove all the objects",
+    "#Simulation",
+    "P  O\tpause / single step",
+    "F  G\tfreezing / shock step on or off",
+    "K  B  V\tshow contacts / bounding boxes / sleeping",
+    "Page Up / Down\ttexture detail",
+    "R\trendering on or off",
+    "F1  F2\tscreenshot / record frames",
+    "H\thide this help",
+    "Esc\tquit",
+  };
+  static const int numHelpLines = (int) (sizeof(helpLines) / sizeof(helpLines[0]));
+
+  // Use the same size for the reminder as the full help, so it doesn't jump around
+  float scale = GetTextPanelScale(numHelpLines);
+  std::vector<std::string> lines;
+  if (mShowHelp)
+  {
+    lines.assign(helpLines, helpLines + numHelpLines);
+  }
+  else
+  {
+    lines.push_back("H\thelp");
+    if (GetSelectedCar())
+      lines.push_back("Arrow keys\tdrive the selected car");
+  }
+  DrawTextPanel(lines, 10, 10, scale);
+}
