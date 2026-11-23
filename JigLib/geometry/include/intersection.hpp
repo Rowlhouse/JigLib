@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //----------------------------------------------------------------------------------------------------------------------
 // This covers cases where primitives are swept against each other. For example, a ray-sphere
 // test is a swept-point vs sphere test. The tests are generally "sided" - i.e. if there is

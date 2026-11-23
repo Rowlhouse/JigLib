@@ -1,6 +1,5 @@
 Testbed for jiglib - written by Danny Chapman 2005
-http://www.rowlhouse.co.uk
-danny@rowlhouse.freeserve.co.uk
+https://www.rowlhouse.co.uk
 
 JigTest is built along with JigLib from the top-level CMakeLists.txt. The configs/ and data/
 folders are found next to the executable if they're there, and otherwise in this source folder,

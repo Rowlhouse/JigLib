@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 #ifndef JIGCONSTRAINT_POINT_HPP
 #define JIGCONSTRAINT_POINT_HPP

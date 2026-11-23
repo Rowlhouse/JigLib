@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 // A quick check that JigLib builds, links and simulates sensibly, without any graphics. It drops
 // some objects onto a ground plane and checks where they come to rest. It also serves as a minimal

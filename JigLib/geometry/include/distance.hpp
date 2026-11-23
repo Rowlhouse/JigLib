@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //----------------------------------------------------------------------------------------------------------------------
 //
 // Provides various functions to get the distances basic primitives when the result cannot have a

@@ -1,10 +1,10 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 /*
 Copyright (c) 2007 Danny Chapman
-http://Www.rowlhouse.co.uk
+https://www.rowlhouse.co.uk
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages

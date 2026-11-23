@@ -1,6 +1,6 @@
 /*
 Copyright (c) 2007 Danny Chapman 
-http://www.rowlhouse.co.uk
+https://www.rowlhouse.co.uk
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages

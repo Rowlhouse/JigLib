@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 #ifndef JIGCONSTRAINT__MAX_DISTANCE_HPP
 #define JIGCONSTRAINT__MAX_DISTANCE_HPP

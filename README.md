@@ -91,6 +91,11 @@ hundred lines, and the JigTest source for much more.
 
 ## History
 
+JigLib has been ported to other languages. JigLibX is a C# port for Microsoft's XNA, and
+[JigLibFlash](https://code.google.com/archive/p/jiglibflash) is an ActionScript 3 port for Flash.
+JigLibFlash was in turn ported to JavaScript ([JigLibJS](https://github.com/supereggbert/JigLibJS))
+and Haxe ([JigLibHX](https://github.com/deprecated-armory3d/jiglibhx)).
+
 The tag `v0.84-original` holds the source as it was in its original Subversion repository, without
 the build outputs and bundled third-party libraries. These are the main changes since then.
 

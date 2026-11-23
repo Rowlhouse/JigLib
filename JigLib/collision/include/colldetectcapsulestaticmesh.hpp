@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 #ifndef JIGCOLLDETECTCAPSULESTATICMESH_HPP
 #define JIGCOLLDETECTCAPSULESTATICMESH_HPP

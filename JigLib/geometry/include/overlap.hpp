@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //----------------------------------------------------------------------------------------------------------------------
 // Overlap tests compare two static geometries and tell you if they overlap. If so then you might
 // get some information about the overlap properties, but when the function mirrors an intersection

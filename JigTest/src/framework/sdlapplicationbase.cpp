@@ -1,6 +1,6 @@
 //======================================================================================================================
 // Copyright (C) 2004 Danny Chapman
-//               danny@rowlhouse.freeserve.co.uk
+//               https://www.rowlhouse.co.uk
 //======================================================================================================================
 #include "sdlapplicationbase.hpp"
 #include "graphics.hpp"
@@ -280,7 +280,7 @@ void tSDLApplicationBase::HandleReShape(int newWidth, int newHeight)
 //======================================================================================================================
 void tSDLApplicationBase::DisplayLicense()
 {
-  TRACE("Application Copyright 2004 Danny Chapman: danny@rowlhouse.freeserve.co.uk\n");
+  TRACE("Application Copyright 2004 Danny Chapman: https://www.rowlhouse.co.uk\n");
   TRACE("Application comes with ABSOLUTELY NO WARRANTY;\n");
   TRACE("This is free software, and you are welcome to redistribute it\n");
   TRACE("under certain conditions; see the zlib license in license.txt\n");
