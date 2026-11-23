@@ -282,6 +282,11 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
   case SDLK_SPACE:
     FireObject(mSelectedIndex);
     break;
+  // Backspace is the "delete" key on Mac keyboards
+  case SDLK_DELETE:
+  case SDLK_BACKSPACE:
+    DeleteSelectedObject();
+    break;
   case SDLK_X:
     CreateBox();
     if (keyMod & SDL_KMOD_CTRL)
@@ -1523,6 +1528,45 @@ tCharacterObject * tJigTestApp::CreateCharacter()
 }
 
 //======================================================================================================================
+// DeleteSelectedObject
+//======================================================================================================================
+void tJigTestApp::DeleteSelectedObject()
+{
+  TRACE_METHOD_ONLY(ONCE_2);
+  tObject * obj = GetSelectedObject();
+  if (!obj)
+    return;
+
+  // Let go of anything we're holding, in case it's part of this object
+  StopDrag();
+  mObjectController.DisableConstraint();
+
+  tCarObject * car = GetSelectedCar();
+  mSelectedIndex = -1;
+  if (car)
+  {
+    mCarAI.RemoveControlledCar(car);
+    mCarObjects.erase(std::remove(mCarObjects.begin(), mCarObjects.end(), car), mCarObjects.end());
+  }
+
+  // Make sure no camera is still looking at it
+  for (tCamera * camera : mCameras)
+  {
+    if (camera->GetTargetObject() == obj)
+      camera->SetTargetObject(0);
+    if (camera->GetPositionObject() == obj)
+      camera->SetPositionObject(0);
+    if (camera->GetOrientationObject() == obj)
+      camera->SetOrientationObject(0);
+    if (camera->GetTrackObject() == obj)
+      camera->SetTrackTarget(0, 0, 0, 0);
+  }
+
+  mObjects.erase(std::remove(mObjects.begin(), mObjects.end(), obj), mObjects.end());
+  delete obj;
+}
+
+//======================================================================================================================
 // RemoveCharacters
 //======================================================================================================================
 void tJigTestApp::RemoveCharacters()
@@ -2526,6 +2570,7 @@ void tJigTestApp::RenderHelp()
     "Left drag\tpull it around (mouse wheel: nearer / further)",
     "Middle click\tthrow the object you're dragging",
     "Space\tfire the selected object from the camera",
+    "Delete\tdelete the selected object",
     "=  -\tselect the next / previous object",
     "X  Z  N\tdrop a box, sphere or capsule",
     "/  \\\tdrop a compound object or a ragdoll",
@@ -2546,7 +2591,8 @@ void tJigTestApp::RenderHelp()
   static const int numHelpLines = (int) (sizeof(helpLines) / sizeof(helpLines[0]));
 
   // Use the same size for the reminder as the full help, so it doesn't jump around
-  float scale = GetTextPanelScale(numHelpLines);
+  float fontSize = GetTextPanelFontSize(numHelpLines);
+  int margin = (int) (0.6f * fontSize);
   std::vector<std::string> lines;
   if (mShowHelp)
   {
@@ -2558,5 +2604,5 @@ void tJigTestApp::RenderHelp()
     if (GetSelectedCar())
       lines.push_back("Arrow keys\tdrive the selected car");
   }
-  DrawTextPanel(lines, 10, 10, scale);
+  DrawTextPanel(lines, margin, margin, fontSize);
 }

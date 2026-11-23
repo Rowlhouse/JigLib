@@ -85,6 +85,9 @@ private:
 
   class tCharacterObject * CreateCharacter();
 
+  // Deletes the selected object
+  void DeleteSelectedObject();
+
   // Removes the first-person character(s) and goes back to the free camera
   void RemoveCharacters();
 

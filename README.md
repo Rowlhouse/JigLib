@@ -114,3 +114,6 @@ Apart from those bug fixes, the physics code is as it was.
 ## Licence
 
 JigLib and JigTest are released under the zlib licence. See [LICENSE.txt](LICENSE.txt).
+
+JigTest includes the [Lato](https://www.latofonts.com) font, which is under the SIL Open Font
+License (see [JigTest/data/fonts/OFL.txt](JigTest/data/fonts/OFL.txt)).

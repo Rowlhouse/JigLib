@@ -119,10 +119,26 @@ bool tSDLApplicationBase::Initialise(const std::string app_name)
   TRACE_FILE_IF(ONCE_2)
     TRACE("SDL initialized.\n");
 
-  mWindowWidth = 800;
-  mWindowHeight = 600;
+  // A size of 0 means fit the screen. Screens vary so much that a fixed default is always either
+  // too big or too small.
+  mWindowWidth = 0;
+  mWindowHeight = 0;
   mConfigFile->GetValue("window_width", mWindowWidth);
   mConfigFile->GetValue("window_height", mWindowHeight);
+  if (mWindowWidth <= 0 || mWindowHeight <= 0)
+  {
+    SDL_Rect usable;
+    if (SDL_GetDisplayUsableBounds(SDL_GetPrimaryDisplay(), &usable))
+    {
+      mWindowWidth = (int) (0.8f * usable.w);
+      mWindowHeight = (int) (0.8f * usable.h);
+    }
+    else
+    {
+      mWindowWidth = 1280;
+      mWindowHeight = 720;
+    }
+  }
 
   // The rendering uses the fixed-function pipeline, so we need a compatibility (or legacy) context,
   // which is what we get by default.
@@ -144,6 +160,8 @@ bool tSDLApplicationBase::Initialise(const std::string app_name)
     TRACE("Window creation failed: %s\n", SDL_GetError());
     return false;
   }
+
+  SDL_SetWindowPosition(mWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
   mGLContext = SDL_GL_CreateContext(mWindow);
   if (!mGLContext)

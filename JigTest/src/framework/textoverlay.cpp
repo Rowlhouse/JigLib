@@ -4,73 +4,169 @@
 //======================================================================================================================
 #include "textoverlay.hpp"
 #include "graphics.hpp"
+#include "resources.hpp"
 
-#include <stb_easy_font.h>
+#define STB_TRUETYPE_IMPLEMENTATION
+#include <stb_truetype.h>
 
 #include <algorithm>
+#include <cmath>
+#include <cstdio>
 #include <vector>
 
-// stb_easy_font characters are about 7 pixels high, so this gives some space between lines
-static const float LINE_HEIGHT = 12.0f;
-static const float COLUMN_GAP = 16.0f;
-static const float PADDING = 8.0f;
+static const char * FONT_FILE = "data/fonts/Lato-Regular.ttf";
+static const float BASE_FONT_SIZE = 16.0f;   // At a display scale of 1
+static const float LINE_SPACING = 1.35f;     // Line height as a multiple of the font size
+
+// The printable ASCII characters are baked into a texture
+static const int FIRST_CHAR = 32;
+static const int NUM_CHARS = 95;
+static const int ATLAS_SIZE = 1024;
+
+//======================================================================================================================
+// tFont - the font file, and the characters baked at one size
+//======================================================================================================================
+struct tFont
+{
+  bool mTriedLoading = false;
+  std::vector<unsigned char> mFileData;
+  stbtt_bakedchar mChars[NUM_CHARS];
+  GLuint mTexture = 0;
+  float mBakedSize = 0.0f;
+
+  bool Prepare(float size);
+  float TextWidth(const std::string & text) const;
+  void DrawText(const std::string & text, float x, float baseline) const;
+};
+
+static tFont sFont;
+
+//======================================================================================================================
+// Prepare - load the font if necessary, and bake it at this size if it isn't already
+//======================================================================================================================
+bool tFont::Prepare(float size)
+{
+  if (!mTriedLoading)
+  {
+    mTriedLoading = true;
+    std::string path = GetResourcePath(FONT_FILE);
+    if (FILE * file = fopen(path.c_str(), "rb"))
+    {
+      fseek(file, 0, SEEK_END);
+      long length = ftell(file);
+      fseek(file, 0, SEEK_SET);
+      if (length > 0)
+      {
+        mFileData.resize(length);
+        if (fread(&mFileData[0], 1, length, file) != (size_t) length)
+          mFileData.clear();
+      }
+      fclose(file);
+    }
+    if (mFileData.empty())
+      TRACE("Warning: unable to load the font %s - there will be no text\n", path.c_str());
+  }
+  if (mFileData.empty())
+    return false;
+
+  size = std::floor(size);
+  if (mTexture && size == mBakedSize)
+    return true;
+
+  std::vector<unsigned char> bitmap(ATLAS_SIZE * ATLAS_SIZE);
+  int result = stbtt_BakeFontBitmap(&mFileData[0], 0, size, &bitmap[0], ATLAS_SIZE, ATLAS_SIZE,
+                                    FIRST_CHAR, NUM_CHARS, mChars);
+  if (result == 0)
+  {
+    TRACE("Warning: unable to bake the font at size %f\n", size);
+    return false;
+  }
+
+  if (!mTexture)
+    glGenTextures(1, &mTexture);
+  glBindTexture(GL_TEXTURE_2D, mTexture);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, ATLAS_SIZE, ATLAS_SIZE, 0, GL_ALPHA, GL_UNSIGNED_BYTE, &bitmap[0]);
+  mBakedSize = size;
+  return true;
+}
 
 //======================================================================================================================
 // TextWidth
 //======================================================================================================================
-static float TextWidth(const std::string & text)
+float tFont::TextWidth(const std::string & text) const
 {
-  std::vector<char> buf(text.begin(), text.end());
-  buf.push_back(0);
-  return (float) stb_easy_font_width(&buf[0]);
+  float width = 0.0f;
+  for (unsigned char c : text)
+  {
+    if (c >= FIRST_CHAR && c < FIRST_CHAR + NUM_CHARS)
+      width += mChars[c - FIRST_CHAR].xadvance;
+  }
+  return width;
 }
 
 //======================================================================================================================
-// DrawText - at (x, y) in unscaled units
+// DrawText - y is the baseline. Expects the font texture to be bound.
 //======================================================================================================================
-static void DrawText(const std::string & text, float x, float y)
+void tFont::DrawText(const std::string & text, float x, float baseline) const
 {
-  if (text.empty())
-    return;
-  std::vector<char> buf(text.begin(), text.end());
-  buf.push_back(0);
-  static std::vector<char> vertices(64 * 1024);
-  int numQuads = stb_easy_font_print(x, y, &buf[0], 0, &vertices[0], (int) vertices.size());
-  glVertexPointer(2, GL_FLOAT, 16, &vertices[0]);
-  glDrawArrays(GL_QUADS, 0, numQuads * 4);
+  glBegin(GL_QUADS);
+  for (unsigned char c : text)
+  {
+    if (c < FIRST_CHAR || c >= FIRST_CHAR + NUM_CHARS)
+      continue;
+    stbtt_aligned_quad q;
+    stbtt_GetBakedQuad(mChars, ATLAS_SIZE, ATLAS_SIZE, c - FIRST_CHAR, &x, &baseline, &q, 1);
+    glTexCoord2f(q.s0, q.t0); glVertex2f(q.x0, q.y0);
+    glTexCoord2f(q.s1, q.t0); glVertex2f(q.x1, q.y0);
+    glTexCoord2f(q.s1, q.t1); glVertex2f(q.x1, q.y1);
+    glTexCoord2f(q.s0, q.t1); glVertex2f(q.x0, q.y1);
+  }
+  glEnd();
 }
 
 //======================================================================================================================
-// GetTextPanelScale
+// GetTextPanelFontSize
 //======================================================================================================================
-float GetTextPanelScale(int numLines)
+float GetTextPanelFontSize(int numLines)
 {
   int w, h;
   GetWindowSize(w, h);
-  // Big enough to read, but small enough for the panel to fit in the window
-  float scale = h / 450.0f;
-  float fitScale = (h - 2.0f * PADDING) / ((numLines + 1) * LINE_HEIGHT);
-  scale = std::min(scale, fitScale);
-  return std::max(scale, 1.0f);
+  // The display scale is 1 at 100%, 2 at 200% etc
+  float displayScale = GetMainWindow() ? SDL_GetWindowDisplayScale(GetMainWindow()) : 1.0f;
+  if (displayScale <= 0.0f)
+    displayScale = 1.0f;
+  float size = BASE_FONT_SIZE * displayScale;
+  // Shrink it if the panel wouldn't fit
+  float fitSize = h / ((numLines + 2) * LINE_SPACING);
+  size = std::min(size, fitSize);
+  return std::max(size, 8.0f);
 }
 
 //======================================================================================================================
 // DrawTextPanel
 //======================================================================================================================
-void DrawTextPanel(const std::vector<std::string> & lines, int x, int y, float scale)
+void DrawTextPanel(const std::vector<std::string> & lines, int x, int y, float fontSize)
 {
   if (lines.empty())
     return;
   int w, h;
   GetWindowSize(w, h);
-  if (w <= 0 || h <= 0)
+  if (w <= 0 || h <= 0 || !sFont.Prepare(fontSize))
     return;
-  if (scale <= 0.0f)
-    scale = GetTextPanelScale((int) lines.size());
+
+  const float lineHeight = std::floor(sFont.mBakedSize * LINE_SPACING);
+  const float padding = std::floor(0.6f * sFont.mBakedSize);
+  const float columnGap = std::floor(1.5f * sFont.mBakedSize);
 
   // Split into columns and measure
   std::vector<std::string> col0(lines.size()), col1(lines.size());
-  float col0Width = 0.0f, col1Width = 0.0f;
+  float col0Width = 0.0f, col1Width = 0.0f, singleWidth = 0.0f;
   for (size_t i = 0 ; i < lines.size() ; ++i)
   {
     const std::string & line = lines[i];
@@ -79,21 +175,19 @@ void DrawTextPanel(const std::vector<std::string> & lines, int x, int y, float s
     if (tab != std::string::npos)
     {
       col1[i] = line.substr(tab + 1);
-      col0Width = std::max(col0Width, TextWidth(col0[i]));
-      col1Width = std::max(col1Width, TextWidth(col1[i]));
+      col0Width = std::max(col0Width, sFont.TextWidth(col0[i]));
+      col1Width = std::max(col1Width, sFont.TextWidth(col1[i]));
+    }
+    else
+    {
+      singleWidth = std::max(singleWidth, sFont.TextWidth(col0[i]));
     }
   }
-  float panelWidth = col0Width + COLUMN_GAP + col1Width;
-  for (size_t i = 0 ; i < lines.size() ; ++i)
-  {
-    if (col1[i].empty())
-      panelWidth = std::max(panelWidth, TextWidth(col0[i]));
-  }
-  float panelHeight = lines.size() * LINE_HEIGHT;
+  float panelWidth = std::max(col0Width + columnGap + col1Width, singleWidth) + 2.0f * padding;
+  float panelHeight = lines.size() * lineHeight + 2.0f * padding;
 
   // 2D drawing in window pixels, with y down
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-  glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
   glViewport(0, 0, w, h);
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -102,50 +196,49 @@ void DrawTextPanel(const std::vector<std::string> & lines, int x, int y, float s
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
+  glTranslatef((float) x, (float) y, 0.0f);
 
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
-  glDisable(GL_TEXTURE_2D);
   glDisable(GL_CULL_FACE);
   glDisable(GL_FOG);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  glTranslatef((float) x, (float) y, 0.0f);
-  glScalef(scale, scale, 1.0f);
-
   // Background
-  glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
+  glDisable(GL_TEXTURE_2D);
+  glColor4f(0.0f, 0.0f, 0.0f, 0.65f);
   glBegin(GL_QUADS);
   glVertex2f(0.0f, 0.0f);
-  glVertex2f(panelWidth + 2.0f * PADDING / scale, 0.0f);
-  glVertex2f(panelWidth + 2.0f * PADDING / scale, panelHeight + 2.0f * PADDING / scale);
-  glVertex2f(0.0f, panelHeight + 2.0f * PADDING / scale);
+  glVertex2f(panelWidth, 0.0f);
+  glVertex2f(panelWidth, panelHeight);
+  glVertex2f(0.0f, panelHeight);
   glEnd();
 
-  // Text
-  glEnableClientState(GL_VERTEX_ARRAY);
-  float pad = PADDING / scale;
+  // Text - the texture's alpha is the glyph coverage, and the colour comes from glColor
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, sFont.mTexture);
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  float ascent = std::floor(0.8f * sFont.mBakedSize);
   for (size_t i = 0 ; i < lines.size() ; ++i)
   {
-    float lineY = pad + i * LINE_HEIGHT;
+    float baseline = padding + i * lineHeight + ascent;
     if (!col0[i].empty() && col0[i][0] == '#')
     {
       glColor4f(1.0f, 0.85f, 0.3f, 1.0f);
-      DrawText(col0[i].substr(1), pad, lineY);
+      sFont.DrawText(col0[i].substr(1), padding, baseline);
       continue;
     }
     glColor4f(0.6f, 0.9f, 1.0f, 1.0f);
-    DrawText(col0[i], pad, lineY);
+    sFont.DrawText(col0[i], padding, baseline);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    DrawText(col1[i], pad + col0Width + COLUMN_GAP, lineY);
+    sFont.DrawText(col1[i], padding + col0Width + columnGap, baseline);
   }
 
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
-  glPopClientAttrib();
   glPopAttrib();
 }

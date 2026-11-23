@@ -35,6 +35,7 @@ Left click         select (clicking on nothing clears the selection)
 Left drag          pull it around (mouse wheel: nearer / further)
 Middle click       throw the object you're dragging
 Space              fire the selected object from the camera
+Delete             delete the selected object (Backspace works too)
 = -                select the next / previous object
 X Z N              drop a box, sphere or capsule
 / \                drop a compound object or a ragdoll
