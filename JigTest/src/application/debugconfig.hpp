@@ -12,6 +12,9 @@ public:
   static bool mIndicateFrozenObjects;
   static bool mRenderCollisionBoundingBoxes;
   static int  mRenderCollisionContacts;
+
+  // Sets everything to its default value (before reading a config file)
+  static void ResetToDefaults();
 };
 
 #endif

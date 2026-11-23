@@ -65,6 +65,8 @@ jigtest            # configs/default.cfg
 jigtest castle     # or demo1, demo2, newton, stress
 ```
 
+In the demo, the number keys switch between these scenes without restarting.
+
 The camera moves like the one in Unreal Engine's editor. Fly with `W` `A` `S` `D` and `Q` `E`,
 look around by dragging with the right mouse button, and orbit the selected object with Alt and
 the left button. Click an object to select it and drag it to pull it around. Press `X`, `Z` or `N`

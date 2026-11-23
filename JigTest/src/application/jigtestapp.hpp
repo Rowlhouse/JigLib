@@ -85,6 +85,9 @@ private:
 
   class tCharacterObject * CreateCharacter();
 
+  // Loads one of the configs (an index into mConfigNames) and restarts with it
+  void SwitchConfig(int index);
+
   // Deletes the selected object
   void DeleteSelectedObject();
 
@@ -196,6 +199,9 @@ private:
 
   // Show the help overlay
   bool mShowHelp;
+
+  // The configs that the number keys switch between
+  std::vector<std::string> mConfigNames;
 
   // The average duration of each physics step
   JigLib::tScalar mPhysicsDuration;

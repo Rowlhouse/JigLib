@@ -44,6 +44,10 @@ Ctrl + any of them fire it from the camera instead
 M                  first-person character on / off (W A S D to walk, mouse to turn, Space to jump)
 T Y                reset / remove all the objects
 
+Scenes:
+
+1 - 9              switch to another config without restarting (the help lists them)
+
 Simulation:
 
 P O                pause / single step

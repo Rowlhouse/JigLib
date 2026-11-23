@@ -39,6 +39,13 @@ public:
   // Return the config file opened at creation
   JigLib::tConfigFile & GetConfigFile() {return *mConfigFile;}
 
+  // The name of the config file in use (e.g. "default")
+  const std::string & GetConfigName() const {return mConfigName;}
+
+  // Replaces the config file with another one - see GetConfigPath for what name can be. Returns
+  // false (and keeps the current one) if it can't be opened.
+  bool LoadConfigFile(const std::string & name);
+
   // Application can over-ride these. Default implementations do nothing.
   virtual void HandleKeyDown( const SDL_KeyboardEvent & event ) {}
   virtual void HandleKeyUp( const SDL_KeyboardEvent & event ) {}
@@ -98,6 +105,7 @@ private:
 
   // The config file - will be non-zero
   JigLib::tConfigFile * mConfigFile;
+  std::string mConfigName;
 
   // The current mouse position (only first two vals used)
   JigLib::tVector3 mMousePos;

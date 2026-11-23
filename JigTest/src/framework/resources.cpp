@@ -8,6 +8,7 @@
 
 #include <SDL3/SDL_filesystem.h>
 
+#include <algorithm>
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -96,4 +97,24 @@ std::string GetConfigPath(const std::string & name)
     return inConfigs.string();
 
   return name;
+}
+
+//======================================================================================================================
+// GetConfigNames
+//======================================================================================================================
+std::vector<std::string> GetConfigNames()
+{
+  std::vector<std::string> names;
+  std::error_code ec;
+  fs::path configsDir = fs::path(GetResourceDir()) / "configs";
+  for (const fs::directory_entry & entry : fs::directory_iterator(configsDir, ec))
+  {
+    if (entry.is_regular_file(ec) && entry.path().extension() == ".cfg")
+      names.push_back(entry.path().stem().string());
+  }
+  std::sort(names.begin(), names.end());
+  std::vector<std::string>::iterator it = std::find(names.begin(), names.end(), "default");
+  if (it != names.end())
+    std::rotate(names.begin(), it, it + 1);
+  return names;
 }

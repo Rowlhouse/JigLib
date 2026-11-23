@@ -24,6 +24,7 @@
 #include "contactrender.hpp"
 #include "skybox.hpp"
 #include "textoverlay.hpp"
+#include "resources.hpp"
 
 #include <algorithm>
 
@@ -61,6 +62,9 @@ tJigTestApp::tJigTestApp(int & argc, char * argv[])
   mMousePos = tVector2(0.0f, 0.0f);
   mOrbitPoint = tVector3::Zero();
   mShowHelp = true;
+
+  tAppConfig::ResetToDefaults();
+  tDebugConfig::ResetToDefaults();
   mPhysicsDuration = 0.0f;
   mPaused = false;
   mPauseAfterNextPhysicsStep = false;
@@ -141,6 +145,13 @@ void tJigTestApp::HandleFPSMouseMotion(const SDL_MouseMotionEvent & event)
 void tJigTestApp::HandleFPSKeyDown( const SDL_KeyboardEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
+  // The number keys switch between the configs
+  if (event.key >= SDLK_1 && event.key <= SDLK_9)
+  {
+    SwitchConfig((int) (event.key - SDLK_1));
+    return;
+  }
+
   if (mCharacterObjects.empty())
     return;
 
@@ -208,6 +219,13 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
   if (!mCharacterObjects.empty())
   {
     HandleFPSKeyDown(event);
+    return;
+  }
+
+  // The number keys switch between the configs
+  if (event.key >= SDLK_1 && event.key <= SDLK_9)
+  {
+    SwitchConfig((int) (event.key - SDLK_1));
     return;
   }
 
@@ -1414,8 +1432,7 @@ void tJigTestApp::LoadAppConfig()
   else if (tAppConfig::mSolverType == "accumulated")
     mPhysics.SetSolverType(tPhysicsSystem::SOLVER_ACCUMULATED);
 
-  if (tAppConfig::mTextureLevel < 0)
-    mRenderManager.SetWireFrameMode(true);
+  mRenderManager.SetWireFrameMode(tAppConfig::mTextureLevel < 0);
 
   delete mSkybox;
   mSkybox = new tSkybox(tAppConfig::mSkybox);
@@ -1431,6 +1448,8 @@ bool tJigTestApp::Initialise(const std::string app_name)
   TRACE_METHOD_ONLY(ONCE_1);
 
   bool retval = tSDLApplicationBase::Initialise(app_name);
+
+  mConfigNames = GetConfigNames();
 
   LoadAppConfig();
 
@@ -1525,6 +1544,33 @@ tCharacterObject * tJigTestApp::CreateCharacter()
   mRenderManager.AddObject(characterObject);
   characterObject->GetBody()->EnableBody();
   return characterObject;
+}
+
+//======================================================================================================================
+// SwitchConfig
+//======================================================================================================================
+void tJigTestApp::SwitchConfig(int index)
+{
+  TRACE_METHOD_ONLY(ONCE_1);
+  if (index < 0 || index >= (int) mConfigNames.size())
+    return;
+  if (!LoadConfigFile(mConfigNames[index]))
+    return;
+  TRACE("Switching to config %s\n", mConfigNames[index].c_str());
+
+  // Start from the defaults so nothing is left over from the previous config. Keep the help as it
+  // was though - that's the user's choice.
+  bool showHelp = mShowHelp;
+  tAppConfig::ResetToDefaults();
+  tDebugConfig::ResetToDefaults();
+  mQuitIterations = 0;
+  LoadAppConfig();
+  mShowHelp = showHelp;
+
+  RestartExperiment();
+  SetSleepingParams();
+  // Don't try to catch up on the time spent loading
+  mPhysics.ResetTime(GetStartOfFrameTime());
 }
 
 //======================================================================================================================
@@ -2590,13 +2636,29 @@ void tJigTestApp::RenderHelp()
   };
   static const int numHelpLines = (int) (sizeof(helpLines) / sizeof(helpLines[0]));
 
+  // The scenes (configs) that the number keys switch between
+  std::string sceneList;
+  for (size_t i = 0 ; i < mConfigNames.size() && i < 9 ; ++i)
+  {
+    char number[8];
+    snprintf(number, sizeof(number), "%d ", (int) i + 1);
+    sceneList += (i == 0 ? "" : "    ") + std::string(number) + mConfigNames[i];
+  }
+  std::string sceneKeys = mConfigNames.size() > 1 ?
+    "1 - " + std::to_string(std::min((int) mConfigNames.size(), 9)) : "1";
+
   // Use the same size for the reminder as the full help, so it doesn't jump around
-  float fontSize = GetTextPanelFontSize(numHelpLines);
+  float fontSize = GetTextPanelFontSize(numHelpLines + 2);
   int margin = (int) (0.6f * fontSize);
   std::vector<std::string> lines;
   if (mShowHelp)
   {
     lines.assign(helpLines, helpLines + numHelpLines);
+    if (!mConfigNames.empty())
+    {
+      lines.push_back("#Scenes (now showing " + GetConfigName() + ")");
+      lines.push_back(sceneKeys + "\t" + sceneList);
+    }
   }
   else
   {

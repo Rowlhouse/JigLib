@@ -7,6 +7,7 @@
 #include "imageloader.hpp"
 #include "resources.hpp"
 #include <stdio.h>
+#include <filesystem>
 #include <string.h>
 #include <vector>
 
@@ -32,6 +33,7 @@ void tSDLApplicationBase::LoadConfig(int & argc, char * argv[],
     configFileName = string(argv[1]);
   configFileName = GetConfigPath(configFileName);
   mConfigFile = new tConfigFile(configFileName, configFileOk);
+  mConfigName = std::filesystem::path(configFileName).stem().string();
 
   if (!configFileOk)
     TRACE("Warning: Unable to open main config file: %s\n", configFileName.c_str());
@@ -56,6 +58,26 @@ void tSDLApplicationBase::LoadConfig(int & argc, char * argv[],
     TRACE("Logging set up\n");
 }
 
+
+//======================================================================================================================
+// LoadConfigFile
+//======================================================================================================================
+bool tSDLApplicationBase::LoadConfigFile(const std::string & name)
+{
+  std::string path = GetConfigPath(name);
+  bool ok = false;
+  tConfigFile * configFile = new tConfigFile(path, ok);
+  if (!ok)
+  {
+    TRACE("Warning: Unable to open config file: %s\n", path.c_str());
+    delete configFile;
+    return false;
+  }
+  delete mConfigFile;
+  mConfigFile = configFile;
+  mConfigName = std::filesystem::path(path).stem().string();
+  return true;
+}
 
 //======================================================================================================================
 // tSDLApplicationBase

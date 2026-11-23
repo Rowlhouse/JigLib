@@ -41,6 +41,9 @@ public:
   static JigLib::tScalar mObjectControllerSpeed;
   static std::string mSkybox;
   static int mMovieInterval;
+
+  // Sets everything to its default value (before reading a config file)
+  static void ResetToDefaults();
 };
 
 #endif

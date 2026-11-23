@@ -6,6 +6,7 @@
 #define RESOURCES_HPP
 
 #include <string>
+#include <vector>
 
 // The resource folder is the one that contains configs/ and data/. It is either the folder holding
 // the executable (for an installed copy) or the source folder (for a development build).
@@ -20,5 +21,9 @@ std::string GetResourcePath(const std::string & path);
 // configs/default.cfg, and a name like "castle" gives configs/castle.cfg. Anything else is treated
 // as a path to a config file, relative to the current directory or else to configs/.
 std::string GetConfigPath(const std::string & name);
+
+// Returns the names of the configs in configs/ (without the .cfg), with "default" first and
+// the rest in alphabetical order
+std::vector<std::string> GetConfigNames();
 
 #endif
