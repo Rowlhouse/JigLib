@@ -26,14 +26,15 @@ public:
   void StartMainLoop();
 
   // event handlers
-  void HandleKeyDown(const SDL_keysym & keysym );
-  void HandleKeyUp(const SDL_keysym & keysym );
-  void HandleFPSKeyDown(const SDL_keysym & keysym );
-  void HandleFPSKeyUp(const SDL_keysym & keysym );
+  void HandleKeyDown(const SDL_KeyboardEvent & event );
+  void HandleKeyUp(const SDL_KeyboardEvent & event );
+  void HandleFPSKeyDown(const SDL_KeyboardEvent & event );
+  void HandleFPSKeyUp(const SDL_KeyboardEvent & event );
   void HandleFPSMouseMotion(const SDL_MouseMotionEvent & event);
   void HandleMouseMotion(const SDL_MouseMotionEvent & event);
   void HandleMouseButtonDown(const SDL_MouseButtonEvent & event);
   void HandleMouseButtonUp(const SDL_MouseButtonEvent & event);
+  void HandleMouseWheel(const SDL_MouseWheelEvent & event);
   void ProcessMainEvent();
 
   void AddObject(class tObject * object);

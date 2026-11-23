@@ -4,10 +4,23 @@
 //======================================================================================================================
 #include "sdlapplicationbase.hpp"
 #include "graphics.hpp"
+#include "imageloader.hpp"
 #include <stdio.h>
+#include <string.h>
+#include <vector>
 
 using namespace std;
 using namespace JigLib;
+
+static SDL_Window * sMainWindow = 0;
+
+//======================================================================================================================
+// GetMainWindow
+//======================================================================================================================
+SDL_Window * GetMainWindow()
+{
+  return sMainWindow;
+}
 
 void tSDLApplicationBase::LoadConfig(int & argc, char * argv[],
                                      string configFileName)
@@ -48,6 +61,9 @@ void tSDLApplicationBase::LoadConfig(int & argc, char * argv[],
 tSDLApplicationBase::tSDLApplicationBase(int & argc, char * argv[],
                                          string configFileName,
                                          void (* licenseFn)(void))
+  :
+  mWindow(0),
+  mGLContext(0)
 {
   TRACE_METHOD_ONLY(ONCE_1);
 
@@ -65,6 +81,11 @@ tSDLApplicationBase::tSDLApplicationBase(int & argc, char * argv[],
 tSDLApplicationBase::~tSDLApplicationBase()
 {
   TRACE_METHOD_ONLY(ONCE_1);
+  if (mGLContext)
+    SDL_GL_DestroyContext(mGLContext);
+  if (mWindow)
+    SDL_DestroyWindow(mWindow);
+  sMainWindow = 0;
 }
 
 //======================================================================================================================
@@ -85,53 +106,54 @@ bool tSDLApplicationBase::Initialise(const std::string app_name)
 
   TRACE_FILE_IF(ONCE_2)
     TRACE("Initializing SDL.\n");
-  if((SDL_Init(SDL_INIT_VIDEO)==-1)) {
+  if (!SDL_Init(SDL_INIT_VIDEO))
+  {
     TRACE("Could not initialize SDL: %s.\n", SDL_GetError());
     return false;
   }
-  /* Clean up on exit */
+  // Clean up on exit
   atexit(SDL_Quit);
 
   TRACE_FILE_IF(ONCE_2)
     TRACE("SDL initialized.\n");
 
-  // Information about the current video settings.
-  const SDL_VideoInfo* info = NULL;
-  // Get some video information.
-  info = SDL_GetVideoInfo( );
-
-  if( !info ) {
-    TRACE("Video query failed: %s\n",
-          SDL_GetError( ) );
-    return false;
-  }
-
   mWindowWidth = 800;
   mWindowHeight = 600;
   mConfigFile->GetValue("window_width", mWindowWidth);
   mConfigFile->GetValue("window_height", mWindowHeight);
-  int bpp = info->vfmt->BitsPerPixel;
 
+  // The rendering uses the fixed-function pipeline, so we need a compatibility (or legacy) context,
+  // which is what we get by default.
   SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
   SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
   SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-  SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+  SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
   bool fullscreen = false;
   mConfigFile->GetValue("fullscreen", fullscreen);
 
-  // Don't allow resizing for now - textures etc get zapped
-  int flags = SDL_OPENGL | (fullscreen ? SDL_FULLSCREEN : 0);
-  SDL_Surface *screen = SDL_SetVideoMode( mWindowWidth,
-                                          mWindowHeight,
-                                          bpp,
-                                          flags );
-  if( screen == 0 )
+  SDL_WindowFlags flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+  if (fullscreen)
+    flags |= SDL_WINDOW_FULLSCREEN;
+  mWindow = SDL_CreateWindow(app_name.c_str(), mWindowWidth, mWindowHeight, flags);
+  if (!mWindow)
   {
-    TRACE("Video mode set failed: %s\n", SDL_GetError( ) );
+    TRACE("Window creation failed: %s\n", SDL_GetError());
     return false;
   }
+
+  mGLContext = SDL_GL_CreateContext(mWindow);
+  if (!mGLContext)
+  {
+    TRACE("OpenGL context creation failed: %s\n", SDL_GetError());
+    return false;
+  }
+  SDL_GL_SetSwapInterval(1);
+  sMainWindow = mWindow;
+
+  TRACE_FILE_IF(ONCE_2)
+    TRACE("OpenGL %s: %s\n", glGetString(GL_VERSION), glGetString(GL_RENDERER));
 
   return true;
 }
@@ -141,7 +163,7 @@ bool tSDLApplicationBase::Initialise(const std::string app_name)
 //======================================================================================================================
 tTime tSDLApplicationBase::GetTimeNow() const
 {
-  Uint32 millisec = SDL_GetTicks();
+  Uint64 millisec = SDL_GetTicks();
   return millisec * 0.001f;
 }
 
@@ -195,30 +217,12 @@ void tSDLApplicationBase::StartMainLoop()
 //======================================================================================================================
 // InternalHandleResize
 //======================================================================================================================
-void tSDLApplicationBase::InternalHandleResize(const SDL_ResizeEvent & event)
+void tSDLApplicationBase::InternalHandleResize(int newWidth, int newHeight)
 {
-  bool fullscreen = false;
-  mConfigFile->GetValue("fullscreen", fullscreen);
-  mWindowWidth = event.w;
-  mWindowHeight = event.h;
-
-  const SDL_VideoInfo* info = SDL_GetVideoInfo( );
-  if( !info ) {
-    TRACE("Video query failed: %s\n",
-          SDL_GetError( ) );
-    return;
-  }
-  int bpp = info->vfmt->BitsPerPixel;
-
-  int flags = SDL_RESIZABLE | SDL_OPENGL | (fullscreen ? SDL_FULLSCREEN : 0);
-  SDL_Surface *screen = SDL_SetVideoMode( mWindowWidth,
-                                          mWindowHeight,
-                                          bpp,
-                                          flags );
-  if( screen == 0 )
-  {
-    TRACE("Video mode set failed: %s\n", SDL_GetError( ) );
-  }
+  // The viewports pick up the new size when they're next applied
+  mWindowWidth = newWidth;
+  mWindowHeight = newHeight;
+  HandleReShape(newWidth, newHeight);
 }
 
 
@@ -232,26 +236,29 @@ void tSDLApplicationBase::ProcessEvents()
   while( SDL_PollEvent( &event ) )
   {
     switch( event.type ) {
-    case SDL_KEYDOWN:
-      HandleKeyDown( event.key.keysym );
+    case SDL_EVENT_KEY_DOWN:
+      HandleKeyDown( event.key );
       break;
-    case SDL_KEYUP:
-      HandleKeyUp( event.key.keysym );
+    case SDL_EVENT_KEY_UP:
+      HandleKeyUp( event.key );
       break;
-    case SDL_MOUSEMOTION:
+    case SDL_EVENT_MOUSE_MOTION:
       HandleMouseMotion( event.motion );
       break;
-    case SDL_MOUSEBUTTONDOWN:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
       HandleMouseButtonDown( event.button );
       break;
-    case SDL_MOUSEBUTTONUP:
+    case SDL_EVENT_MOUSE_BUTTON_UP:
       HandleMouseButtonUp( event.button );
       break;
-    case SDL_VIDEORESIZE:
-      InternalHandleResize( event.resize );
+    case SDL_EVENT_MOUSE_WHEEL:
+      HandleMouseWheel( event.wheel );
       break;
-    case SDL_QUIT:
-      /* Handle quit requests (like Ctrl-c). */
+    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+      InternalHandleResize( event.window.data1, event.window.data2 );
+      break;
+    case SDL_EVENT_QUIT:
+      // Handle quit requests (like Ctrl-c).
       exit(0);
       break;
     }
@@ -274,61 +281,32 @@ void tSDLApplicationBase::DisplayLicense()
   TRACE("Application Copyright 2004 Danny Chapman: danny@rowlhouse.freeserve.co.uk\n");
   TRACE("Application comes with ABSOLUTELY NO WARRANTY;\n");
   TRACE("This is free software, and you are welcome to redistribute it\n");
-  TRACE("under certain conditions; see the GNU General Public License\n");
+  TRACE("under certain conditions; see the zlib license in license.txt\n");
 }
 
 
 
 //======================================================================================================================
-// Code to write out screen shots
+// WriteFrameBuffer
 //======================================================================================================================
-static void FlipVertical(unsigned char *data, int w, int h)
+static void WriteFrameBuffer(const char *filename)
 {
-  int x, y, i1, i2;
-  unsigned char temp;
-  for (x=0;x<w;x++){
-    for (y=0;y<h/2;y++){
-      i1 = (y*w + x)*3; // This pixel
-      i2 = ((h - y - 1)*w + x)*3; // Its opposite (across x-axis)
-
-      // Swap pixels
-      temp = data[i1];
-      data[i1] = data[i2];
-      data[i2] = temp;
-
-      i1++; i2++;
-      temp = data[i1];
-      data[i1] = data[i2];
-      data[i2] = temp;
-
-      i1++; i2++;
-      temp = data[i1];
-      data[i1] = data[i2];
-      data[i2] = temp;
-    }
-  }
-}
-
-
-//======================================================================================================================
-// writeFrameBuffer
-//======================================================================================================================
-static void WriteFrameBuffer(char *filename)
-{
-  FILE *fp = fopen(filename, "wb");
   int width, height;
   GetWindowSize(width, height);
+  if (width <= 0 || height <= 0)
+    return;
 
-  int data_size = width * height * 3;
-  unsigned char *framebuffer =
-    (unsigned char *) malloc(data_size * sizeof(unsigned char));
-  glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, framebuffer);
-  FlipVertical(framebuffer, width, height);
+  std::vector<unsigned char> framebuffer(width * height * 3);
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, &framebuffer[0]);
 
-  fprintf(fp, "P6\n%d %d\n%d\n", width, height, 255);
-  fwrite(framebuffer, data_size, 1, fp);
-  fclose(fp);
-  free(framebuffer);
+  // OpenGL's first row is the bottom of the image, but PNG's is the top
+  std::vector<unsigned char> flipped(framebuffer.size());
+  for (int y = 0 ; y < height ; ++y)
+    memcpy(&flipped[y * width * 3], &framebuffer[(height - y - 1) * width * 3], width * 3);
+
+  if (!SavePNGImage(filename, width, height, &flipped[0]))
+    TRACE("Unable to write screenshot %s\n", filename);
 }
 
 //======================================================================================================================
@@ -337,9 +315,8 @@ static void WriteFrameBuffer(char *filename)
 void tSDLApplicationBase::DoScreenshot()
 {
   static int count = 0;
-  static char screen_file[] = "screenshot-00000.ppm";
-  sprintf(screen_file, "screenshot-%05d.ppm", count++);
-//  printf("%s\n", movie_file);
+  char screen_file[64];
+  snprintf(screen_file, sizeof(screen_file), "screenshot-%05d.png", count++);
   WriteFrameBuffer(screen_file);
 }
 

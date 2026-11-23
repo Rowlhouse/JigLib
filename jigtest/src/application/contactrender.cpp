@@ -60,7 +60,7 @@ void RenderContact(const tVector3 pos,
       GLCOLOR3(1.0f, 1.0f, 1.0f);
 
     GLTRANSLATE(pos.x, pos.y, pos.z);
-    gluSphere(GetGLUQuadric(),
+    DrawSphere(
               0.02f,
               12, 12);
 

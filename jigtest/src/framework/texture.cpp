@@ -23,7 +23,7 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
   TRACE_FILE_IF(ONCE_2)
     TRACE("Reading %s ", file.c_str());
   JigLib::tArray2D<tPixel> image(0, 0);
-  if (false == LoadImage(image, file.c_str()))
+  if (false == LoadImageFile(image, file.c_str()))
   {
     TRACE("Error reading %s\n", file.c_str());
     mTextureLow = 0;
@@ -102,8 +102,9 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST_MIPMAP_LINEAR);
-    gluBuild2DMipmaps(GL_TEXTURE_2D,glType,mW,mH,glType,
-                      GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    glTexImage2D(GL_TEXTURE_2D, 0, glType, mW, mH, 0, glType,
+                 GL_UNSIGNED_BYTE, data);
   }
   else
   {
@@ -123,8 +124,9 @@ tRGBAFileTexture::tRGBAFileTexture(const string & file,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
-    gluBuild2DMipmaps(GL_TEXTURE_2D,glType,mW,mH,glType,
-                      GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    glTexImage2D(GL_TEXTURE_2D, 0, glType, mW, mH, 0, glType,
+                 GL_UNSIGNED_BYTE, data);
   }
   else
   {

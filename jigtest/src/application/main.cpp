@@ -1,33 +1,35 @@
+//======================================================================================================================
+// Copyright (C) 2004 Danny Chapman
+//               danny@rowlhouse.freeserve.co.uk
+//======================================================================================================================
 #include "jigtestapp.hpp"
 
 #include "jiglib.hpp"
 
+#include <SDL3/SDL_main.h>
+
+#include <filesystem>
 #include <string>
 
 using namespace std;
 using namespace JigLib;
-
-// Need this to fix the reference to __ftol2 when libxml is built on VC7 but the app is built using
-// vc6
-//f (_MSC_VER >= 1300) && (WINVER < 0x0500)
-//VC7 or later, building with pre-VC7 runtime libraries
-//tern "C" long _ftol( double ); //defined by VC6 C libs
-//tern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
-//ndif
-
-
-// Only for MSDEV 6.0
-#if (_MSC_VER == 1200) && (WINVER < 0x0500)
-extern "C" long _ftol( double ); //defined by VC6 C libs
-extern "C" long _ftol2( double dblSource ) { return _ftol( dblSource ); }
-#endif
-
 
 //======================================================================================================================
 // main
 //======================================================================================================================
 int main(int argc, char * argv[])
 {
+  // The config files and data/ live next to the executable. If they aren't in the current directory
+  // (e.g. when launched from a file browser or IDE) then switch to the executable's directory.
+  if (!std::filesystem::exists("jigtest.cfg"))
+  {
+    if (const char * basePath = SDL_GetBasePath())
+    {
+      std::error_code ec;
+      std::filesystem::current_path(basePath, ec);
+    }
+  }
+
   // Scope this to control when the app gets deleted
   {
     tJigTestApp jigTestApp(argc, argv);

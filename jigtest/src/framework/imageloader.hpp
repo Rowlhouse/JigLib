@@ -12,9 +12,12 @@ struct tPixel
   unsigned char r, g, b, a;
 };
 
-// Works out the image type from the name (last 3 characters). data is resized and populated.
-// Currently support PNG and uncompressed SGI/RGB format
-bool LoadImage(JigLib::tArray2D<tPixel> & data,
+// Loads an image file (PNG, JPEG, BMP, TGA etc). data is resized and populated, with the first row
+// being the bottom of the image.
+bool LoadImageFile(JigLib::tArray2D<tPixel> & data,
                const char * fileName);
+
+// Writes RGB data (3 bytes per pixel, first row at the top) to a PNG file
+bool SavePNGImage(const char * fileName, int width, int height, const unsigned char * rgbData);
 
 #endif

@@ -3,6 +3,8 @@
 //               danny@rowlhouse.freeserve.co.uk
 //======================================================================================================================
 #include "meshobject.hpp"
+
+#include <pugixml.hpp>
 #include "debugconfig.hpp"
 
 using namespace JigLib;
@@ -203,241 +205,13 @@ void tMeshObject::AddToTriangles(std::vector<tVector3>& triangleVertices,
   }
 }
 
-#ifdef NO_XML
 //======================================================================================================================
 // LoadMesh
-//======================================================================================================================
-void tMeshObject::LoadMesh(const char* meshXMLFile,
-                           std::vector<tVector3>& vertices,
-                           std::vector<tTriangleVertexIndices>& triangleVertexIndices)
-{
-  vertices.clear();
-  triangleVertexIndices.clear();
-  TRACE("Warning: no XML support so skipping mesh %s\n", meshXMLFile);
-}
-
-#else
-//======================================================================================================================
-// ReadVertices
-//======================================================================================================================
-void tMeshObject::ReadVertices(xmlTextReaderPtr reader, std::vector<JigLib::tVector3>& vertices, int numVertices)
-{
-  int numVerticesRead = 0;
-  while (true)
-  {
-    int ret = xmlTextReaderRead(reader);
-
-    if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
-    {
-      const xmlChar *name = xmlTextReaderConstName(reader);
-      if (name == NULL)
-      {
-        TRACE("Got null name\n");
-        return;
-      }
-      if (xmlStrcmp(name, (const xmlChar*) "position") == 0)
-      {
-        // DeleD coordinates are left-handed, and y is up... So the mapping onto my coords is:
-        // x -> -y
-        // y -> z
-        // z -> x
-        tScalar x, y, z;
-        const xmlChar* value;
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read vertex x\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        y = -(tScalar) atof((const char*) value);
-
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read vertex y\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        z = (tScalar) atof((const char*) value);
-
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read vertex z\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        x = (tScalar) atof((const char*) value);
-
-        vertices.push_back(tVector3(x, y, z));
-        if (vertices.size() == numVertices)
-        {
-          TRACE("Read %d vertices\n", numVertices);
-          return;
-        }
-      }
-      else if (xmlStrcmp(name, (const xmlChar*) "vertexbuffer") == 0)
-      {
-      }
-      else if (xmlStrcmp(name, (const xmlChar*) "vertex") == 0)
-      {
-      }
-      else if (xmlStrcmp(name, (const xmlChar*) "texcoord") == 0)
-      {
-      }
-      else if (xmlStrcmp(name, (const xmlChar*) "normal") == 0)
-      {
-      }
-      else
-      {
-        TRACE("Read unexpected value %s\n", name);
-        return;
-      }
-    }
-  }
-}
-
-//======================================================================================================================
-// ReadFaces
-//======================================================================================================================
-void tMeshObject::ReadFaces(xmlTextReaderPtr reader, std::vector<JigLib::tTriangleVertexIndices>& faces, int numFaces)
-{
-  int numFacesRead = 0;
-  while (true)
-  {
-    int ret = xmlTextReaderRead(reader);
-
-    if (xmlTextReaderNodeType(reader) == XML_ELEMENT_NODE)
-    {
-      const xmlChar *name = xmlTextReaderConstName(reader);
-      if (name == NULL)
-      {
-        TRACE("Got null name\n");
-        return;
-      }
-      if (xmlStrcmp(name, (const xmlChar*) "face") == 0)
-      {
-        // Need to flip vertices to convert winding
-        int v1, v2, v3;
-        const xmlChar* value;
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read face index 1\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        v2 = atoi((const char*) value);
-
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read face index 2\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        v1 = atoi((const char*) value);
-
-        if (1 != xmlTextReaderMoveToNextAttribute(reader))
-        {
-          TRACE("Unable to read face index 3\n"); return;
-        }
-        name = xmlTextReaderConstName(reader);
-        value = xmlTextReaderConstValue(reader);
-        v3 = atoi((const char*) value);
-
-        faces.push_back(tTriangleVertexIndices(v1, v2, v3));
-        if (faces.size() == numFaces)
-        {
-          TRACE("Read %d faces\n", numFaces);
-          return;
-        }
-      }
-      else
-      {
-        TRACE("Read unexpected value %s\n", name);
-        return;
-      }
-    }
-  }
-}
-
-//======================================================================================================================
-// ProcessNode
-//======================================================================================================================
-void tMeshObject::ProcessNode(xmlTextReaderPtr reader,
-                              std::vector<tVector3>& triangleVertices,
-                              std::vector<tTriangleVertexIndices>& triangleVertexIndices)
-{
-  if (xmlTextReaderNodeType(reader) != XML_ELEMENT_NODE)
-    return;
-
-  const xmlChar *name = xmlTextReaderConstName(reader);
-  if (name == NULL)
-  {
-    TRACE("Got null name\n");
-    return;
-  }
-
-  static std::vector<tVector3> vertices;
-  static std::vector<tTriangleVertexIndices> faces;
-
-  if (xmlStrcmp(name, (const xmlChar*) "faces") == 0)
-  {
-    if (1 == xmlTextReaderMoveToNextAttribute(reader))
-    {
-      name = xmlTextReaderConstName(reader);
-      const xmlChar* value = xmlTextReaderConstValue(reader);
-      if (xmlStrcmp(name, (const xmlChar*) "count") == 0)
-      {
-        int numFaces = atoi((const char*) value);
-        TRACE("Reading %d faces\n", numFaces);
-
-        // Now read them
-        faces.clear();
-        vertices.clear();
-        ReadFaces(reader, faces, numFaces);
-      }
-      else
-      {
-        TRACE("Number of faces attribute should be called count\n");
-      }
-    }
-    else
-    {
-      TRACE("Unable to get number of faces attribute\n");
-    }
-  }
-  else if (xmlStrcmp(name, (const xmlChar*) "geometry") == 0)
-  {
-    if (1 == xmlTextReaderMoveToNextAttribute(reader))
-    {
-      name = xmlTextReaderConstName(reader);
-      const xmlChar* value = xmlTextReaderConstValue(reader);
-      if (xmlStrcmp(name, (const xmlChar*) "vertexcount") == 0)
-      {
-        int numVertices = atoi((const char*) value);
-        TRACE("Reading %d vertices\n", numVertices);
-
-        // Now read them
-        ReadVertices(reader, vertices, numVertices);
-
-        // Add em
-        AddToTriangles(triangleVertices, triangleVertexIndices, vertices, faces);
-
-        faces.clear();
-        vertices.clear();
-      }
-      else
-      {
-        TRACE("Number of vertices attribute should be called vertexcount\n");
-      }
-    }
-    else
-    {
-      TRACE("Unable to get number of faces attribute\n");
-    }
-  }
-}
-
-//======================================================================================================================
-// LoadMesh
+//
+// Reads the XML format written by the Ogre3D exporter for the DeleD editor:
+// <mesh><submeshes><submesh>
+//   <faces count="n"><face v1="" v2="" v3=""/>...</faces>
+//   <geometry vertexcount="n"><vertexbuffer><vertex><position x="" y="" z=""/>...
 //======================================================================================================================
 void tMeshObject::LoadMesh(const char* meshXMLFile,
                            std::vector<tVector3>& vertices,
@@ -446,36 +220,41 @@ void tMeshObject::LoadMesh(const char* meshXMLFile,
   vertices.clear();
   triangleVertexIndices.clear();
 
-  // This initialize the library and check potential ABI mismatches between the version it was
-  // compiled for and the actual shared library used.
-  LIBXML_TEST_VERSION;
+  pugi::xml_document doc;
+  pugi::xml_parse_result result = doc.load_file(meshXMLFile);
+  if (!result)
+  {
+    TRACE("Unable to load %s: %s\n", meshXMLFile, result.description());
+    return;
+  }
 
-  xmlTextReaderPtr reader = xmlReaderForFile(meshXMLFile, NULL,
-                                             XML_PARSE_PEDANTIC);
-  if (reader != NULL)
+  for (pugi::xml_node submesh : doc.child("mesh").child("submeshes").children("submesh"))
   {
-    int ret = xmlTextReaderRead(reader);
-    while (ret == 1)
+    std::vector<tTriangleVertexIndices> faces;
+    for (pugi::xml_node face : submesh.child("faces").children("face"))
     {
-      ProcessNode(reader, vertices, triangleVertexIndices);
-      ret = xmlTextReaderRead(reader);
+      // Need to swap two vertices to convert the winding
+      faces.push_back(tTriangleVertexIndices(face.attribute("v2").as_int(),
+                                             face.attribute("v1").as_int(),
+                                             face.attribute("v3").as_int()));
     }
-    /*
-    // Once the document has been fully parsed check the validation results
-    if (xmlTextReaderIsValid(reader) != 1)
+
+    std::vector<tVector3> submeshVertices;
+    for (pugi::xml_node vertex : submesh.child("geometry").child("vertexbuffer").children("vertex"))
     {
-    TRACE("Document %s does not validate\n", meshXMLFile);
-    vertices.clear();
-    triangleVertexIndices.clear();
+      // DeleD coordinates are left-handed, and y is up... So the mapping onto my coords is:
+      // x -> -y
+      // y -> z
+      // z -> x
+      pugi::xml_node position = vertex.child("position");
+      tScalar x = position.attribute("x").as_float();
+      tScalar y = position.attribute("y").as_float();
+      tScalar z = position.attribute("z").as_float();
+      submeshVertices.push_back(tVector3(z, -x, y));
     }
-    */
-    xmlFreeTextReader(reader);
+
+    TRACE("Read %d faces and %d vertices\n", (int) faces.size(), (int) submeshVertices.size());
+    AddToTriangles(vertices, triangleVertexIndices, submeshVertices, faces);
   }
-  else
-  {
-    TRACE("Unable to open %s\n", meshXMLFile);
-  }
-  xmlCleanupParser();
 }
 
-#endif

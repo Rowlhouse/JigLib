@@ -148,7 +148,7 @@ void tSphereObject::Render(tRenderObject::tRenderType renderType)
              0.5f);
     const tSphere &sphere = mCollisionSkin.GetPrimitiveLocal(0)->GetSphere();
     GLTRANSLATE(sphere.GetPos().x, sphere.GetPos().y, sphere.GetPos().z);
-    gluSphere(GetGLUQuadric(),
+    DrawSphere(
               sphere.GetRadius(),
               12, 12);
     glEndList();

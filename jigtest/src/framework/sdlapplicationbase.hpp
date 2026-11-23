@@ -40,11 +40,12 @@ public:
   JigLib::tConfigFile & GetConfigFile() {return *mConfigFile;}
 
   // Application can over-ride these. Default implementations do nothing.
-  virtual void HandleKeyDown( const SDL_keysym & keysym ) {}
-  virtual void HandleKeyUp( const SDL_keysym & keysym ) {}
+  virtual void HandleKeyDown( const SDL_KeyboardEvent & event ) {}
+  virtual void HandleKeyUp( const SDL_KeyboardEvent & event ) {}
   virtual void HandleMouseMotion( const SDL_MouseMotionEvent & event ) {}
   virtual void HandleMouseButtonDown( const SDL_MouseButtonEvent & event ) {}
   virtual void HandleMouseButtonUp( const SDL_MouseButtonEvent & event ) {}
+  virtual void HandleMouseWheel( const SDL_MouseWheelEvent & event ) {}
   virtual void ProcessMainEvent() {}
 
   // Only x and y are set in the mouse position
@@ -86,7 +87,11 @@ private:
   // Internally do some things that need to be done at the start of each round of the event loop
   void InternalHandleStartOfLoop();
 
-  void InternalHandleResize(const SDL_ResizeEvent & event);
+  void InternalHandleResize(int newWidth, int newHeight);
+
+  // The window and its OpenGL context
+  SDL_Window * mWindow;
+  SDL_GLContext mGLContext;
 
   // The current window/screen dims
   int mWindowWidth, mWindowHeight;

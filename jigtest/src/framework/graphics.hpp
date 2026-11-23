@@ -7,51 +7,23 @@
 
 #include "jiglib.hpp"
 
-#include "SDL.h"
-#include "SDL_opengl.h"
-#if 0
-// Evil evil evil evil evil
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
 
-#if defined(__APPLE__) || defined(MACOSX)
-#include <GLUT/gl.h>
-#include <GLUT/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif  // __APPLE__
-#endif
-// Helpers to avoid using SDL directly
+#include "glutils.hpp"
+
+// The application's window - set up by tSDLApplicationBase
+SDL_Window * GetMainWindow();
+
+// Helpers to avoid using SDL directly. This returns the size in pixels, which is what OpenGL needs.
 inline void GetWindowSize(int & width, int & height)
 {
-  SDL_Surface * surface = SDL_GetVideoSurface();
-  if (surface)
-  {
-    width = surface->w;
-    height = surface->h;
-  }
-  else
+  SDL_Window * window = GetMainWindow();
+  if (!window || !SDL_GetWindowSizeInPixels(window, &width, &height))
   {
     TRACE("Error getting window width/height\n");
     width = height = 0;
   }
-}
-
-// Single quadric for everything... If it doesn't exist it will be created
-inline GLUquadricObj * GetGLUQuadric()
-{
-  static GLUquadricObj * quadric = 0;
-  if (quadric == 0)
-  {
-    quadric = gluNewQuadric();
-//    gluQuadricNormals(quadric, GLU_FLAT);
-    gluQuadricNormals(quadric, GLU_SMOOTH);
-    gluQuadricDrawStyle(quadric, GLU_FILL);
-  }
-  Assert(quadric);
-  return quadric;
 }
 
 // warning - expensive!
@@ -71,11 +43,11 @@ struct tSaveGLMatrixState
 //======================================================================================================================
 // CheckGLErrors
 //======================================================================================================================
-inline void CheckGLErrors(char * str="")
+inline void CheckGLErrors(const char * str="")
 {
   GLenum err_code = glGetError();
   if (err_code != GL_NO_ERROR)
-    TRACE("OpenGL Error: %s [%s]\n", gluErrorString(err_code), str);
+    TRACE("OpenGL Error: %s [%s]\n", GLErrorString(err_code), str);
 }
 
 #ifdef USING_DOUBLE

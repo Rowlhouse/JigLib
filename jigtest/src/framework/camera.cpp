@@ -69,7 +69,7 @@ void tCamera::Apply(tScalar aspectRatio)
 {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(
+  SetPerspective(
     mFOV,
     aspectRatio,
     mClipNear, mClipFar);
@@ -78,9 +78,9 @@ void tCamera::Apply(tScalar aspectRatio)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  gluLookAt(mPosition[0], mPosition[1], mPosition[2],
-            mTarget[0], mTarget[1], mTarget[2],
-            mUp[0], mUp[1], mUp[2]);
+  LookAt(mPosition[0], mPosition[1], mPosition[2],
+         mTarget[0], mTarget[1], mTarget[2],
+         mUp[0], mUp[1], mUp[2]);
 }
 
 //======================================================================================================================
@@ -219,7 +219,7 @@ tVector3 tCamera::Unproject(const tVector2& screenPt, const tViewport* viewport)
 
   GLint vp[4];
   GLdouble mvmatrix[16], projmatrix[16];
-  GLint realy;         // Convertet y coord
+  GLint realy;         // Converted y coord
   GLdouble wx, wy, wz; // Return value
 
   viewport->ApplyViewport();
@@ -229,8 +229,7 @@ tVector3 tCamera::Unproject(const tVector2& screenPt, const tViewport* viewport)
   glGetDoublev(GL_PROJECTION_MATRIX, projmatrix);
 
   realy = vp[3] - (GLint) y - 1;
-  int result = gluUnProject((GLdouble) x, (GLdouble) realy, 1.0, mvmatrix, projmatrix, vp, &wx, &wy, &wz);
-  if (result == GL_TRUE)
+  if (UnProject((GLdouble) x, (GLdouble) realy, 1.0, mvmatrix, projmatrix, vp, &wx, &wy, &wz))
   {
     return tVector3((tScalar) wx, (tScalar) wy, (tScalar) wz);
   }

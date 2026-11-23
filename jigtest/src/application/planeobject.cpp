@@ -92,7 +92,7 @@ void tPlaneObject::Render(tRenderObject::tRenderType renderType)
     mDisplayListNum = glGenLists(1);
     glNewList(mDisplayListNum, GL_COMPILE);
     ApplyTransformation(point, mat);
-    gluDisk(GetGLUQuadric(),
+    DrawDisk(
             0.0f, 1000.0f, // TODO: work out max radius somehow...
             8, 8);
     glEndList();

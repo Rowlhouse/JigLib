@@ -274,7 +274,7 @@ void tBoxSphereObject::Render(tRenderObject::tRenderType renderType)
 
     const tSphere & sphere = mCollisionSkin.GetPrimitiveLocal(1)->GetSphere();
     GLTRANSLATE(sphere.GetPos()[0], sphere.GetPos()[1], sphere.GetPos()[2]);
-    gluSphere(GetGLUQuadric(),
+    DrawSphere(
               mCollisionSkin.GetPrimitiveLocal(1)->GetSphere().GetRadius(),
               12, 12);
 

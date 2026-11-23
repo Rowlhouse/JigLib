@@ -37,7 +37,7 @@ void DisplayLicense()
   TRACE("JigTest Copyright 2007 Danny Chapman: danny@rowlhouse.freeserve.co.uk\n");
   TRACE("This comes with ABSOLUTELY NO WARRANTY;\n");
   TRACE("This is free software, and you are welcome to redistribute it\n");
-  TRACE("under certain conditions; see the GNU General Public License\n");
+  TRACE("under certain conditions; see the zlib license in license.txt\n");
   TRACE("Version compiled " __TIME__ " " __DATE__ "\n");
 }
 
@@ -103,16 +103,16 @@ void tJigTestApp::HandleFPSMouseMotion(const SDL_MouseMotionEvent & event)
   tBody* body = character->GetBody();
   if (!body) return;
 
-  int x, y;
+  float x, y;
   SDL_GetMouseState(&x, &y);
-  SDL_Surface* surface = SDL_GetVideoSurface();
-  if (surface)
+  int w, h;
+  if (SDL_GetWindowSize(GetMainWindow(), &w, &h))
   {
-    int midX = surface->w / 2;
-    int midY = surface->h / 2;
+    float midX = w / 2.0f;
+    float midY = h / 2.0f;
 
     handlingWarp = true;
-    SDL_WarpMouse(midX, midY);
+    SDL_WarpMouseInWindow(GetMainWindow(), midX, midY);
 
     float bearingScale = 30.0f;
     float deltaBearing = (bearingScale * (x - midX)) / midX;
@@ -131,14 +131,14 @@ void tJigTestApp::HandleFPSMouseMotion(const SDL_MouseMotionEvent & event)
 //======================================================================================================================
 // HandleFPSKeyDown
 //======================================================================================================================
-void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
+void tJigTestApp::HandleFPSKeyDown( const SDL_KeyboardEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
   if (mCharacterObjects.empty())
     return;
 
   tCharacterObject* character = mCharacterObjects[0];
-  switch( keysym.sym )
+  switch( event.key )
   {
   case SDLK_F1:
     DoScreenshot();
@@ -149,16 +149,16 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
   case SDLK_ESCAPE:
     ExitMainLoop();
     break;
-  case SDLK_y:
+  case SDLK_Y:
     RemoveAllObjects(true);
     break;
-  case SDLK_t:
+  case SDLK_T:
     RestartExperiment();
     break;
-  case SDLK_w: character->ControlFwd(true); break;
-  case SDLK_a: character->ControlLeft(true); break;
-  case SDLK_s: character->ControlBack(true); break;
-  case SDLK_d: character->ControlRight(true); break;
+  case SDLK_W: character->ControlFwd(true); break;
+  case SDLK_A: character->ControlLeft(true); break;
+  case SDLK_S: character->ControlBack(true); break;
+  case SDLK_D: character->ControlRight(true); break;
   case SDLK_SPACE: character->ControlJump(); break;
   default: break;
   }
@@ -167,7 +167,7 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_keysym & keysym )
 //======================================================================================================================
 // HandleFPSKeyUp
 //======================================================================================================================
-void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
+void tJigTestApp::HandleFPSKeyUp( const SDL_KeyboardEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
   if (mCharacterObjects.empty())
@@ -175,12 +175,12 @@ void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
 
   tCharacterObject* character = mCharacterObjects[0];
 
-  switch( keysym.sym )
+  switch( event.key )
   {
-  case SDLK_w: character->ControlFwd(false); break;
-  case SDLK_a: character->ControlLeft(false); break;
-  case SDLK_s: character->ControlBack(false); break;
-  case SDLK_d: character->ControlRight(false); break;
+  case SDLK_W: character->ControlFwd(false); break;
+  case SDLK_A: character->ControlLeft(false); break;
+  case SDLK_S: character->ControlBack(false); break;
+  case SDLK_D: character->ControlRight(false); break;
   default: break;
   }
 }
@@ -188,19 +188,19 @@ void tJigTestApp::HandleFPSKeyUp( const SDL_keysym & keysym )
 //======================================================================================================================
 // HandleKeyDown
 //======================================================================================================================
-void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
+void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
 
   if (!mCharacterObjects.empty())
   {
-    HandleFPSKeyDown(keysym);
+    HandleFPSKeyDown(event);
     return;
   }
 
-  SDLMod keyMod = SDL_GetModState();
+  SDL_Keymod keyMod = SDL_GetModState();
 
-  switch( keysym.sym )
+  switch( event.key )
   {
   case SDLK_F1:
     DoScreenshot();
@@ -208,54 +208,54 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
   case SDLK_F2:
     mDoMovie = !mDoMovie;
     break;
-  case SDLK_w:
+  case SDLK_W:
     mCameraMoveDir |= MOVE_FWD;
     break;
-  case SDLK_s:
+  case SDLK_S:
     mCameraMoveDir |= MOVE_BACK;
     break;
-  case SDLK_a:
+  case SDLK_A:
     mCameraMoveDir |= MOVE_LEFT;
     break;
-  case SDLK_d:
+  case SDLK_D:
     mCameraMoveDir |= MOVE_RIGHT;
     break;
-  case SDLK_e:
+  case SDLK_E:
     mCameraMoveDir |= MOVE_UP;
     break;
-  case SDLK_q:
+  case SDLK_Q:
     mCameraMoveDir |= MOVE_DOWN;
     break;
   case SDLK_1:
     mCameraMode = (mCameraMode == CAMERA_FIXED ? CAMERA_FOLLOW : CAMERA_FIXED);
     break;
-  case SDLK_r:
+  case SDLK_R:
     tAppConfig::mRenderEnable = !tAppConfig::mRenderEnable;
     break;
-  case SDLK_k:
+  case SDLK_K:
     tDebugConfig::mRenderCollisionContacts =
       (tDebugConfig::mRenderCollisionContacts + 1) %3;
     break;
-  case SDLK_b:
+  case SDLK_B:
     tDebugConfig::mRenderCollisionBoundingBoxes =
       !tDebugConfig::mRenderCollisionBoundingBoxes;
     break;
-  case SDLK_v:
+  case SDLK_V:
     tDebugConfig::mIndicateFrozenObjects =
       !tDebugConfig::mIndicateFrozenObjects;
     break;
-  case SDLK_f:
+  case SDLK_F:
     tAppConfig::mEnableFreezing = !tAppConfig::mEnableFreezing;
     mPhysics.EnableFreezing(tAppConfig::mEnableFreezing);
     break;
-  case SDLK_h:
+  case SDLK_H:
     tAppConfig::mDoShockStep = !tAppConfig::mDoShockStep;
     mPhysics.SetDoShockStep(tAppConfig::mDoShockStep);
     break;
-  case SDLK_p:
+  case SDLK_P:
     mPaused = !mPaused;
     break;
-  case SDLK_o:
+  case SDLK_O:
     mPaused = false;
     mPauseAfterNextPhysicsStep = true;
     break;
@@ -268,44 +268,44 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
   case SDLK_SPACE:
     FireObject();
     break;
-  case SDLK_x:
+  case SDLK_X:
     CreateBox();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
   case SDLK_SLASH:
     CreateCompound();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
-  case SDLK_z:
+  case SDLK_Z:
     CreateSphere();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
-  case SDLK_n:
+  case SDLK_N:
     CreateCapsule();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
-  case SDLK_c:
+  case SDLK_C:
     CreateCar();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
   case SDLK_BACKSLASH:
   case SDLK_LESS:
     CreateRagdoll();
-    if (keyMod & KMOD_CTRL)
+    if (keyMod & SDL_KMOD_CTRL)
       FireLastCreatedObject();
     break;
-  case SDLK_m:
+  case SDLK_M:
     CreateCharacter();
     break;
-  case SDLK_y:
+  case SDLK_Y:
     RemoveAllObjects(true);
     break;
-  case SDLK_t:
+  case SDLK_T:
     RestartExperiment();
     break;
   case SDLK_LEFT:
@@ -342,34 +342,34 @@ void tJigTestApp::HandleKeyDown( const SDL_keysym & keysym )
 //======================================================================================================================
 // HandleKeyUp
 //======================================================================================================================
-void tJigTestApp::HandleKeyUp( const SDL_keysym & keysym )
+void tJigTestApp::HandleKeyUp( const SDL_KeyboardEvent & event )
 {
   TRACE_METHOD_ONLY(FRAME_1);
 
   if (!mCharacterObjects.empty())
   {
-    HandleFPSKeyUp(keysym);
+    HandleFPSKeyUp(event);
     return;
   }
 
-  switch( keysym.sym )
+  switch( event.key )
   {
-  case SDLK_w:
+  case SDLK_W:
     mCameraMoveDir &= ~MOVE_FWD;
     break;
-  case SDLK_s:
+  case SDLK_S:
     mCameraMoveDir &= ~MOVE_BACK;
     break;
-  case SDLK_a:
+  case SDLK_A:
     mCameraMoveDir &= ~MOVE_LEFT;
     break;
-  case SDLK_d:
+  case SDLK_D:
     mCameraMoveDir &= ~MOVE_RIGHT;
     break;
-  case SDLK_e:
+  case SDLK_E:
     mCameraMoveDir &= ~MOVE_UP;
     break;
-  case SDLK_q:
+  case SDLK_Q:
     mCameraMoveDir &= ~MOVE_DOWN;
     break;
   case SDLK_LEFT:
@@ -401,19 +401,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
   if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
     mObjectPositionController.GetBody()->SetActive();
 
-  if ( mPicking && (event.button == 4 ||  event.button == 5) )
-  {
-    if (event.button == 4)
-      mPickDist *= 1.1f;
-    else if (event.button == 5)
-      mPickDist *= 0.9f;
-    SDL_MouseMotionEvent motionEvent;
-    motionEvent.x = event.x;
-    motionEvent.y = event.y;
-    HandleMouseMotion( motionEvent );
-    return;
-  }
-  else if (event.button == 2 && mPicking)
+  if (event.button == SDL_BUTTON_MIDDLE && mPicking)
   {
     if (tBody* body = mObjectPositionController.GetBody())
     {
@@ -479,7 +467,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
     return;
   }
 
-  if (event.button == 1)
+  if (event.button == SDL_BUTTON_LEFT)
   {
     for (i = 0 ; i < mObjects.size() ; ++i)
     {
@@ -490,7 +478,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
       }
     }
   }
-  else if (event.button == 3)
+  else if (event.button == SDL_BUTTON_RIGHT)
   {
     mPickDist = (pos - camPos).GetLength();
 
@@ -511,7 +499,7 @@ void tJigTestApp::HandleMouseButtonDown( const SDL_MouseButtonEvent & event )
 //======================================================================================================================
 void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
 {
-  if (event.button == 2 || event.button == 3)
+  if (event.button == SDL_BUTTON_MIDDLE || event.button == SDL_BUTTON_RIGHT)
   {
     if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
       mObjectPositionController.GetBody()->SetActive();
@@ -519,6 +507,29 @@ void tJigTestApp::HandleMouseButtonUp( const SDL_MouseButtonEvent & event )
     mObjectPositionDamperController.DisableConstraint();
     mPicking = false;
   }
+}
+
+//======================================================================================================================
+// HandleMouseWheel
+//======================================================================================================================
+void tJigTestApp::HandleMouseWheel( const SDL_MouseWheelEvent & event )
+{
+  // When picking, the wheel moves the picked object towards/away from the camera
+  if (!mPicking || event.y == 0.0f)
+    return;
+
+  if (mObjectPositionController.GetConstraintEnabled() && mObjectPositionController.GetBody())
+    mObjectPositionController.GetBody()->SetActive();
+
+  if (event.y > 0.0f)
+    mPickDist *= 1.1f;
+  else
+    mPickDist *= 0.9f;
+
+  SDL_MouseMotionEvent motionEvent = {};
+  motionEvent.x = event.mouse_x;
+  motionEvent.y = event.mouse_y;
+  HandleMouseMotion( motionEvent );
 }
 
 //======================================================================================================================
@@ -928,7 +939,7 @@ void tJigTestApp::ProcessMainEvent()
     CheckGLErrors("After vewport renders");
   }
 
-  SDL_GL_SwapBuffers( );
+  SDL_GL_SwapWindow(GetMainWindow());
 
   CheckGLErrors("After buffer swap");
 }

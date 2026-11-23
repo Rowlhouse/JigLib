@@ -158,14 +158,14 @@ void tCharacterObject::Render(tRenderObject::tRenderType renderType)
     unsigned num = 12;
 
     GLTRANSLATE(0.0f, 0.0f, capsule.GetRadius());
-    gluSphere(GetGLUQuadric(),
+    DrawSphere(
               capsule.GetRadius(),
               num, num);
 
-    gluCylinder(GetGLUQuadric(), capsule.GetRadius(), capsule.GetRadius(), capsule.GetLength(), num, num);
+    DrawCylinder(capsule.GetRadius(), capsule.GetRadius(), capsule.GetLength(), num, num);
 
     GLTRANSLATE(0.0f, 0.0f, capsule.GetLength());
-    gluSphere(GetGLUQuadric(),
+    DrawSphere(
               capsule.GetRadius(),
               num, num);
 

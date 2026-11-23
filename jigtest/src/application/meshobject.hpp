@@ -11,10 +11,6 @@
 
 #include <vector>
 
-#ifndef NO_XML
-#include <libxml/xmlreader.h>
-#endif
-
 // This is a game-object - i.e. a mesh that has no body, has collision, and can be rendered.
 class tMeshObject : public tObject
 {
@@ -46,18 +42,6 @@ private:
   void LoadMesh(const char* meshXMLFile,
                 std::vector<JigLib::tVector3>& vertices,
                 std::vector<JigLib::tTriangleVertexIndices>& triangleVertexIndices);
-
-#ifndef NO_XML
-  void ProcessNode(xmlTextReaderPtr reader,
-                   std::vector<JigLib::tVector3>& vertices,
-                   std::vector<JigLib::tTriangleVertexIndices>& triangleVertexIndices);
-  void ReadVertices(xmlTextReaderPtr reader,
-                    std::vector<JigLib::tVector3>& vertices,
-                    int numVertices);
-  void ReadFaces(xmlTextReaderPtr reader,
-                 std::vector<JigLib::tTriangleVertexIndices>& faces,
-                 int numFaces);
-#endif
 
   void AddToTriangles(std::vector<JigLib::tVector3>& triangleVertices,
                       std::vector<JigLib::tTriangleVertexIndices>& triangleVertexIndices,

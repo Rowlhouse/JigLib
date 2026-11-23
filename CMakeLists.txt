@@ -6,6 +6,7 @@ project(JigLib
   LANGUAGES CXX)
 
 option(JIGLIB_USE_DOUBLE "Use double precision for tScalar" OFF)
+option(JIGLIB_BUILD_DEMO "Build the jigtest demo (needs OpenGL; downloads SDL3 etc if not installed)" ${PROJECT_IS_TOP_LEVEL})
 option(JIGLIB_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (used by CI)" OFF)
 
 # Default to a Release build for single-config generators
@@ -115,3 +116,7 @@ else()
 endif()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${JIGLIB_SOURCES} ${JIGLIB_HEADERS})
+
+if(JIGLIB_BUILD_DEMO)
+  add_subdirectory(jigtest)
+endif()

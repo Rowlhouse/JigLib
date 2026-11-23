@@ -36,7 +36,7 @@ tHeightmapObject::tHeightmapObject(const string & fileName,
 
   tArray2D<tPixel> image(0, 0);
   tArray2D<tScalar> heights(0, 0);
-  bool result = LoadImage(image, fileName.c_str());
+  bool result = LoadImageFile(image, fileName.c_str());
 
   if ( (result == false) ||
        (image.GetNx() == 0) ||
