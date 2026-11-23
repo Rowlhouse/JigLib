@@ -40,7 +40,7 @@ X Z N              drop a box, sphere or capsule
 / \                drop a compound object or a ragdoll
 C                  drop a car (select it to drive it with the arrow keys)
 Ctrl + any of them fire it from the camera instead
-M                  first-person character (W A S D to walk, mouse to turn, Space to jump)
+M                  first-person character on / off (W A S D to walk, mouse to turn, Space to jump)
 T Y                reset / remove all the objects
 
 Simulation:

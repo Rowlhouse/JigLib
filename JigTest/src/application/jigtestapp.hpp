@@ -85,6 +85,9 @@ private:
 
   class tCharacterObject * CreateCharacter();
 
+  // Removes the first-person character(s) and goes back to the free camera
+  void RemoveCharacters();
+
   class tRagdoll * CreateRagdoll();
 
   class tNewton * CreateNewton();

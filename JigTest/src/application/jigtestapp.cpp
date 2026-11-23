@@ -156,6 +156,9 @@ void tJigTestApp::HandleFPSKeyDown( const SDL_KeyboardEvent & event )
   case SDLK_H:
     mShowHelp = !mShowHelp;
     break;
+  case SDLK_M:
+    RemoveCharacters();
+    break;
   case SDLK_ESCAPE:
     ExitMainLoop();
     break;
@@ -1520,6 +1523,50 @@ tCharacterObject * tJigTestApp::CreateCharacter()
 }
 
 //======================================================================================================================
+// RemoveCharacters
+//======================================================================================================================
+void tJigTestApp::RemoveCharacters()
+{
+  TRACE_METHOD_ONLY(ONCE_2);
+  if (mCharacterObjects.empty())
+    return;
+
+  StopDrag();
+
+  // Carry on from where the character's camera was
+  if (!mCameras.empty())
+  {
+    tCamera * camera = mCameras[0];
+    SetCameraDirection(camera->GetTarget() - camera->GetPosition());
+    camera->SetPositionObject(0);
+    camera->SetOrientationObject(0);
+    camera->SetTargetObject(0);
+    camera->SetTrackTarget(0, 0, 0, 0);
+  }
+  mCameraMoveDir = MOVE_NONE;
+  mCameraLookDir = 0;
+
+  // Removing objects changes the indices, so remember what was selected
+  tObject * selected = GetSelectedObject();
+  mSelectedIndex = -1;
+
+  for (tCharacterObject * character : mCharacterObjects)
+  {
+    if (selected == character)
+      selected = 0;
+    mObjects.erase(std::remove(mObjects.begin(), mObjects.end(), (tObject *) character), mObjects.end());
+    delete character;
+  }
+  mCharacterObjects.clear();
+
+  for (unsigned i = 0 ; i < mObjects.size() ; ++i)
+  {
+    if (mObjects[i] == selected)
+      mSelectedIndex = (int) i;
+  }
+}
+
+//======================================================================================================================
 // CreateCapsule
 //======================================================================================================================
 tCapsuleObject * tJigTestApp::CreateCapsule()
@@ -2484,7 +2531,7 @@ void tJigTestApp::RenderHelp()
     "/  \\\tdrop a compound object or a ragdoll",
     "C\tdrop a car (select it to drive it)",
     "Ctrl + any of these\tfire it from the camera",
-    "M\tfirst-person character (W A S D, mouse, Space)",
+    "M\tfirst-person character on / off (W A S D, mouse, Space)",
     "T  Y\treset / remove all the objects",
     "#Simulation",
     "P  O\tpause / single step",
