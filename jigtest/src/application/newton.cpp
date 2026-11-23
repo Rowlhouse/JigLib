@@ -3,7 +3,7 @@
 //               danny@rowlhouse.freeserve.co.uk
 //======================================================================================================================
 #include "newton.hpp"
-#include "renderManager.hpp"
+#include "rendermanager.hpp"
 
 using namespace std;
 using namespace JigLib;

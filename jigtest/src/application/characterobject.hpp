@@ -20,7 +20,7 @@ public:
                      JigLib::tScalar staticFriction,
                      JigLib::tScalar dynamicFriction);
   // Inherited from tObject - uses a solid mass distribution
-  void SetDensity(JigLib::tScalar density) override
+  void SetDensity(JigLib::tScalar density)
     {SetDensity(density, JigLib::tPrimitive::tPrimitiveProperties::SOLID);}
   void SetDensity(JigLib::tScalar density,
                   JigLib::tPrimitive::tPrimitiveProperties::tMassDistribution massDistribution);

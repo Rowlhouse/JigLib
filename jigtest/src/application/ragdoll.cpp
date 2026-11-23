@@ -6,7 +6,7 @@
 #include "boxobject.hpp"
 #include "capsuleobject.hpp"
 #include "sphereobject.hpp"
-#include "renderManager.hpp"
+#include "rendermanager.hpp"
 
 #include "jiglib.hpp"
 
