@@ -7,6 +7,10 @@ cmake_minimum_required(VERSION 3.21)
 
 project(JigLibAndJigTest LANGUAGES CXX)
 
+# Link the MSVC runtime statically, so JigTest runs without the Visual C++ redistributable. This
+# applies to everything built here, including SDL3 and pugixml.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # Default to a Release build for single-config generators
 if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)

@@ -1,0 +1,140 @@
+name: Release
+
+# Builds JigTest for Windows, Linux and macOS and packages each as a self-contained folder (the
+# executable plus configs/, data/, readme and licence). Run it from the Actions tab. By default it
+# only uploads the packages as workflow artifacts, for testing. With "make_release" ticked, on main,
+# it also creates a draft GitHub release, which can be checked and then published by hand.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, e.g. 0.84.1 (the release is tagged v<version>)"
+        required: true
+        default: "test"
+      make_release:
+        description: "Create a draft GitHub release (main only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-x64
+            os: windows-latest
+            archive: zip
+          # The oldest supported Ubuntu runner, so the binary works with older versions of glibc
+          - platform: linux-x64
+            os: ubuntu-22.04
+            archive: tar.gz
+          - platform: macos-universal
+            os: macos-latest
+            archive: zip
+            osx_architectures: arm64;x86_64
+
+    env:
+      PACKAGE: JigTest-${{ inputs.version }}-${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install build dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxtst-dev \
+            libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev
+
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew list ninja || brew install ninja
+
+      - name: Configure
+        run: |
+          args=()
+          if [ -n "${{ matrix.osx_architectures }}" ]; then
+            args+=("-DCMAKE_OSX_ARCHITECTURES=${{ matrix.osx_architectures }}" "-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0")
+          fi
+          cmake --preset default -DJIGLIB_BUILD_TESTS=OFF "${args[@]}"
+
+      - name: Build
+        run: cmake --build --preset release --target jigtest
+
+      - name: Install into a folder
+        run: cmake --install build/default --config Release --prefix "staging/JigTest"
+
+      - name: Package
+        run: |
+          ls -la staging/JigTest
+          case "${{ matrix.archive }}" in
+            tar.gz) tar -czf "$PACKAGE.tar.gz" -C staging JigTest ;;
+            zip)
+              if [ "$RUNNER_OS" = "macOS" ]; then
+                ditto -c -k --keepParent staging/JigTest "$PACKAGE.zip"
+              else
+                7z a "$PACKAGE.zip" ./staging/JigTest
+              fi
+              ;;
+          esac
+          ls -la "$PACKAGE".*
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ env.PACKAGE }}
+          path: ${{ env.PACKAGE }}.${{ matrix.archive }}
+          if-no-files-found: error
+
+  release:
+    name: Draft release
+    needs: build
+    if: inputs.make_release && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          ls -la dist
+          cat > notes.md <<'EOF'
+          JigTest, the interactive demo for the JigLib physics library, for Windows, Linux and macOS.
+
+          Download the package for your platform, unpack it, and run `jigtest` from the `JigTest`
+          folder. Press H in the demo for the controls, and 1-6 to switch between the scenes.
+
+          - **Windows:** 64-bit, Windows 10 or later.
+          - **Linux:** x86-64, built on Ubuntu 22.04. Needs OpenGL and X11 or Wayland.
+          - **macOS:** Apple Silicon and Intel, macOS 11 or later. The app isn't signed, so the
+            first time, right-click (or Ctrl-click) `jigtest` and choose Open.
+
+          To use the library itself, build it from source (see the README).
+          EOF
+          sed -i 's/^          //' notes.md
+          gh release create "v$VERSION" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --draft \
+            --title "JigTest $VERSION" \
+            --notes-file notes.md
