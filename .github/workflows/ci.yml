@@ -50,4 +50,4 @@ jobs:
         run: cmake --preset default -DJIGLIB_WARNINGS_AS_ERRORS=ON ${{ matrix.cmake_args }}
 
       - name: Build
-        run: cmake --build --preset ${{ matrix.preset }}
+        run: cmake --build --preset ${{ matrix.preset }} -- -k 0

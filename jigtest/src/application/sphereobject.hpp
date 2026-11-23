@@ -18,9 +18,11 @@ public:
   void SetProperties(JigLib::tScalar elasticity,
                      JigLib::tScalar staticFriction,
                      JigLib::tScalar dynamicFriction);
+  // Inherited from tObject - uses a solid mass distribution
+  void SetDensity(JigLib::tScalar density) override
+    {SetDensity(density, JigLib::tPrimitive::tPrimitiveProperties::SOLID);}
   void SetDensity(JigLib::tScalar density,
-                  JigLib::tPrimitive::tPrimitiveProperties::tMassDistribution massDistribution =
-                    JigLib::tPrimitive::tPrimitiveProperties::SOLID);
+                  JigLib::tPrimitive::tPrimitiveProperties::tMassDistribution massDistribution);
   void SetMass(JigLib::tScalar mass,
                JigLib::tPrimitive::tPrimitiveProperties::tMassDistribution massDistribution =
                  JigLib::tPrimitive::tPrimitiveProperties::SOLID);
