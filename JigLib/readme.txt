@@ -1,7 +1,19 @@
-See jigtest for a demo application that uses jiglib.
+JigLib is a rigid body physics library. See ../JigTest for a demo
+application that uses it.
 
-Applications should add this directory/include to their include path,
-and this directory/lib to their link path (after building jiglib)
+This folder is self-contained. To use JigLib in your own application,
+copy this folder into your project and, in your CMakeLists.txt:
+
+  add_subdirectory(JigLib)
+  target_link_libraries(your_app PRIVATE JigLib::jiglib)
+
+Then include "jiglib.hpp". It can also be built on its own:
+
+  cmake -S . -B build
+  cmake --build build
+
+Options: JIGLIB_USE_DOUBLE (double precision) and
+JIGLIB_WARNINGS_AS_ERRORS.
 
 Coding style:
 

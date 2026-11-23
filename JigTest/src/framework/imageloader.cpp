@@ -3,6 +3,7 @@
 //               danny@rowlhouse.freeserve.co.uk
 //======================================================================================================================
 #include "imageloader.hpp"
+#include "resources.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -23,7 +24,7 @@ bool LoadImageFile(tArray2D<tPixel> & image,
     TRACE("Loading image: %s\n", fileName);
 
   int width, height, channels;
-  unsigned char * data = stbi_load(fileName, &width, &height, &channels, 4);
+  unsigned char * data = stbi_load(GetResourcePath(fileName).c_str(), &width, &height, &channels, 4);
   if (!data)
   {
     TRACE("Error loading image %s: %s\n", fileName, stbi_failure_reason());

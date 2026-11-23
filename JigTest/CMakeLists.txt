@@ -1,7 +1,18 @@
-# jigtest - the graphical demo/test application for JigLib.
+# JigTest - the graphical demo/test application for JigLib.
 #
-# Dependencies are SDL3, OpenGL, stb_image and pugixml. SDL3 and pugixml are used from the system if
-# CMake can find them, otherwise they (and stb) are downloaded and built as part of this project.
+# Dependencies are JigLib, SDL3, OpenGL, stb_image and pugixml. SDL3 and pugixml are used from the
+# system if CMake can find them, otherwise they (and stb) are downloaded and built as part of this
+# project.
+#
+# This is normally built from the top-level CMakeLists.txt, but can be built on its own too.
+
+cmake_minimum_required(VERSION 3.21)
+
+project(JigTest LANGUAGES C CXX)
+
+if(NOT TARGET JigLib::jiglib)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../JigLib ${CMAKE_CURRENT_BINARY_DIR}/JigLib)
+endif()
 
 include(FetchContent)
 
@@ -10,9 +21,9 @@ find_package(OpenGL REQUIRED)
 # SDL3
 find_package(SDL3 3.2 CONFIG QUIET)
 if(SDL3_FOUND)
-  message(STATUS "jigtest: using installed SDL3 ${SDL3_VERSION}")
+  message(STATUS "JigTest: using installed SDL3 ${SDL3_VERSION}")
 else()
-  message(STATUS "jigtest: SDL3 not found - it will be downloaded and built")
+  message(STATUS "JigTest: SDL3 not found - it will be downloaded and built")
   set(SDL_SHARED OFF CACHE BOOL "" FORCE)
   set(SDL_STATIC ON CACHE BOOL "" FORCE)
   set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
@@ -25,6 +36,7 @@ endif()
 # pugixml
 find_package(pugixml CONFIG QUIET)
 if(NOT pugixml_FOUND)
+  set(PUGIXML_INSTALL OFF CACHE BOOL "" FORCE)
   FetchContent_Declare(pugixml
     URL https://github.com/zeux/pugixml/releases/download/v1.16/pugixml-1.16.tar.gz)
   FetchContent_MakeAvailable(pugixml)
@@ -63,6 +75,7 @@ add_executable(jigtest
   src/framework/imageloader.cpp
   src/framework/rendermanager.cpp
   src/framework/renderobject.cpp
+  src/framework/resources.cpp
   src/framework/sdlapplicationbase.cpp
   src/framework/skybox.cpp
   src/framework/texture.cpp
@@ -90,15 +103,14 @@ else()
   endif()
 endif()
 
-# The demo reads its config files and data/ relative to the executable, so copy them alongside it
-set(JIGTEST_CONFIGS
-  jigtest.cfg jigtest1.cfg jigtest2.cfg jigtest_castle.cfg jigtest_newton.cfg jigtest_stress.cfg)
-list(TRANSFORM JIGTEST_CONFIGS PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/)
-add_custom_command(TARGET jigtest POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data $<TARGET_FILE_DIR:jigtest>/data
-  COMMAND ${CMAKE_COMMAND} -E copy ${JIGTEST_CONFIGS} $<TARGET_FILE_DIR:jigtest>
-  VERBATIM)
+# The demo looks for configs/ and data/ next to the executable (for an installed copy), and then in
+# this source folder (for a development build), so nothing needs copying into the build folder.
+target_compile_definitions(jigtest PRIVATE JIGTEST_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-set_target_properties(jigtest PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:jigtest>)
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT jigtest)
+
+# cmake --install <build dir> --prefix <folder> gives a self-contained, runnable copy of the demo
+install(TARGETS jigtest RUNTIME DESTINATION .)
+install(DIRECTORY configs data DESTINATION .)
+install(FILES readme.txt ${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt DESTINATION .)
 

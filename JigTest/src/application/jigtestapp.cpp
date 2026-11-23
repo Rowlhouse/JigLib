@@ -46,7 +46,7 @@ void DisplayLicense()
 //======================================================================================================================
 tJigTestApp::tJigTestApp(int & argc, char * argv[])
   :
-  tSDLApplicationBase(argc, argv, "jigtest.cfg", ::DisplayLicense),
+  tSDLApplicationBase(argc, argv, "", ::DisplayLicense),
   mCarAI(100.0f)
 {
   TRACE_METHOD_ONLY(ONCE_1);

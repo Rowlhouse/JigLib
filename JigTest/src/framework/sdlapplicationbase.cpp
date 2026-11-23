@@ -5,6 +5,7 @@
 #include "sdlapplicationbase.hpp"
 #include "graphics.hpp"
 #include "imageloader.hpp"
+#include "resources.hpp"
 #include <stdio.h>
 #include <string.h>
 #include <vector>
@@ -29,6 +30,7 @@ void tSDLApplicationBase::LoadConfig(int & argc, char * argv[],
   bool configFileOk;
   if (argc > 1)
     configFileName = string(argv[1]);
+  configFileName = GetConfigPath(configFileName);
   mConfigFile = new tConfigFile(configFileName, configFileOk);
 
   if (!configFileOk)

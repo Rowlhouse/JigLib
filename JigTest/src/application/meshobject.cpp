@@ -3,6 +3,7 @@
 //               danny@rowlhouse.freeserve.co.uk
 //======================================================================================================================
 #include "meshobject.hpp"
+#include "resources.hpp"
 
 #include <pugixml.hpp>
 #include "debugconfig.hpp"
@@ -221,7 +222,7 @@ void tMeshObject::LoadMesh(const char* meshXMLFile,
   triangleVertexIndices.clear();
 
   pugi::xml_document doc;
-  pugi::xml_parse_result result = doc.load_file(meshXMLFile);
+  pugi::xml_parse_result result = doc.load_file(GetResourcePath(meshXMLFile).c_str());
   if (!result)
   {
     TRACE("Unable to load %s: %s\n", meshXMLFile, result.description());
