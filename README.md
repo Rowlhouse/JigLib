@@ -72,7 +72,8 @@ The camera moves like the one in Unreal Engine's editor. Fly with `W` `A` `S` `D
 look around by dragging with the right mouse button, and orbit the selected object with Alt and
 the left button. Click an object to select it and drag it to pull it around. Press `X`, `Z` or `N`
 to drop in a box, sphere or capsule (hold Ctrl to fire it from the camera), `\` for a ragdoll and
-`C` for a car, which you can drive with the arrow keys once it's selected. `T` resets the scene.
+`C` for a car, which you can drive with the arrow keys once it's selected (`Tab` gives you a camera
+that follows it). `T` resets the scene.
 
 Press `H` to show or hide the full list of controls in the demo (it's shown at startup), or see
 `JigTest/readme.txt`. The config files are plain text and control most of the scene and physics

@@ -28,6 +28,7 @@ Right drag         look around
 Arrow keys         look around (or drive the selected car)
 Alt + left drag    orbit around the selected object (or the last place clicked)
 Mouse wheel        move forwards / backwards
+Tab                follow the selected object on / off (mouse wheel: distance)
 
 Objects:
 

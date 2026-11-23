@@ -61,6 +61,9 @@ tJigTestApp::tJigTestApp(int & argc, char * argv[])
   mMouseMode = MOUSE_NONE;
   mMousePos = tVector2(0.0f, 0.0f);
   mOrbitPoint = tVector3::Zero();
+  mFollowCamera = false;
+  mFollowDistance = 7.0f;
+  mCameraFollowing = false;
   mShowHelp = true;
 
   tAppConfig::ResetToDefaults();
@@ -242,6 +245,9 @@ void tJigTestApp::HandleKeyDown( const SDL_KeyboardEvent & event )
     break;
   case SDLK_H:
     mShowHelp = !mShowHelp;
+    break;
+  case SDLK_TAB:
+    mFollowCamera = !mFollowCamera;
     break;
   case SDLK_W:
     mCameraMoveDir |= MOVE_FWD;
@@ -563,6 +569,17 @@ void tJigTestApp::HandleMouseWheel( const SDL_MouseWheelEvent & event )
     return;
   }
 
+  // When following an object, it changes how far behind the camera is
+  if (mCameraFollowing)
+  {
+    if (event.y > 0.0f)
+      mFollowDistance *= 0.9f;
+    else
+      mFollowDistance *= 1.1f;
+    Limit(mFollowDistance, SCALAR(2.0f), SCALAR(50.0f));
+    return;
+  }
+
   // Otherwise it moves the camera forwards/backwards
   tScalar step = (SDL_GetModState() & SDL_KMOD_SHIFT) ? 4.0f : 1.0f;
   tCamera * camera = mCameras[0];
@@ -756,13 +773,23 @@ void tJigTestApp::ProcessMainEvent()
   // Update car ai
   mCarAI.Update(iLoop / tAppConfig::mPhysicsFrequency);
 
-  // Move the free camera (unless there's a first-person character, which has its own camera)
+  // Move the camera (unless there's a first-person character, which has its own camera)
   if (mCharacterObjects.empty())
   {
     tScalar dt = GetStartOfFrameTime() - GetOldStartOfFrameTime();
     if (mDoMovie)
       dt = 1.0f / tAppConfig::mPhysicsFrequency;
-    UpdateFreeCamera(dt);
+    tObject * followObject = mFollowCamera ? GetSelectedObject() : 0;
+    if (followObject && followObject->GetBody())
+    {
+      UpdateFollowCamera(followObject);
+    }
+    else
+    {
+      if (mCameraFollowing)
+        StopFollowCamera();
+      UpdateFreeCamera(dt);
+    }
   }
 
   // Do rendering
@@ -827,9 +854,9 @@ void tJigTestApp::ProcessMainEvent()
       mViewports[i]->Render();
       if (tDebugConfig::mRenderCollisionContacts)
         RenderAllContacts(tDebugConfig::mRenderCollisionContacts);
-      // Show the selected object
+      // Show the selected object (but not cars - it gets in the way when driving)
       tObject * selected = GetSelectedObject();
-      if (selected && selected->GetBody())
+      if (selected && selected->GetBody() && !GetSelectedCar())
         selected->RenderWorldBoundingBox(&tVector3::Look()); // look = red
     }
     CheckGLErrors("After viewport renders");
@@ -1317,6 +1344,7 @@ void tJigTestApp::SetupExperiment()
   camera0->SetUp(tVector3::Up());
   SetCameraDirection(tVector3::Zero() - camera0->GetPosition());
   mOrbitPoint = tVector3::Zero();
+  mCameraFollowing = false;
 
   // If there's a car, select it so that the arrow keys drive it
   if (!mCarObjects.empty())
@@ -2549,6 +2577,40 @@ void tJigTestApp::UpdateFreeCamera(tScalar dt)
 }
 
 //======================================================================================================================
+// UpdateFollowCamera
+//======================================================================================================================
+void tJigTestApp::UpdateFollowCamera(tObject * object)
+{
+  if (mCameras.empty())
+    return;
+  // The camera trails behind and above the object, smoothly, keeping it in view
+  tCamera * camera = mCameras[0];
+  if (camera->GetTrackObject() != object)
+  {
+    camera->SetTargetObject(object);
+    camera->SetTrackTarget(object, 8.0f, 3.0f, 50.0f);
+    camera->SetChase(true);
+  }
+  camera->SetPositionOffset(tVector3(-mFollowDistance, 0.0f, 0.0f));
+  mCameraFollowing = true;
+}
+
+//======================================================================================================================
+// StopFollowCamera
+//======================================================================================================================
+void tJigTestApp::StopFollowCamera()
+{
+  mCameraFollowing = false;
+  if (mCameras.empty())
+    return;
+  // Carry on with the free camera, looking the same way
+  tCamera * camera = mCameras[0];
+  SetCameraDirection(camera->GetTarget() - camera->GetPosition());
+  camera->SetTargetObject(0);
+  camera->SetTrackTarget(0, 0, 0, 0);
+}
+
+//======================================================================================================================
 // StartMouseLook
 //======================================================================================================================
 void tJigTestApp::StartMouseLook(int mode)
@@ -2611,6 +2673,7 @@ void tJigTestApp::RenderHelp()
     "Arrow keys\tlook around (or drive the selected car)",
     "Alt + left drag\torbit around the selected object",
     "Mouse wheel\tmove forwards / backwards",
+    "Tab\tfollow the selected object on / off (mouse wheel: distance)",
     "#Objects",
     "Left click\tselect",
     "Left drag\tpull it around (mouse wheel: nearer / further)",
@@ -2662,7 +2725,10 @@ void tJigTestApp::RenderHelp()
   {
     lines.push_back("H\thelp");
     if (GetSelectedCar())
+    {
       lines.push_back("Arrow keys\tdrive the selected car");
+      lines.push_back("Tab\tfollow camera on / off");
+    }
   }
   DrawTextPanel(lines, margin, margin, fontSize);
 }

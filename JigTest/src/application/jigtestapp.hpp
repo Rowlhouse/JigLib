@@ -115,6 +115,9 @@ private:
 
   // The free camera
   void UpdateFreeCamera(JigLib::tScalar dt);
+  // The follow camera trails behind an object
+  void UpdateFollowCamera(class tObject * object);
+  void StopFollowCamera();
   // Turns the camera by these angles (degrees). If orbit is set then the camera also moves around
   // the orbit pivot.
   void RotateCamera(JigLib::tScalar deltaYaw, JigLib::tScalar deltaPitch, bool orbit);
@@ -196,6 +199,12 @@ private:
 
   // The camera orbits around the selected object, or this point (the last place clicked)
   JigLib::tVector3 mOrbitPoint;
+
+  // Follow the selected object (toggled with Tab), how far behind, and whether the camera is
+  // following something at the moment
+  bool mFollowCamera;
+  JigLib::tScalar mFollowDistance;
+  bool mCameraFollowing;
 
   // Show the help overlay
   bool mShowHelp;
